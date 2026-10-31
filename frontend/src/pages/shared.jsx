@@ -731,8 +731,11 @@ export function JobDetails({ prefix = '', canApply = false }) {
                           className="btn btn-warning rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm text-dark cc-profile-incomplete-cta"
                         >
                           <User size={15} />
-                          <span className="cc-profile-incomplete-cta-label">Complete My Profile ({100 - studentProfileCompletion}% remaining)</span>
-                          <ArrowRight size={15} />
+                          <span className="cc-profile-incomplete-cta-label">
+                            <span className="cc-profile-incomplete-cta-desktop">Complete My Profile ({100 - studentProfileCompletion}% remaining)</span>
+                            <span className="cc-profile-incomplete-cta-mobile">Complete Profile · {100 - studentProfileCompletion}% left</span>
+                          </span>
+                          <ArrowRight className="cc-profile-incomplete-cta-arrow" size={15} />
                         </Link>
                         <button
                           type="button"
@@ -741,7 +744,7 @@ export function JobDetails({ prefix = '', canApply = false }) {
                           style={{ cursor: 'not-allowed', opacity: 0.65 }}
                         >
                           <Lock size={13} />
-                          <span>Apply Locked (100% Profile Required)</span>
+                          <span className="cc-profile-locked-label">Apply Locked (100% Profile Required)</span>
                         </button>
                       </div>
                     </div>

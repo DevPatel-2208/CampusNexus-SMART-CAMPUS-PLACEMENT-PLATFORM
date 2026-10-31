@@ -7531,6 +7531,7 @@ aside.cc-sidebar.cc-ss-student.is-collapsed [data-tip]:hover::after {
 .cc-profile-incomplete-cta > svg,
 .cc-profile-locked-cta > svg { flex: 0 0 auto; }
 .cc-profile-incomplete-cta-label { min-width: 0; overflow-wrap: anywhere; }
+.cc-profile-incomplete-cta-mobile { display: none; }
 
 @media (max-width: 768px) {
   .cc-profile-incomplete-card { padding: 14px; }
@@ -7550,6 +7551,24 @@ aside.cc-sidebar.cc-ss-student.is-collapsed [data-tip]:hover::after {
   .cc-stepper-wrap::before {
     display: none;
   }
+}
+
+@media (max-width: 576px) {
+  .cc-profile-incomplete-card { padding: 12px; }
+  .cc-profile-incomplete-header { gap: 8px; margin-bottom: 10px; }
+  .cc-profile-incomplete-copy { margin-bottom: 11px; font-size: .78rem; }
+  .cc-profile-incomplete-cta,
+  .cc-profile-locked-cta {
+    min-height: 40px;
+    padding: 7px 9px;
+    gap: 6px !important;
+    font-size: .77rem;
+  }
+  .cc-profile-incomplete-cta-desktop { display: none; }
+  .cc-profile-incomplete-cta-mobile { display: inline; }
+  .cc-profile-incomplete-cta-arrow { display: none; }
+  .cc-profile-incomplete-cta-label { line-height: 1.2; }
+  .cc-profile-locked-label { line-height: 1.2; }
 }
 
 /* ============================================================
