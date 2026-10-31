@@ -1,0 +1,78 @@
+# ============================================================
+# CareerConnect — Root Git Ignore
+# ============================================================
+
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Environment variables & secrets (NEVER COMMIT CREDENTIALS)
+.env
+.env.local
+.env.*.local
+*.env
+backend/.env
+frontend/.env
+*.pem
+*.key
+*.cert
+
+# Production & Build outputs
+dist/
+build/
+out/
+.next/
+frontend/dist/
+
+# Logs & debugging output
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.err
+backend/server.log
+backend/server.err
+frontend/dev-server.log
+frontend/vite-dev.log
+frontend/vite-dev2.log
+
+# Vite & build runtime cache
+.vite/
+*.timestamp-*.mjs
+
+# Ephemeral user uploads (Keep directory structure with .gitkeep)
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/uploads/resumes/*
+!backend/uploads/resumes/.gitkeep
+backend/uploads/profile_photos/*
+!backend/uploads/profile_photos/.gitkeep
+backend/uploads/company_logos/*
+!backend/uploads/company_logos/.gitkeep
+backend/uploads/company_documents/*
+!backend/uploads/company_documents/.gitkeep
+backend/uploads/offer_letters/*
+!backend/uploads/offer_letters/.gitkeep
+
+# Operating system artifacts
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE & Editor configurations
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.bak
