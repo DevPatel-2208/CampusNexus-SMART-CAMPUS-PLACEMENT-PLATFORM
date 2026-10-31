@@ -43,6 +43,7 @@ const env = {
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
   GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI || '',
   ALLOW_SEED: process.env.ALLOW_SEED === 'true',
+  RESEND_API_KEY: process.env.RESEND_API_KEY || '',
 };
 
 if (env.NODE_ENV === 'production') {

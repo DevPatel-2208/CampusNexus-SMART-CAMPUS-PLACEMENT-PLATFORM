@@ -38,5 +38,7 @@ services:
         value: CampusNexus <devkpatel426@gmail.com>
       - key: MAIL_REQUIRED
         value: "false"
+      - key: RESEND_API_KEY
+        sync: false
       - key: ALLOW_SEED
         value: "false"

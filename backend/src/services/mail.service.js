@@ -26,6 +26,33 @@ function getTransporter() {
 }
 
 async function sendMail(to, subject, html) {
+  // 1. If RESEND_API_KEY is present, send via Resend HTTPS REST API (Port 443 - never blocked by cloud firewalls like Render Free Tier)
+  if (env.RESEND_API_KEY) {
+    try {
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: 'CampusNexus <onboarding@resend.dev>',
+          to: [to],
+          subject,
+          html,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data?.id) {
+        console.log(`[mail:resend:sent] to=${to} messageId=${data.id}`);
+        return { sent: true, messageId: data.id };
+      }
+      console.warn('[mail:resend:warn] Resend API failed, falling back to SMTP:', data);
+    } catch (err) {
+      console.error('[mail:resend:error] Fallback to SMTP:', err.message);
+    }
+  }
+
   const tx = getTransporter();
   // Always use authenticated SMTP_USER address if MAIL_FROM is missing or uses local domain
   const from = (env.SMTP_USER && (!env.MAIL_FROM || env.MAIL_FROM.includes('campusnexus.local')))
