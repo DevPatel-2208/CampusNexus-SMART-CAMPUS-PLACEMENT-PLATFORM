@@ -9,7 +9,8 @@
     "test": "jest --runInBand --forceExit",
     "migrate": "node scripts/migrate-mysql-to-mongodb.js",
     "seed": "node scripts/seed.js",
-    "seed:companies-jobs": "node scripts/seedCompaniesAndJobs.js"
+    "seed:companies-jobs": "node scripts/seedCompaniesAndJobs.js",
+    "seed:assessments": "node scripts/seed-assessments.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
