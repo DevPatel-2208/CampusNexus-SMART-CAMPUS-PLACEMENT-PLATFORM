@@ -115,6 +115,8 @@ export function KpiGrid({ children, className = '' }) {
 export function PageHeader({ title, description, icon, eyebrow, actions, meta, className = '' }) {
   return (
     <div className={`cc-page-header ${className}`.trim()}>
+      <div className="cc-page-header-glow" aria-hidden="true" />
+      <div className="cc-page-header-glow-2" aria-hidden="true" />
       <div className="cc-page-header-main">
         {icon && <span className="cc-page-header-icon">{icon}</span>}
         <div className="cc-page-header-text">

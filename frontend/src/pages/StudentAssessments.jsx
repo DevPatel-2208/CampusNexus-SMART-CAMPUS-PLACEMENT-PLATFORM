@@ -138,6 +138,7 @@ export function Assessments() {
     <div className="cc-page cc-assessments-page">
       <PageHeader
         title="Assessments & Tests"
+        eyebrow="Online Evaluations"
         description="Online technical tests, aptitude evaluations, and screening exams assigned by hiring partners."
         icon={<FileText size={26} />}
         actions={(
@@ -873,6 +874,7 @@ export function Interviews() {
     <div className="cc-page cc-interviews-page">
       <PageHeader
         title="Interviews & Rounds"
+        eyebrow="Campus Hiring Rounds"
         description="Track your technical interviews, campus drive discussions, and join live online meetings."
         icon={<Video size={26} />}
         actions={(
@@ -1247,6 +1249,7 @@ export function Offers() {
     <div className="cc-page cc-offers-page">
       <PageHeader
         title="Job Offers & Letters"
+        eyebrow="Corporate Offers"
         description="Review formal job offers, compensation packages, and appointment letters from campus recruiters."
         icon={<Award size={26} />}
         actions={(
@@ -1600,6 +1603,7 @@ export function PlacementStatus() {
     <div className="cc-page cc-placement-status-page">
       <PageHeader
         title="Placement Status"
+        eyebrow="Milestones & Verification"
         description="Your overall placement journey, verified achievements, and confirmed college records."
         icon={<Trophy size={26} />}
         actions={(
