@@ -4,6 +4,9 @@ dist/
 dist-ssr/
 .env
 .env.*
+!.env.example
+!.env.development
+!.env.production
 *.local
 *.log
 .vite/

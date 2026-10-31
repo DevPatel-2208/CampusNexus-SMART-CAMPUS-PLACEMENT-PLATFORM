@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Support both standard VITE_API_BASE_URL and legacy VITE_API_URL
-const rawBase = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5002/api/v1').trim();
+const rawBase = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '/api/v1').trim();
 const normalizedBase = rawBase.replace(/\/+$/, '').endsWith('/api/v1')
   ? rawBase.replace(/\/+$/, '')
   : `${rawBase.replace(/\/+$/, '')}/api/v1`;

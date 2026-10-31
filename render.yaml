@@ -12,8 +12,8 @@ services:
         value: production
       - key: MONGO_URI
         sync: false
-      - key: CLIENT_URL
-        sync: false
+      - key: CORS_ORIGIN
+        value: https://campusnexus-placement-platform.netlify.app
       - key: JWT_ACCESS_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET

@@ -16,7 +16,7 @@ const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: parseInt(process.env.PORT || '5002', 10),
   MONGO_URI: process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/careerconnect',
-  CLIENT_URL: (process.env.CLIENT_URL || process.env.CORS_ORIGIN || 'http://localhost:5173')
+  CORS_ORIGINS: (process.env.CORS_ORIGIN || process.env.CLIENT_URL || 'http://localhost:5173,https://campusnexus-placement-platform.netlify.app')
     .split(',')
     .map((s) => s.trim().replace(/\/+$/, ''))
     .filter(Boolean),

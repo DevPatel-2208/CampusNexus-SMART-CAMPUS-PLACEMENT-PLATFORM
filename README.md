@@ -98,17 +98,15 @@ CampusNexus/
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/careerconnect.git
+git clone <your-repository-url>
 cd careerconnect
 
-# Install all dependencies (or run individually in frontend/ and backend/)
-npm run install:all
-```
-
-Or install in each directory:
-```bash
-cd backend && npm install
-cd ../frontend && npm install
+# Install in each app directory (works in Windows PowerShell and Command Prompt)
+cd backend
+npm install
+cd ../frontend
+npm install
+cd ..
 ```
 
 ---
@@ -116,9 +114,9 @@ cd ../frontend && npm install
 ### 2. Configure Environment Variables
 
 #### Backend (`backend/.env`)
-Copy the backend template:
-```bash
-cp backend/.env.example backend/.env
+Copy the backend template in PowerShell:
+```powershell
+Copy-Item backend/.env.example backend/.env
 ```
 
 Edit `backend/.env`:
@@ -126,7 +124,7 @@ Edit `backend/.env`:
 PORT=5002
 NODE_ENV=development
 MONGO_URI=mongodb://127.0.0.1:27017/careerconnect
-CLIENT_URL=http://localhost:5173
+CORS_ORIGIN=http://localhost:5173,https://campusnexus-placement-platform.netlify.app
 
 # Strong random secrets (at least 32 characters in production)
 JWT_ACCESS_SECRET=your-secure-access-secret-at-least-32-chars-long
@@ -147,16 +145,17 @@ GROQ_API_KEY=
 GROQ_MODEL=qwen/qwen3.8-27b
 ```
 
-#### Frontend (`frontend/.env`)
-Copy the frontend template:
-```bash
-cp frontend/.env.example frontend/.env
+#### Frontend
+`frontend/.env.development` and `frontend/.env.production` are safe, committed configuration files. Local Vite uses the `/api/v1` proxy to reach `http://localhost:5002`; production uses the Render API URL. You can copy `.env.example` to `.env.local` to override either value on your machine (that file is ignored by Git):
+```powershell
+Copy-Item frontend/.env.example frontend/.env.local
 ```
 
-Edit `frontend/.env`:
+For local development, the default is:
 ```env
-VITE_API_BASE_URL=http://localhost:5002/api/v1
+VITE_API_BASE_URL=/api/v1
 ```
+The centralized Axios client adds `/api/v1` when a server origin is supplied without the prefix. No API keys or secrets belong in frontend variables.
 
 ---
 
@@ -178,7 +177,7 @@ Open two separate terminals:
 **Terminal 1 — Backend API:**
 ```bash
 cd backend
-npm start
+npm run dev
 # Server listens on http://localhost:5002
 ```
 
@@ -221,9 +220,9 @@ Navigate to **`http://localhost:5173`** in your browser.
    | Key | Value | Note |
    |---|---|---|
    | `NODE_ENV` | `production` | Enables production optimizations & checks |
-   | `PORT` | `10000` | Or leave Render default (auto-injected) |
+   | `PORT` | Render assigned | Leave unset; the server uses Render's injected port (local fallback: 5002) |
    | `MONGO_URI` | `mongodb+srv://...` | Your MongoDB Atlas connection string |
-   | `CORS_ORIGIN` | `https://your-site.netlify.app` | Your deployed Netlify URL (comma-separated if multiple) |
+   | `CORS_ORIGIN` | `https://campusnexus-placement-platform.netlify.app` | Exact allowed origin(s), comma-separated |
    | `JWT_ACCESS_SECRET` | *32+ random characters* | e.g. `openssl rand -hex 32` |
    | `JWT_REFRESH_SECRET` | *32+ random characters* | e.g. `openssl rand -hex 32` |
    | `JWT_ACCESS_EXPIRES` | `15m` | Token expiration |
@@ -238,7 +237,7 @@ Navigate to **`http://localhost:5173`** in your browser.
 5. Click **Create Web Service**.
 6. Once deployed, test your live health endpoint:
    ```text
-   https://campusnexus-api.onrender.com/health
+   https://campusnexus-backend-7myy.onrender.com/health
    # Returns: {"status":"ok","uptime":...,"service":"CampusNexus Backend API"}
    ```
 
@@ -251,16 +250,12 @@ Navigate to **`http://localhost:5173`** in your browser.
 3. Configure the build settings (these match the included `netlify.toml`):
    - **Base directory:** `frontend`
    - **Build command:** `npm run build`
-   - **Publish directory:** `frontend/dist`
+   - **Publish directory:** `dist` (relative to the `frontend` base directory)
 4. Under **Site configuration** → **Environment variables**, add:
    | Key | Value |
    |---|---|
-   | `VITE_API_BASE_URL` | `https://campusnexus-api.onrender.com/api/v1` |
-5. Click **Deploy Site**.
-6. Once Netlify finishes deploying:
-   - Copy your Netlify URL (e.g. `https://campusnexus-demo.netlify.app`).
-   - Return to Render and update `CORS_ORIGIN` with your actual Netlify URL:
-     `CORS_ORIGIN=https://campusnexus-demo.netlify.app`
+   | `VITE_API_BASE_URL` | `https://campusnexus-backend-7myy.onrender.com` |
+5. The root `netlify.toml` also supplies this safe public URL and configures the SPA fallback. Set the variable in Netlify if you use a different backend.
 
 ---
 
@@ -287,7 +282,7 @@ The backend includes zero-dependency health monitoring endpoints for Render and 
 
 | Issue | Root Cause | Solution |
 |---|---|---|
-| **CORS error in browser** | Frontend origin not allowlisted | In Render, ensure `CORS_ORIGIN` matches your exact Netlify domain (no trailing slash). |
+| **CORS error in browser** | Frontend origin not allowlisted or the service has old settings | Set Render `CORS_ORIGIN` to the exact frontend origin (scheme and host, no path or trailing slash), then redeploy/restart the backend. OPTIONS is handled by the global CORS middleware before routes. |
 | **Page Refresh 404 on Netlify** | SPA client-side routing fallback missing | `frontend/public/_redirects` and `netlify.toml` include `/* /index.html 200` to resolve all sub-paths. |
 | **MongoDB connection timeout** | Atlas IP allowlist blocking Render | In Atlas &rarr; Network Access &rarr; add `0.0.0.0/0` to allow dynamic Render IP addresses. |
 | **JWT startup error on Render** | Secrets shorter than 32 characters | Set `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` to random 32+ character strings. |
@@ -300,7 +295,7 @@ The backend includes zero-dependency health monitoring endpoints for Render and 
 - **Credential Isolation:** `.gitignore` excludes all `.env` files, credentials, upload files, and debug logs.
 - **Strict Headers:** `helmet()` sets security headers (`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`).
 - **NoSQL Injection Prevention:** `express-mongo-sanitize` scrubs request bodies, params, and queries.
-- **Secure Cookies:** Refresh tokens use `httpOnly`, `sameSite: 'lax'`, and `secure` in production.
+- **Secure Cookies:** Refresh tokens are `httpOnly`; local uses `sameSite: 'lax'`, while the cross-site Netlify-to-Render production flow uses `sameSite: 'none'` and `secure` over HTTPS.
 - **Role Isolation:** Multi-level middleware verifies authentication token and enforces role-specific permissions (`student`, `company`, `tpo`).
 
 ---

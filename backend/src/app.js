@@ -6,23 +6,15 @@ const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 const env = require('./config/env');
+const corsOptions = require('./middleware/cors');
 const { notFound, errorHandler } = require('./middleware/validate');
 
 const app = express();
 app.set('trust proxy', 1);
+// Install CORS before the other middleware and routes so preflight requests and
+// application error responses retain the appropriate browser access headers.
+app.use(cors(corsOptions));
 app.use(helmet({ crossOriginResourcePolicy: false }));
-
-const allowedOrigins = env.CLIENT_URL;
-app.use(cors({
-  origin(origin, cb) {
-    if (!origin) return cb(null, true);
-    const clean = origin.replace(/\/+$/, '');
-    if (allowedOrigins.includes(clean)) return cb(null, true);
-    if (env.NODE_ENV !== 'production' && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(clean)) return cb(null, true);
-    return cb(null, false);
-  },
-  credentials: true,
-}));
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
