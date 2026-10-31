@@ -7,7 +7,7 @@ import {
   ShieldAlert, ShieldCheck, Sparkles, Target, Trophy, Wifi, WifiOff
 } from 'lucide-react';
 import { Loading } from '../components/ui';
-import api, { apiErrorMessage } from '../services/api';
+import api, { apiErrorMessage, fileUrl } from '../services/api';
 import { confirmAction } from '../services/alerts';
 
 const VIOLATIONS = ['TAB_SWITCH', 'WINDOW_BLUR', 'FULLSCREEN_EXIT', 'COPY_ATTEMPT', 'PASTE_ATTEMPT', 'CUT_ATTEMPT', 'CONTEXT_MENU', 'SHORTCUT_ATTEMPT', 'PRINTSCREEN_ATTEMPT', 'NETWORK_INTERRUPTION', 'SAVE_FAIL'];
@@ -24,6 +24,7 @@ export function AssessmentOpen() {
   const [assessment, setAssessment] = useState(null);
   const [attempt, setAttempt] = useState(null);
   const [error, setError] = useState(null);
+  const [logoFailed, setLogoFailed] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -132,13 +133,28 @@ export function AssessmentOpen() {
         {/* Company & Assessment Header */}
         <div className="cc-exam-hero-header">
           <div className="d-flex align-items-center gap-3">
-            <div className="cc-exam-co-avatar">
-              {assessment.company?.logo ? (
-                <img src={assessment.company.logo} alt={assessment.company.companyName} />
-              ) : (
-                <span>{coInitial}</span>
-              )}
-            </div>
+            {(() => {
+              const companyLogo = assessment.company?.logo;
+              const hasValidLogo = Boolean(
+                companyLogo &&
+                typeof companyLogo === 'string' &&
+                (companyLogo.startsWith('http') || companyLogo.startsWith('/') || companyLogo.includes('.')) &&
+                !logoFailed
+              );
+              return (
+                <div className="cc-exam-co-avatar" title={assessment.company?.companyName || 'Hiring Partner'}>
+                  {hasValidLogo ? (
+                    <img
+                      src={fileUrl(companyLogo)}
+                      alt=""
+                      onError={() => setLogoFailed(true)}
+                    />
+                  ) : (
+                    <span>{coInitial}</span>
+                  )}
+                </div>
+              );
+            })()}
             <div>
               <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
                 <span className="cc-exam-co-name">{assessment.company?.companyName || 'Campus Hiring Partner'}</span>
