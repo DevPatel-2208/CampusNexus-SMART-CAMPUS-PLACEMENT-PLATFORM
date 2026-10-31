@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Check, CheckCircle2, ChevronLeft, ChevronRight, Clock, Maximize, Shield, ShieldAlert, Wifi, WifiOff } from 'lucide-react';
+import {
+  AlertCircle, ArrowLeft, Award, Briefcase, Building2, Check, CheckCircle2,
+  ChevronLeft, ChevronRight, Clock, HelpCircle, Layers, Maximize, Shield,
+  ShieldAlert, ShieldCheck, Sparkles, Target, Trophy, Wifi, WifiOff
+} from 'lucide-react';
+import { Loading } from '../components/ui';
 import api, { apiErrorMessage } from '../services/api';
 import { confirmAction } from '../services/alerts';
 
@@ -15,6 +20,36 @@ export function AssessmentOpen() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [agreed, setAgreed] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [assessment, setAssessment] = useState(null);
+  const [attempt, setAttempt] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    Promise.all([
+      api.get('/assessments/' + id),
+      api.get('/attempts/mine').catch(() => ({ data: { data: [] } })),
+    ])
+      .then(([resAsmt, resAtt]) => {
+        if (!mounted) return;
+        const asmt = resAsmt.data?.data || null;
+        setAssessment(asmt);
+        const allAttempts = resAtt.data?.data || [];
+        const existing = allAttempts.find((att) => {
+          const aid = att.assessment?._id || att.assessment;
+          return String(aid) === String(id);
+        });
+        setAttempt(existing || null);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        setError(apiErrorMessage(err));
+        setLoading(false);
+      });
+    return () => { mounted = false; };
+  }, [id]);
 
   useEffect(() => {
     const receiveSubmission = (event) => {
@@ -22,7 +57,7 @@ export function AssessmentOpen() {
       if (event.data?.type !== 'campusnexus:assessment-submitted' && event.data?.type !== 'careerconnect:assessment-submitted') return;
       const attemptId = String(event.data.attemptId || '');
       if (!/^[a-f\d]{24}$/i.test(attemptId)) return;
-      navigate(`/student/attempt/${attemptId}`, { replace: true });
+      navigate('/student/attempt/' + attemptId, { replace: true });
     };
     window.addEventListener('message', receiveSubmission);
     return () => window.removeEventListener('message', receiveSubmission);
@@ -30,42 +65,249 @@ export function AssessmentOpen() {
 
   const openExam = () => {
     if (!agreed) return;
-    const sessionKey = `cc-exam-session:${id}`;
+    const sessionKey = 'cc-exam-session:' + id;
     let sessionId = sessionStorage.getItem(sessionKey) || sessionStorage.getItem('cc-exam-session');
     if (!sessionId) {
-      sessionId = window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      sessionId = window.crypto?.randomUUID?.() || Date.now() + '-' + Math.random().toString(36).slice(2);
       sessionStorage.setItem(sessionKey, sessionId);
     }
-    const url = `${window.location.origin}/student/exam/${id}?session=${encodeURIComponent(sessionId)}`;
+    const url = window.location.origin + '/student/exam/' + id + '?session=' + encodeURIComponent(sessionId);
     const width = Math.min(window.screen.availWidth || 1440, 1600);
     const height = Math.min(window.screen.availHeight || 900, 1000);
-    const examWindow = window.open(url, '_blank', `popup=yes,width=${width},height=${height},left=20,top=20,resizable=yes,scrollbars=yes`);
+    const examWindow = window.open(url, '_blank', 'popup=yes,width=' + width + ',height=' + height + ',left=20,top=20,resizable=yes,scrollbars=yes');
     if (!examWindow) {
       toast.info('Popup blocked. Opening the secure assessment in this tab.');
-      navigate(`/student/exam/${id}?session=${encodeURIComponent(sessionId)}`);
+      navigate('/student/exam/' + id + '?session=' + encodeURIComponent(sessionId));
       return;
     }
     examWindow.focus();
   };
 
-  return (
-    <div className="cc-exam-intro">
-      <Link className="cc-exam-back" to="/student/assessments"><ChevronLeft size={16} /> My assessments</Link>
-      <section className="cc-exam-intro-card">
-        <div className="cc-exam-intro-icon"><Shield size={25} /></div>
-        <span className="cc-exam-eyebrow">SECURE ASSESSMENT</span>
-        <h1>Get ready for your assessment</h1>
-        <p className="cc-exam-intro-copy">Your exam opens in a dedicated window. Enter fullscreen there before the server timer starts. Your answers save automatically.</p>
-        <div className="cc-exam-rule-grid">
-          <div><CheckCircle2 size={18} /><span>Questions appear one at a time. You can move between them.</span></div>
-          <div><Clock size={18} /><span>The server controls the timer. Leaving does not pause it.</span></div>
-          <div><ShieldAlert size={18} /><span>Leaving the exam, fullscreen, or using copy and paste is recorded.</span></div>
-          <div><Check size={18} /><span>Three integrity violations block and submit the attempt.</span></div>
+  if (loading) {
+    return (
+      <div className="cc-exam-intro-wrap">
+        <Loading rows={4} height={120} />
+      </div>
+    );
+  }
+
+  if (error || !assessment) {
+    return (
+      <div className="cc-exam-intro-wrap">
+        <div className="cc-exam-intro-card text-center p-5">
+          <div className="cc-exam-intro-icon mx-auto bg-danger-subtle text-danger">
+            <AlertCircle size={28} />
+          </div>
+          <h2 className="h4 fw-bold mt-3 mb-2">Unable to Load Assessment</h2>
+          <p className="text-muted mb-4">{error || 'This assessment could not be found or you do not have permission to view it.'}</p>
+          <Link to="/student/assessments" className="btn btn-primary rounded-pill px-4">
+            <ArrowLeft size={16} className="me-2" /> Return to My Assessments
+          </Link>
         </div>
-        <label className="cc-exam-agreement"><input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} /><span>I have read and agree to follow these assessment instructions.</span></label>
-        <button className="btn btn-primary cc-exam-open-btn" disabled={!agreed} onClick={openExam}><Maximize size={16} /> Open secure exam window <ChevronRight size={16} /></button>
-        <p className="cc-exam-popup-note">If your browser blocks pop-ups, the exam opens in this tab.</p>
-      </section>
+      </div>
+    );
+  }
+
+  const coInitial = String(assessment.company?.companyName || 'C')[0]?.toUpperCase() || 'C';
+  const diffKey = String(assessment.difficulty || 'medium').toLowerCase();
+  const isSubmitted = attempt?.status === 'submitted';
+  const isPassed = attempt && attempt.percentage >= (assessment.passingPercentage || 60);
+
+  return (
+    <div className="cc-exam-intro-wrap">
+      {/* Top Navigation */}
+      <div className="cc-exam-nav-bar mb-4">
+        <Link className="cc-exam-back-link" to="/student/assessments">
+          <ArrowLeft size={16} />
+          <span>Back to All Assessments</span>
+        </Link>
+        <span className="cc-exam-status-badge">
+          <span className="cc-exam-live-dot" />
+          Proctored Session
+        </span>
+      </div>
+
+      {/* Main Container Card */}
+      <div className="cc-exam-intro-card">
+        {/* Company & Assessment Header */}
+        <div className="cc-exam-hero-header">
+          <div className="d-flex align-items-center gap-3">
+            <div className="cc-exam-co-avatar">
+              {assessment.company?.logo ? (
+                <img src={assessment.company.logo} alt={assessment.company.companyName} />
+              ) : (
+                <span>{coInitial}</span>
+              )}
+            </div>
+            <div>
+              <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
+                <span className="cc-exam-co-name">{assessment.company?.companyName || 'Campus Hiring Partner'}</span>
+                {assessment.job?.title && (
+                  <span className="cc-exam-role-badge">
+                    <Briefcase size={12} /> {assessment.job.title}
+                  </span>
+                )}
+              </div>
+              <h1 className="cc-exam-hero-title">{assessment.title}</h1>
+              <div className="cc-table-tags-row mt-2">
+                <span className="cc-table-tag cc-table-tag-cat">
+                  <Layers size={12} className="me-1" />
+                  {assessment.categories || 'Technical & Aptitude'}
+                </span>
+                <span className={'cc-table-tag cc-table-tag-diff cc-diff-' + diffKey}>
+                  {assessment.difficulty || 'Medium'} Difficulty
+                </span>
+                {assessment.technology && (
+                  <span className="cc-table-tag cc-table-tag-cat">
+                    Stack: {assessment.technology}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4 Metric Stats Strip */}
+        <div className="cc-exam-metrics-grid">
+          <div className="cc-exam-metric-box">
+            <div className="cc-exam-metric-icon text-warning">
+              <Clock size={20} />
+            </div>
+            <div>
+              <div className="cc-exam-metric-value">{assessment.durationMinutes || 30} mins</div>
+              <div className="cc-exam-metric-label">Total Duration</div>
+            </div>
+          </div>
+
+          <div className="cc-exam-metric-box">
+            <div className="cc-exam-metric-icon text-info">
+              <HelpCircle size={20} />
+            </div>
+            <div>
+              <div className="cc-exam-metric-value">{assessment.questionCount || assessment.numQuestions || 10} Qs</div>
+              <div className="cc-exam-metric-label">Multiple Choice</div>
+            </div>
+          </div>
+
+          <div className="cc-exam-metric-box">
+            <div className="cc-exam-metric-icon text-success">
+              <Target size={20} />
+            </div>
+            <div>
+              <div className="cc-exam-metric-value">{assessment.passingPercentage || 60}%</div>
+              <div className="cc-exam-metric-label">Passing Criteria</div>
+            </div>
+          </div>
+
+          <div className="cc-exam-metric-box">
+            <div className="cc-exam-metric-icon text-primary">
+              <Award size={20} />
+            </div>
+            <div>
+              <div className="cc-exam-metric-value">{assessment.totalMarks || 100} Pts</div>
+              <div className="cc-exam-metric-label">Maximum Score</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Assessment Description if available */}
+        {assessment.description && (
+          <div className="cc-exam-desc-box mb-4">
+            <h3 className="h6 fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+              <Sparkles size={16} className="text-primary" /> Assessment Overview
+            </h3>
+            <p className="text-muted small mb-0">{assessment.description}</p>
+          </div>
+        )}
+
+        {/* Proctoring & Examination Rules */}
+        <div className="cc-exam-rules-section mb-4">
+          <h3 className="cc-exam-rules-title">
+            <ShieldCheck size={18} className="text-success" /> Security & Proctoring Instructions
+          </h3>
+          <div className="cc-exam-rule-grid">
+            <div className="cc-exam-rule-card">
+              <CheckCircle2 size={18} className="text-success flex-shrink-0" />
+              <div>
+                <strong>Fullscreen Viewport Enforced</strong>
+                <p>The assessment opens in an isolated window. Exiting fullscreen mode or resizing is flagged immediately.</p>
+              </div>
+            </div>
+            <div className="cc-exam-rule-card">
+              <Clock size={18} className="text-warning flex-shrink-0" />
+              <div>
+                <strong>Continuous Server Timer</strong>
+                <p>The timer runs centrally on the server. Navigating away or closing the tab will not pause your remaining time.</p>
+              </div>
+            </div>
+            <div className="cc-exam-rule-card">
+              <ShieldAlert size={18} className="text-danger flex-shrink-0" />
+              <div>
+                <strong>Tab-Switch & Clipboard Monitoring</strong>
+                <p>Loss of focus, window switching, and copy/paste attempts are logged in real-time integrity telemetry.</p>
+              </div>
+            </div>
+            <div className="cc-exam-rule-card">
+              <Check size={18} className="text-primary flex-shrink-0" />
+              <div>
+                <strong>Instant Question Auto-Save</strong>
+                <p>Answers are saved automatically as you select them. 3 integrity violations will lock and auto-submit the exam.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action / Launch Area */}
+        {isSubmitted ? (
+          <div className="cc-exam-completed-banner">
+            <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
+              <div className="d-flex align-items-center gap-3">
+                <div className={'cc-exam-score-pill ' + (isPassed ? 'passed' : 'failed')}>
+                  {isPassed ? <Trophy size={22} /> : <AlertCircle size={22} />}
+                  <span>{attempt.percentage ?? 0}%</span>
+                </div>
+                <div>
+                  <h4 className="h6 fw-bold mb-0">Assessment Already Submitted</h4>
+                  <p className="small text-muted mb-0">
+                    Result: <strong className={isPassed ? 'text-success' : 'text-danger'}>{isPassed ? 'Qualified / Passed' : 'Did Not Clear'}</strong> • Score: {attempt.score ?? 0} / {assessment.totalMarks || 100}
+                  </p>
+                </div>
+              </div>
+              <Link to={'/student/attempt/' + attempt._id} className="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold">
+                View Full Attempt Scorecard <ChevronRight size={16} />
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="cc-exam-action-box">
+            <label className="cc-exam-agreement">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+              />
+              <span>
+                I confirm that I am in a quiet environment, have read the examination guidelines, and agree to adhere to CampusNexus proctoring integrity policies.
+              </span>
+            </label>
+
+            <button
+              type="button"
+              className="btn btn-primary cc-exam-launch-btn"
+              disabled={!agreed}
+              onClick={openExam}
+            >
+              <Maximize size={18} />
+              <span>Launch Secure Exam Window</span>
+              <ChevronRight size={18} />
+            </button>
+
+            <p className="cc-exam-popup-note">
+              Note: If your browser blocks pop-ups, please allow pop-ups for this domain, or the exam will open in the current tab.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

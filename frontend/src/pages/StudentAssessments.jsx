@@ -285,7 +285,7 @@ export function Assessments() {
                             <Link to={`/student/assessments/${a._id}`} className="cc-table-test-name text-truncate d-block" title={a.title}>
                               {a.title}
                             </Link>
-                            <div className="d-flex align-items-center gap-1.5 mt-1 flex-wrap">
+                            <div className="cc-table-tags-row">
                               <span className="cc-table-tag cc-table-tag-cat">{a.categories || 'Technical'}</span>
                               <span className={`cc-table-tag cc-table-tag-diff cc-diff-${diffKey}`}>
                                 {a.difficulty || 'Medium'}
