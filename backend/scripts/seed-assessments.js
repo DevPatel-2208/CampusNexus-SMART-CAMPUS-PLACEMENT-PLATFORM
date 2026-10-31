@@ -1322,119 +1322,238 @@ const assessmentsData = [
     ],
   },
 
-  // 12. OmniCart Commerce - Full Stack Engineer (Node.js & React)
+  // 13. EduSphere Learning Systems - EdTech Full Stack Engineer (MERN)
   {
-    companyName: 'OmniCart Commerce',
-    jobTitle: 'Full Stack Engineer (Node.js & React)',
-    title: 'Scalable E-Commerce Web Platforms & API Architecture Test',
-    description: 'Comprehensive evaluation covering high-throughput e-commerce catalog search, Redis caching strategies, order inventory locks, checkout workflows, and resilient API design.',
-    durationMinutes: 35,
+    companyName: 'EduSphere Learning Systems',
+    jobTitle: 'EdTech Full Stack Engineer (MERN)',
+    title: 'EdTech Web Architecture & MERN Stack Screening',
+    description: 'Specialized full-stack assessment testing interactive web application development, real-time client-server communication, MongoDB aggregations, and responsive frontend architecture.',
+    durationMinutes: 45,
     totalMarks: 100,
     marksPerQuestion: 10,
     numQuestions: 10,
     difficulty: 'Medium',
     categories: 'Technical',
-    technology: 'Full Stack (Node.js, React, Redis, Caching)',
+    technology: 'MERN Stack, WebSockets, MongoDB',
     passingPercentage: 60,
     negativeMarking: false,
     questions: [
       {
-        question: 'In high-traffic e-commerce flash sales, how can product inventory over-selling be prevented when thousands of users click "Buy Now" simultaneously?',
+        question: 'In real-time educational portals, what protocol is best suited for bi-directional, low-latency live quiz and chat communication between student and instructor?',
         questionType: 'MCQ',
-        optionA: 'By executing atomic Redis DECR / Lua script checks or database conditional updates (UPDATE products SET stock = stock - 1 WHERE id = ? AND stock > 0).',
-        optionB: 'By reading the stock in React state and assuming no other user has purchased.',
-        optionC: 'By removing the Buy button after 10 seconds regardless of stock.',
-        optionD: 'By accepting all orders and canceling excess orders weeks later.',
+        optionA: 'WebSockets (ws:// / wss://)',
+        optionB: 'HTTP Polling every 60 seconds',
+        optionC: 'FTP File Transfer',
+        optionD: 'SMTP Mail Relay',
         correctAnswer: 'A',
         marks: 10,
       },
       {
-        question: 'What is the "Cache-Aside" (Lazy Loading) caching pattern widely used for e-commerce product catalogs?',
+        question: 'When modeling student course progress in MongoDB, what is the key advantage of embedding recent lecture progress inside the Student document versus referencing a separate collection?',
         questionType: 'MCQ',
-        optionA: 'The application queries the cache first; on a cache miss, it reads from the database, stores the result in cache with a TTL, and returns it to the client.',
-        optionB: 'The cache writes all data directly to magnetic tape drives.',
-        optionC: 'The database updates the client browser cache directly via WebSockets.',
-        optionD: 'The cache permanently deletes records older than 1 minute.',
+        optionA: 'It allows 1-query atomic read and updates for dashboard rendering without requiring multi-collection joins.',
+        optionB: 'It reduces the database RAM usage to zero.',
+        optionC: 'Embedded documents are automatically indexed by Google Search.',
+        optionD: 'MongoDB does not support document references.',
         correctAnswer: 'A',
         marks: 10,
       },
       {
-        question: 'What is the "Cache Stampede" (Thundering Herd) problem and how can it be mitigated?',
+        question: 'How does React memo (React.memo) optimize performance in complex learning management dashboards?',
         questionType: 'MCQ',
-        optionA: 'When a popular cached item expires, causing massive concurrent requests to hit the database simultaneously; mitigated by mutex locking or probabilistic early recomputation.',
-        optionB: 'When the Redis server runs out of disk storage space.',
-        optionC: 'When network cables are unplugged during server backup.',
-        optionD: 'When users submit invalid credit card numbers.',
+        optionA: 'It memoizes the rendered output of a functional component, skipping re-renders if its props have not changed (shallow comparison).',
+        optionB: 'It prevents the browser from reloading CSS styles.',
+        optionC: 'It auto-saves student quiz answers to localStorage.',
+        optionD: 'It translates React components into native mobile widgets.',
         correctAnswer: 'A',
         marks: 10,
       },
       {
-        question: 'Why is Cursor-based Pagination preferred over Offset-based Pagination (OFFSET / LIMIT) for large e-commerce product listings and continuous feeds?',
+        question: 'What is the purpose of the MongoDB $facet aggregation stage in course catalog search?',
         questionType: 'MCQ',
-        optionA: 'Cursor pagination uses indexed pointer values (e.g., WHERE id > last_seen_id LIMIT 20), maintaining O(1) performance and preventing duplicate or skipped items as new rows insert.',
-        optionB: 'Offset pagination cannot return more than 10 rows.',
-        optionC: 'Cursor pagination disables database indexing.',
-        optionD: 'Offset pagination is only supported by NoSQL databases.',
+        optionA: 'It executes multiple aggregation pipelines within a single stage on the same input documents, enabling multi-faceted search (e.g., categories, price ranges, ratings).',
+        optionB: 'It truncates long text strings.',
+        optionC: 'It restarts the MongoDB server if query takes longer than 1 second.',
+        optionD: 'It encrypts student passwords.',
         correctAnswer: 'A',
         marks: 10,
       },
       {
-        question: 'Which HTTP caching header instructs both intermediate CDN proxies and browser caches that a response can be cached for 1 hour, but must be validated with the origin server if stale?',
+        question: 'In Express.js, what does the express.json() built-in middleware do?',
         questionType: 'MCQ',
-        optionA: 'Cache-Control: public, max-age=3600, must-revalidate',
-        optionB: 'Cache-Control: no-store, private',
-        optionC: 'Pragma: no-cache',
-        optionD: 'Expires: -1',
+        optionA: 'It parses incoming HTTP request bodies with JSON payloads and populates req.body.',
+        optionB: 'It converts outgoing HTML pages into JSON objects.',
+        optionC: 'It compresses static PDF assets.',
+        optionD: 'It validates JWT tokens.',
         correctAnswer: 'A',
         marks: 10,
       },
       {
-        question: 'What is the purpose of an ETag (Entity Tag) in HTTP response headers?',
+        question: 'What is the difference between synchronous and asynchronous code execution in JavaScript?',
         questionType: 'MCQ',
-        optionA: 'An identifier representing a specific version of a resource, allowing clients to send "If-None-Match" and receive an empty 304 Not Modified if the resource is unchanged.',
-        optionB: 'A tracking pixel used by marketing agencies.',
-        optionC: 'A cryptographic key used to decode TLS packets.',
-        optionD: 'An HTML tag used to display emojis in headers.',
+        optionA: 'Synchronous operations block thread execution until completion, while asynchronous operations delegate work (e.g., I/O, timers) and resolve via event loop callbacks or promises without blocking.',
+        optionB: 'Asynchronous code only executes on 64-bit operating systems.',
+        optionC: 'Synchronous code can only execute in web workers.',
+        optionD: 'There is no difference in JavaScript.',
         correctAnswer: 'A',
         marks: 10,
       },
       {
-        question: 'In modern shopping cart architectures, why is a hybrid storage strategy (client-side state synced with server-side database) employed?',
+        question: 'Which status code should a REST API return when a student submits an invalid quiz payload that fails schema validation rules?',
         questionType: 'MCQ',
-        optionA: 'It provides instant UI feedback for guest shoppers while persisting cart state across devices and browser sessions once authenticated.',
-        optionB: 'It reduces the price of items in the cart automatically.',
-        optionC: 'It bypasses payment gateway fees.',
-        optionD: 'It stores shopping carts permanently inside DNS servers.',
+        optionA: '400 Bad Request / 422 Unprocessable Entity',
+        optionB: '500 Internal Server Error',
+        optionC: '200 OK',
+        optionD: '301 Moved Permanently',
         correctAnswer: 'A',
         marks: 10,
       },
       {
-        question: 'What search engine technology is most commonly integrated with e-commerce platforms to power typo-tolerant full-text search, facets, and filter aggregations?',
+        question: 'What is the primary function of the CSS flex-wrap property?',
         questionType: 'MCQ',
-        optionA: 'Elasticsearch / OpenSearch',
-        optionB: 'SQLite in-memory',
-        optionC: 'Microsoft Access 97',
-        optionD: 'Apache CouchDB',
+        optionA: 'It specifies whether flex items are forced onto a single line or can wrap onto multiple lines as viewport width decreases.',
+        optionB: 'It rounds the corners of flex containers.',
+        optionC: 'It rotates flex items 90 degrees.',
+        optionD: 'It hides text overflow with an ellipsis.',
         correctAnswer: 'A',
         marks: 10,
       },
       {
-        question: 'How should sensitive customer authentication tokens (JWT) be securely stored on client browsers to prevent XSS exfiltration?',
+        question: 'What is the purpose of CORS (Cross-Origin Resource Sharing) headers in web application security?',
         questionType: 'MCQ',
-        optionA: 'In an HttpOnly, Secure, SameSite=Strict cookie, making it inaccessible to client-side JavaScript.',
-        optionB: 'In window.localStorage as a plain text string.',
-        optionC: 'In document.title so it is visible in browser tabs.',
-        optionD: 'Inside a visible HTML hidden input field.',
+        optionA: 'To tell the browser whether resources from a different origin (domain, protocol, or port) are permitted to be accessed by client-side web scripts.',
+        optionB: 'To encrypt database backups.',
+        optionC: 'To speed up video streaming.',
+        optionD: 'To block search engine web scrapers.',
         correctAnswer: 'A',
         marks: 10,
       },
       {
-        question: 'What is the function of a Content Delivery Network (CDN) in global e-commerce web applications?',
+        question: 'In Node.js, what does process.env represent?',
         questionType: 'MCQ',
-        optionA: 'Caching and serving static assets (images, product photos, JS, CSS) from edge server locations physically closer to users, drastically reducing latency and server load.',
-        optionB: 'Processing credit card transactions without bank authorization.',
-        optionC: 'Printing shipping barcode labels on physical warehouse printers.',
-        optionD: 'Translating SQL queries into NoSQL queries.',
+        optionA: 'An object containing the user environment variables defined in the host OS or loaded via configuration files.',
+        optionB: 'A list of currently open network socket file descriptors.',
+        optionC: 'A function that measures server temperature.',
+        optionD: 'The directory path to the node_modules folder.',
+        correctAnswer: 'A',
+        marks: 10,
+      },
+    ],
+  },
+
+  // 14. Zentrix Enterprise Solutions - Junior Software Developer
+  {
+    companyName: 'Zentrix Enterprise Solutions',
+    jobTitle: 'Junior Software Developer',
+    title: 'Core Software Engineering, Data Structures & OOP Evaluation',
+    description: 'Foundational assessment measuring algorithmic problem solving, Big-O complexity, Object-Oriented Programming (OOP) concepts, and relational database fundamentals.',
+    durationMinutes: 40,
+    totalMarks: 100,
+    marksPerQuestion: 10,
+    numQuestions: 10,
+    difficulty: 'Easy',
+    categories: 'Technical',
+    technology: 'Data Structures, Algorithms, OOP',
+    passingPercentage: 60,
+    negativeMarking: false,
+    questions: [
+      {
+        question: 'What is the average time complexity of searching for an element in a balanced Binary Search Tree (BST) containing N elements?',
+        questionType: 'MCQ',
+        optionA: 'O(log N)',
+        optionB: 'O(N)',
+        optionC: 'O(1)',
+        optionD: 'O(N^2)',
+        correctAnswer: 'A',
+        marks: 10,
+      },
+      {
+        question: 'Which of the following data structures operates strictly on a First-In, First-Out (FIFO) principle?',
+        questionType: 'MCQ',
+        optionA: 'Stack',
+        optionB: 'Queue',
+        optionC: 'Binary Tree',
+        optionD: 'Hash Map',
+        correctAnswer: 'B',
+        marks: 10,
+      },
+      {
+        question: 'What is Polymorphism in Object-Oriented Programming (OOP)?',
+        questionType: 'MCQ',
+        optionA: 'The ability of different objects to respond to the same method call in their own specific way (e.g., method overriding and method overloading).',
+        optionB: 'The process of hiding internal data using private variables.',
+        optionC: 'The restriction of classes to a single instance.',
+        optionD: 'The conversion of integers into floating point numbers.',
+        correctAnswer: 'A',
+        marks: 10,
+      },
+      {
+        question: 'In a relational database, what is a Foreign Key constraint?',
+        questionType: 'MCQ',
+        optionA: 'A column or combination of columns that enforces referential integrity by linking to a primary key in another table.',
+        optionB: 'An encryption key used by international users.',
+        optionC: 'A temporary index created during server startup.',
+        optionD: 'A key stored in a foreign data center.',
+        correctAnswer: 'A',
+        marks: 10,
+      },
+      {
+        question: 'What is the time complexity of looking up a value by key in an optimal Hash Table?',
+        questionType: 'MCQ',
+        optionA: 'O(1) average case',
+        optionB: 'O(N log N)',
+        optionC: 'O(N^2)',
+        optionD: 'O(log N)',
+        correctAnswer: 'A',
+        marks: 10,
+      },
+      {
+        question: 'In software development, what does the acronym DRY stand for?',
+        questionType: 'MCQ',
+        optionA: 'Don’t Repeat Yourself',
+        optionB: 'Do Real Yields',
+        optionC: 'Database Relational Yield',
+        optionD: 'Direct Route YAML',
+        correctAnswer: 'A',
+        marks: 10,
+      },
+      {
+        question: 'What is a "NullPointerException" or "TypeError: cannot read properties of undefined"?',
+        questionType: 'MCQ',
+        optionA: 'An error triggered when program code attempts to access a property or invoke a method on a variable that points to null or undefined in memory.',
+        optionB: 'A hardware failure in the computer’s RAM card.',
+        optionC: 'A network timeout when pinging google.com.',
+        optionD: 'A syntax error in HTML markup.',
+        correctAnswer: 'A',
+        marks: 10,
+      },
+      {
+        question: 'Which sorting algorithm has a worst-case time complexity of O(N^2) but is simple to implement using adjacent swaps?',
+        questionType: 'MCQ',
+        optionA: 'Bubble Sort',
+        optionB: 'Merge Sort',
+        optionC: 'Heap Sort',
+        optionD: 'TimSort',
+        correctAnswer: 'A',
+        marks: 10,
+      },
+      {
+        question: 'What does the SQL command SELECT COUNT(*) FROM students WHERE status = "active"; return?',
+        questionType: 'MCQ',
+        optionA: 'The total number of rows matching the criteria status = "active".',
+        optionB: 'The names of all students in alphabetical order.',
+        optionC: 'The average age of all active students.',
+        optionD: 'A list of duplicate student rows.',
+        correctAnswer: 'A',
+        marks: 10,
+      },
+      {
+        question: 'In Git version control, what does the command "git commit -m \'feat: add login\'" do?',
+        questionType: 'MCQ',
+        optionA: 'Saves staged snapshot changes to the local repository history with the descriptive commit message.',
+        optionB: 'Uploads code to GitHub immediately over the internet.',
+        optionC: 'Reverts all uncommitted changes back to the previous version.',
+        optionD: 'Deletes the current feature branch.',
         correctAnswer: 'A',
         marks: 10,
       },
@@ -1464,65 +1583,65 @@ async function seedAssessments() {
         continue;
       }
 
-      // 2. Locate Job
-      const job = await Job.findOne({
-        company: company._id,
+      // 2. Locate ALL Jobs matching this title across all company branches/seeds
+      const jobs = await Job.find({
         $or: [
           { title: item.jobTitle.trim() },
           { title: { $regex: item.jobTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' } }
         ]
       });
-      if (!job) {
-        console.warn(`⚠️ Job not found: "${item.jobTitle}" for ${item.companyName}. Skipping.`);
+      if (!jobs.length) {
+        console.warn(`⚠️ Job not found: "${item.jobTitle}". Skipping.`);
         continue;
       }
 
-      // 3. Remove existing assessment for this job if present
-      const existing = await Assessment.findOne({ job: job._id });
-      if (existing) {
-        await AssessmentQuestion.deleteMany({ assessment: existing._id });
-        await Assessment.deleteOne({ _id: existing._id });
-        console.log(`Cleaned up prior assessment for job: ${job.title}`);
+      for (const job of jobs) {
+        // 3. Remove existing assessment for this job if present
+        const existing = await Assessment.findOne({ job: job._id });
+        if (existing) {
+          await AssessmentQuestion.deleteMany({ assessment: existing._id });
+          await Assessment.deleteOne({ _id: existing._id });
+          console.log(`Cleaned up prior assessment for job: ${job.title} (${job._id})`);
+        }
+
+        // 4. Create Assessment
+        const assessment = await Assessment.create({
+          company: job.company || company._id,
+          job: job._id,
+          title: item.title,
+          description: item.description,
+          durationMinutes: item.durationMinutes,
+          totalMarks: item.totalMarks,
+          marksPerQuestion: item.marksPerQuestion,
+          numQuestions: item.questions.length,
+          difficulty: item.difficulty,
+          categories: item.categories,
+          technology: item.technology,
+          passingPercentage: item.passingPercentage,
+          negativeMarking: item.negativeMarking,
+          negativeMarks: item.negativeMarking ? 2.5 : 0,
+          status: 'active',
+        });
+        createdAssessments++;
+
+        // 5. Create Questions
+        const questionsToInsert = item.questions.map((q) => ({
+          assessment: assessment._id,
+          question: q.question,
+          questionType: q.questionType || 'MCQ',
+          optionA: q.optionA,
+          optionB: q.optionB,
+          optionC: q.optionC,
+          optionD: q.optionD,
+          correctAnswer: q.correctAnswer,
+          marks: q.marks || item.marksPerQuestion,
+        }));
+
+        await AssessmentQuestion.insertMany(questionsToInsert);
+        createdQuestions += questionsToInsert.length;
+
+        console.log(`✅ [Assessment #${createdAssessments}] Linked: "${item.title}" -> Job: ${job.title} [ID: ${job._id}]`);
       }
-
-      // 4. Create Assessment
-      const assessment = await Assessment.create({
-        company: company._id,
-        job: job._id,
-        title: item.title,
-        description: item.description,
-        durationMinutes: item.durationMinutes,
-        totalMarks: item.totalMarks,
-        marksPerQuestion: item.marksPerQuestion,
-        numQuestions: item.questions.length,
-        difficulty: item.difficulty,
-        categories: item.categories,
-        technology: item.technology,
-        passingPercentage: item.passingPercentage,
-        negativeMarking: item.negativeMarking,
-        negativeMarks: item.negativeMarking ? 2.5 : 0,
-        status: 'active',
-      });
-      createdAssessments++;
-
-      // 5. Create Questions
-      const questionsToInsert = item.questions.map((q) => ({
-        assessment: assessment._id,
-        question: q.question,
-        questionType: q.questionType || 'MCQ',
-        optionA: q.optionA,
-        optionB: q.optionB,
-        optionC: q.optionC,
-        optionD: q.optionD,
-        correctAnswer: q.correctAnswer,
-        marks: q.marks || item.marksPerQuestion,
-      }));
-
-      await AssessmentQuestion.insertMany(questionsToInsert);
-      createdQuestions += questionsToInsert.length;
-
-      console.log(`✅ [${createdAssessments}/12] Created: "${item.title}"`);
-      console.log(`   Company: ${company.companyName} | Job: ${job.title} | Questions: ${questionsToInsert.length}`);
     }
 
     console.log('----------------------------------------------------');

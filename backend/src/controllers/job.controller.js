@@ -43,11 +43,24 @@ const getJob = asyncHandler(async (req, res) => {
   const skills = await JobSkill.find({ job: job._id }).populate('skill', 'skillName category');
   let application = null;
   let assessment = null;
+  const findActiveAssessment = async (jId, jTitle, cId) => {
+    let a = await Assessment.findOne({ job: jId, status: 'active' }).populate('company', 'companyName logo').lean();
+    if (!a && jTitle) {
+      const rx = new RegExp(jTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      a = await Assessment.findOne({
+        status: 'active',
+        $or: [
+          { company: cId, title: rx },
+          { title: rx },
+        ],
+      }).populate('company', 'companyName logo').lean();
+    }
+    return a;
+  };
+
   if (req.user && req.user.role === 'student') {
     application = await Application.findOne({ student: req.user._id, job: job._id }).select('_id status createdAt history coverLetter').lean();
-    const activeAssessment = await Assessment.findOne({ job: job._id, status: 'active' })
-      .populate('company', 'companyName logo')
-      .lean();
+    const activeAssessment = await findActiveAssessment(job._id, job.title, job.company?._id || job.company);
     if (activeAssessment) {
       const [questionCount, attempt] = await Promise.all([
         AssessmentQuestion.countDocuments({ assessment: activeAssessment._id }),
@@ -73,9 +86,7 @@ const getJob = asyncHandler(async (req, res) => {
       };
     }
   } else {
-    const activeAssessment = await Assessment.findOne({ job: job._id, status: 'active' })
-      .populate('company', 'companyName logo')
-      .lean();
+    const activeAssessment = await findActiveAssessment(job._id, job.title, job.company?._id || job.company);
     if (activeAssessment) {
       const questionCount = await AssessmentQuestion.countDocuments({ assessment: activeAssessment._id });
       assessment = {

@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const mongoose = require('mongoose');
 const { Assessment, AssessmentQuestion, AssessmentAttempt, AssessmentAnswer, ExamViolation } = require('../models/Assessment');
 const { Application } = require('../models/Application');
 const { Job } = require('../models/Job');
@@ -37,15 +38,43 @@ const list = asyncHandler(async (req, res) => {
   const { page, limit, skip } = paginate(req.query);
   let filter = {};
   if (req.user.role === 'student') {
-    const apps = await Application.find({ student: req.user._id }).select('job');
-    const appliedJobIds = apps.map((a) => String(a.job));
+    const apps = await Application.find({ student: req.user._id }).populate('job', 'title company');
+    const appliedJobIds = [];
+    const titles = [];
+    const companyIds = [];
+    for (const a of apps) {
+      if (a.job) {
+        const jId = a.job._id || a.job;
+        appliedJobIds.push(jId);
+        if (a.job.title) titles.push(a.job.title.trim());
+        if (a.job.company) companyIds.push(a.job.company._id || a.job.company);
+      }
+    }
+    // Find all matching jobs across the platform by ID or Title
+    const matchingJobs = titles.length
+      ? await Job.find({ $or: [{ _id: { $in: appliedJobIds } }, { title: { $in: titles } }] }).select('_id')
+      : [];
+    const allJobIds = [...new Set([
+      ...appliedJobIds.map(String),
+      ...matchingJobs.map((j) => String(j._id)),
+    ])];
+    const validJobObjectIds = allJobIds
+      .filter((id) => mongoose.Types.ObjectId.isValid(id))
+      .map((id) => new mongoose.Types.ObjectId(id));
+
     if (req.query.jobId) {
-      if (!appliedJobIds.includes(String(req.query.jobId))) {
+      if (!allJobIds.includes(String(req.query.jobId))) {
         return res.json({ success: true, data: [], pagination: { page: 1, limit, total: 0, pages: 1 } });
       }
       filter = { status: 'active', job: req.query.jobId };
     } else {
-      filter = { status: 'active', job: { $in: appliedJobIds } };
+      filter = {
+        status: 'active',
+        $or: [
+          { job: { $in: validJobObjectIds } },
+          { company: { $in: companyIds } },
+        ],
+      };
     }
   } else if (req.user.role === 'company') {
     const cp = await ownCompany(req.user._id);
@@ -69,7 +98,19 @@ const list = asyncHandler(async (req, res) => {
     o.attemptCount = attemptCount;
     return o;
   }));
-  res.json({ success: true, data: enriched, pagination: { page, limit, total, pages: Math.max(1, Math.ceil(total / limit)) } });
+
+  // Deduplicate assessments by title and company name for clean student rendering
+  const seen = new Set();
+  const deduped = [];
+  for (const item of enriched) {
+    const key = `${item.title}::${item.company?.companyName || item.company?._id || item.company}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      deduped.push(item);
+    }
+  }
+
+  res.json({ success: true, data: deduped, pagination: { page, limit, total: deduped.length, pages: Math.max(1, Math.ceil(deduped.length / limit)) } });
 });
 
 const create = asyncHandler(async (req, res) => {
