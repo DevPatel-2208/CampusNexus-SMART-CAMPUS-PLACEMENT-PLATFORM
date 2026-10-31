@@ -28,13 +28,16 @@ function getTransporter() {
 async function sendMail(to, subject, html) {
   // 1. If BREVO_API_KEY is present, send via Brevo (Sendinblue) HTTPS REST API (Port 443 - no domain lock, 300 free/day)
   if (env.BREVO_API_KEY) {
+    if (env.BREVO_API_KEY.startsWith('xsmtpsib-')) {
+      console.error('[mail:brevo:error] Misconfigured key! The key starts with "xsmtpsib-", which is an SMTP password. Brevo REST API requires an API key starting with "xkeysib-" from https://app.brevo.com/settings/keys/api');
+    }
     try {
       const senderEmail = env.BREVO_SENDER || env.SMTP_USER || 'devkpatel426@gmail.com';
       const senderName = 'CampusNexus';
       const res = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
         headers: {
-          'api-key': env.BREVO_API_KEY,
+          'api-key': env.BREVO_API_KEY.trim(),
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
@@ -50,7 +53,7 @@ async function sendMail(to, subject, html) {
         console.log(`[mail:brevo:sent] to=${to} messageId=${data.messageId}`);
         return { sent: true, messageId: data.messageId, provider: 'brevo' };
       }
-      console.warn('[mail:brevo:warn] Brevo API rejected email delivery:', data);
+      console.warn('[mail:brevo:warn] Brevo API rejected email delivery:', res.status, data);
     } catch (err) {
       console.error('[mail:brevo:error] Brevo fetch error:', err.message);
     }

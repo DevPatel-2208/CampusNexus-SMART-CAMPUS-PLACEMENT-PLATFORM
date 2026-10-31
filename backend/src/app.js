@@ -81,14 +81,28 @@ app.get('/api/v1/health', (req, res) => {
 });
 
 app.get('/api/v1/health/mail-check', (req, res) => {
+  const brevoKeyPrefix = env.BREVO_API_KEY ? env.BREVO_API_KEY.slice(0, 8) : null;
+  const brevoKeyValid = Boolean(env.BREVO_API_KEY && env.BREVO_API_KEY.startsWith('xkeysib-'));
+  const brevoIsSmtpPassword = Boolean(env.BREVO_API_KEY && env.BREVO_API_KEY.startsWith('xsmtpsib-'));
+
   res.status(200).json({
     hasBrevo: Boolean(env.BREVO_API_KEY),
+    brevoKeyPrefix,
+    brevoKeyStatus: brevoKeyValid
+      ? 'VALID_API_KEY_FORMAT'
+      : brevoIsSmtpPassword
+      ? 'WRONG_KEY_TYPE: You pasted an SMTP password (starts with xsmtpsib-). You need an API Key (starts with xkeysib-) from https://app.brevo.com/settings/keys/api'
+      : env.BREVO_API_KEY
+      ? 'UNKNOWN_KEY_FORMAT'
+      : 'NOT_SET',
     hasResend: Boolean(env.RESEND_API_KEY),
     hasSmtp: Boolean(env.SMTP_USER && env.SMTP_PASS),
-    smtpUser: env.SMTP_USER || null,
-    smtpHost: env.SMTP_HOST || null,
-    activeProvider: env.BREVO_API_KEY ? 'brevo (HTTPS:443)' : env.RESEND_API_KEY ? 'resend (HTTPS:443)' : (env.SMTP_USER ? 'smtp (BLOCKED on Render free tier)' : 'none'),
-    note: 'Render free tier blocks raw outbound SMTP ports 25, 465, and 587. Email delivery requires Brevo or Resend via HTTPS (port 443).'
+    activeProvider: brevoKeyValid
+      ? 'brevo (HTTPS:443 - ACTIVE)'
+      : env.RESEND_API_KEY
+      ? 'resend (HTTPS:443)'
+      : 'none',
+    instruction: 'To fix: Go to https://app.brevo.com/settings/keys/api -> Generate a new API key -> Copy the key starting with xkeysib- -> Paste into BREVO_API_KEY in Render.'
   });
 });
 
