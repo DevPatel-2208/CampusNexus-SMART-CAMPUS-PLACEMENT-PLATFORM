@@ -25,6 +25,37 @@ function getTransporter() {
   return transporter;
 }
 
+let cachedBrevoSender = null;
+
+async function getBrevoSender() {
+  if (cachedBrevoSender) return cachedBrevoSender;
+  // If explicitly set and valid
+  if (env.BREVO_SENDER && env.BREVO_SENDER.includes('@') && env.BREVO_SENDER !== 'devkpatel426@gmail.com') {
+    cachedBrevoSender = env.BREVO_SENDER;
+    return cachedBrevoSender;
+  }
+  // Otherwise auto-detect from Brevo account senders
+  if (env.BREVO_API_KEY && env.BREVO_API_KEY.startsWith('xkeysib-')) {
+    try {
+      const r = await fetch('https://api.brevo.com/v3/senders', {
+        headers: { 'api-key': env.BREVO_API_KEY.trim(), 'Accept': 'application/json' },
+      });
+      if (r.ok) {
+        const data = await r.json();
+        const activeSender = data?.senders?.find((s) => s.active !== false);
+        if (activeSender?.email) {
+          cachedBrevoSender = activeSender.email;
+          console.log('[mail:brevo] Auto-detected verified sender from Brevo account:', cachedBrevoSender);
+          return cachedBrevoSender;
+        }
+      }
+    } catch (e) {
+      console.warn('[mail:brevo] Failed to query Brevo senders:', e.message);
+    }
+  }
+  return env.BREVO_SENDER || env.SMTP_USER || 'devkpatel426@gmail.com';
+}
+
 async function sendMail(to, subject, html) {
   // 1. If BREVO_API_KEY is present, send via Brevo (Sendinblue) HTTPS REST API (Port 443 - no domain lock, 300 free/day)
   if (env.BREVO_API_KEY) {
@@ -32,7 +63,7 @@ async function sendMail(to, subject, html) {
       console.error('[mail:brevo:error] Misconfigured key! The key starts with "xsmtpsib-", which is an SMTP password. Brevo REST API requires an API key starting with "xkeysib-" from https://app.brevo.com/settings/keys/api');
     }
     try {
-      const senderEmail = env.BREVO_SENDER || env.SMTP_USER || 'devkpatel426@gmail.com';
+      const senderEmail = await getBrevoSender();
       const senderName = 'CampusNexus';
       const res = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
@@ -50,10 +81,12 @@ async function sendMail(to, subject, html) {
       });
       const data = await res.json();
       if (res.ok && data?.messageId) {
-        console.log(`[mail:brevo:sent] to=${to} messageId=${data.messageId}`);
+        console.log(`[mail:brevo:sent] to=${to} sender=${senderEmail} messageId=${data.messageId}`);
         return { sent: true, messageId: data.messageId, provider: 'brevo' };
       }
       console.warn('[mail:brevo:warn] Brevo API rejected email delivery:', res.status, data);
+      // Return details for diagnostic test endpoints
+      return { sent: false, error: data, status: res.status, senderUsed: senderEmail };
     } catch (err) {
       console.error('[mail:brevo:error] Brevo fetch error:', err.message);
     }

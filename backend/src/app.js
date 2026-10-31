@@ -106,6 +106,30 @@ app.get('/api/v1/health/mail-check', (req, res) => {
   });
 });
 
+app.get('/api/v1/health/brevo-senders', async (req, res) => {
+  if (!env.BREVO_API_KEY) return res.status(400).json({ error: 'BREVO_API_KEY not configured' });
+  try {
+    const r = await fetch('https://api.brevo.com/v3/senders', {
+      headers: { 'api-key': env.BREVO_API_KEY.trim(), 'Accept': 'application/json' },
+    });
+    const d = await r.json();
+    res.status(r.status).json({ status: r.status, data: d });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/v1/health/test-email', async (req, res) => {
+  const { sendMail, emailVerificationTemplate } = require('./services/mail.service');
+  const to = req.query.to || env.SMTP_USER || 'devkpatel426@gmail.com';
+  try {
+    const result = await sendMail(to, 'CampusNexus Live Test OTP: 123456', emailVerificationTemplate('123456', 10));
+    res.json({ success: true, to, result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // API Routes
 app.use('/api/v1/auth', require('./routes/auth.routes'));
 app.use('/api/v1/jobs', require('./routes/job.routes'));
