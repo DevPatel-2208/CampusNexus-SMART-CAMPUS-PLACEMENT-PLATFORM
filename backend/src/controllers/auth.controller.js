@@ -157,7 +157,15 @@ const refresh = asyncHandler(async (req, res) => {
 
 const me = asyncHandler(async (req, res) => {
   const data = req.user.toObject();
-  if (req.user.role === 'student') data.profile = await StudentProfile.findOne({ user: req.user._id });
+  if (req.user.role === 'student') {
+    const profile = await StudentProfile.findOne({ user: req.user._id });
+    if (profile) {
+      const prev = profile.profileCompletion;
+      const next = profile.recalcCompletion();
+      if (prev !== next) await profile.save();
+    }
+    data.profile = profile;
+  }
   if (req.user.role === 'company') data.company = await CompanyProfile.findOne({ user: req.user._id });
   res.json({ success: true, data });
 });

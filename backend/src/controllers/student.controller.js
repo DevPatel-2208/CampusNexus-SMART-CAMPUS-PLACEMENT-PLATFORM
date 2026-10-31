@@ -9,6 +9,11 @@ const path = require('path');
 
 const getMe = asyncHandler(async (req, res) => {
   const profile = await StudentProfile.findOne({ user: req.user._id });
+  if (profile) {
+    const prev = profile.profileCompletion;
+    const next = profile.recalcCompletion();
+    if (prev !== next) await profile.save();
+  }
   res.json({ success: true, data: { user: req.user, profile } });
 });
 

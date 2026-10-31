@@ -23,9 +23,36 @@ const studentProfileSchema = new mongoose.Schema({
 
 /** Parity with PHP calculateProfileCompletion: weighted completeness 0–100. */
 studentProfileSchema.methods.recalcCompletion = function () {
-  const weights = { phone: 8, dob: 5, gender: 3, address: 5, city: 5, course: 10, branch: 10, semester: 5, cgpa: 12, passingYear: 8, backlogs: 4, about: 10, profilePhoto: 5, enrollmentNo: 10 };
+  const weights = {
+    enrollmentNo: 10,
+    phone: 8,
+    dob: 5,
+    gender: 3,
+    address: 5,
+    city: 5,
+    course: 10,
+    branch: 10,
+    semester: 5,
+    cgpa: 12,
+    passingYear: 8,
+    backlogs: 4,
+    about: 10,
+  };
   let score = 0;
-  for (const [k, w] of Object.entries(weights)) { if (this[k] !== null && this[k] !== undefined && this[k] !== '') score += w; }
+  for (const [k, w] of Object.entries(weights)) {
+    if (this[k] !== null && this[k] !== undefined && this[k] !== '') {
+      score += w;
+    }
+  }
+  // Profile photo gives 5 bonus points
+  if (this.profilePhoto) {
+    score += 5;
+  }
+  // If student has completed all primary academic, personal & contact fields (reaches 95+),
+  // they have fulfilled all requirements: grant 100% completion!
+  if (score >= 95) {
+    score = 100;
+  }
   this.profileCompletion = Math.min(100, score);
   return this.profileCompletion;
 };
