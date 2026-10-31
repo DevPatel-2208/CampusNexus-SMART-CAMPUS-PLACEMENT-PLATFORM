@@ -722,7 +722,7 @@ export function JobDetails({ prefix = '', canApply = false }) {
                       </div>
 
                       <p className="cc-profile-incomplete-copy">
-                        Recruiters and TPOs require full academic and personal credentials. Jab tak aapki profile <strong>100% complete</strong> nahi hoti, apply button unlock nahi hoga.
+                        Recruiters and TPOs require complete academic and personal details. Your profile must be <strong>100% complete</strong> before you can apply.
                       </p>
 
                       <div className="cc-profile-incomplete-actions">
