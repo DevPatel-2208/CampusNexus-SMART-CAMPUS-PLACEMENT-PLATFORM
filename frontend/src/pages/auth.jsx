@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -240,7 +240,7 @@ function PasswordField({ label, error, registerProps, placeholder = 'Enter your 
   );
 }
 
-function SubmitButton({ loading, disabled = false, icon: Icon, children }) {
+function SubmitButton({ loading, disabled = false, icon: Icon, loadingText = 'Please wait…', children }) {
   const off = loading || disabled;
   return (
     <motion.button
@@ -249,8 +249,8 @@ function SubmitButton({ loading, disabled = false, icon: Icon, children }) {
       whileHover={{ scale: off ? 1 : 1.01 }}
       whileTap={{ scale: off ? 1 : 0.99 }}
     >
-      {loading ? <Loader2 size={17} className="cc-spin" /> : <Icon size={17} />}
-      <span>{loading ? 'Please wait…' : children}</span>
+      {loading ? <Loader2 size={17} className="cc-spin" /> : (Icon ? <Icon size={17} /> : null)}
+      <span>{loading ? loadingText : children}</span>
     </motion.button>
   );
 }
@@ -825,12 +825,15 @@ export function VerifyEmail() {
   }, [form.userId, form.email]);
 
   const expired = left <= 0;
-  const submit = async (e) => {
-    if (e) e.preventDefault();
-    if (form.code.length !== 6 || busy || expired) return;
+  const autoSubmittedRef = useRef('');
+
+  const submit = useCallback(async (e, codeOverride) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const codeToVerify = codeOverride || form.code;
+    if (!codeToVerify || codeToVerify.length !== 6 || busy || expired) return;
     setBusy(true); setErr(''); setMsg('');
     try {
-      await api.post('/auth/verify-email', form);
+      await api.post('/auth/verify-email', { ...form, code: codeToVerify });
       sessionStorage.removeItem('cc-pending');
       await showSuccess({
         title: 'Account Verified & Activated!',
@@ -839,8 +842,24 @@ export function VerifyEmail() {
         intensity: 'medium',
       });
       navigate('/login');
-    } catch (e2) { setErr(apiErrorMessage(e2)); } finally { setBusy(false); }
-  };
+    } catch (e2) {
+      setErr(apiErrorMessage(e2));
+      autoSubmittedRef.current = '';
+    } finally {
+      setBusy(false);
+    }
+  }, [form, busy, expired, navigate]);
+
+  // Auto-submit as soon as all 6 digits are entered
+  useEffect(() => {
+    if (form.code.length < 6) {
+      autoSubmittedRef.current = '';
+    } else if (form.code.length === 6 && autoSubmittedRef.current !== form.code && !busy && !expired) {
+      autoSubmittedRef.current = form.code;
+      submit(null, form.code);
+    }
+  }, [form.code, busy, expired, submit]);
+
   const resend = async () => {
     setErr(''); setMsg('');
     try {
@@ -851,6 +870,8 @@ export function VerifyEmail() {
         ? 'A fresh 6-digit verification code was sent to your email.'
         : 'The account is ready, but email delivery failed. Check the server mail configuration and try again shortly.');
       setCool(60); setLeft(600); setJustRegistered(false);
+      setForm((f) => ({ ...f, code: '' }));
+      autoSubmittedRef.current = '';
     } catch (e2) { const r = e2.response?.data?.resendAfter; if (r) setCool(r); setErr(apiErrorMessage(e2)); }
   };
   return (
@@ -921,13 +942,29 @@ export function VerifyEmail() {
           </div>
         )}
         <div className="otp-timer-wrap mb-3" role="timer" aria-live="polite">
-          <span className={`otp-timer${expired ? ' is-expired' : ''}`}><Clock size={13} /> {expired ? 'Code expired' : fmtClock(left)}</span>
-          <span className="otp-timer-note">{expired ? 'Request a new code below' : 'Code expires in 10 minutes'}</span>
+          <div className="otp-timer-left">
+            <span className={`otp-timer${expired ? ' is-expired' : ''}`}>
+              <Clock size={13} className={expired ? '' : 'otp-clock-pulse'} />
+              <span>{expired ? 'Code Expired' : fmtClock(left)}</span>
+            </span>
+            {!expired && <span className="otp-live-dot" title="Active session" />}
+          </div>
+          <span className="otp-timer-note">
+            <Clock size={12} className="opacity-75" />
+            {expired ? 'Request a new code below' : 'Valid for 10 minutes'}
+          </span>
         </div>
         <div className="mb-3">
           <OtpBoxes value={form.code} onChange={(code) => setForm((f) => ({ ...f, code }))} disabled={busy || expired} autoFocus />
         </div>
-        <SubmitButton loading={busy} disabled={form.code.length !== 6 || expired} icon={CheckCircle2}>Verify &amp; Activate Account</SubmitButton>
+        <SubmitButton
+          loading={busy}
+          loadingText="Verifying OTP &amp; Activating..."
+          disabled={form.code.length !== 6 || expired}
+          icon={CheckCircle2}
+        >
+          Verify &amp; Activate Account
+        </SubmitButton>
       </form>
       <div className="otp-resend mt-3">
         <span>Didn&apos;t get the code?</span>
@@ -955,8 +992,24 @@ export function ForgotPassword() {
   const [busy, setBusy] = useState(false);
   const [cool, setCool] = useState(0);
   const [left, setLeft] = useCountdown(0);
-  const go = async (fn) => { setBusy(true); setErr(''); setMsg(''); try { await fn(); } catch (e) { setErr(apiErrorMessage(e)); } finally { setBusy(false); } };
+  const autoSubmittedResetRef = useRef('');
+  const go = async (fn) => { setBusy(true); setErr(''); setMsg(''); try { await fn(); } catch (e) { setErr(apiErrorMessage(e)); autoSubmittedResetRef.current = ''; } finally { setBusy(false); } };
   const expired = step === 2 && left <= 0;
+
+  useEffect(() => {
+    if (step === 2) {
+      if (form.code.length < 6) {
+        autoSubmittedResetRef.current = '';
+      } else if (form.code.length === 6 && autoSubmittedResetRef.current !== form.code && !busy && !expired) {
+        autoSubmittedResetRef.current = form.code;
+        go(async () => {
+          const { data } = await api.post('/auth/verify-reset-otp', { email: form.email, role: form.role, code: form.code });
+          setForm((f) => ({ ...f, resetToken: data.data.resetToken }));
+          setStep(3);
+        });
+      }
+    }
+  }, [form.code, step, busy, expired]);
   const resend = () => go(async () => {
     await api.post('/auth/forgot-password', { email: form.email, role: form.role });
     setMsg('A new reset code was sent.'); setCool(60); setLeft(600);
@@ -1050,11 +1103,20 @@ export function ForgotPassword() {
             onSubmit={(e) => { e.preventDefault(); go(async () => { const { data } = await api.post('/auth/verify-reset-otp', { email: form.email, role: form.role, code: form.code }); setForm({ ...form, resetToken: data.data.resetToken }); setStep(3); }); }}
           >
             <div className="otp-timer-wrap mb-3" role="timer" aria-live="polite">
-              <span className={`otp-timer${expired ? ' is-expired' : ''}`}><Clock size={13} /> {expired ? 'Code expired' : fmtClock(left)}</span>
-              <span className="otp-timer-note">Code expires in 10 minutes</span>
+              <div className="otp-timer-left">
+                <span className={`otp-timer${expired ? ' is-expired' : ''}`}>
+                  <Clock size={13} className={expired ? '' : 'otp-clock-pulse'} />
+                  <span>{expired ? 'Code Expired' : fmtClock(left)}</span>
+                </span>
+                {!expired && <span className="otp-live-dot" title="Active session" />}
+              </div>
+              <span className="otp-timer-note">
+                <Clock size={12} className="opacity-75" />
+                {expired ? 'Request a new code below' : 'Valid for 10 minutes'}
+              </span>
             </div>
             <div className="mb-3"><OtpBoxes value={form.code} onChange={(code) => setForm((f) => ({ ...f, code }))} disabled={busy || expired} autoFocus /></div>
-            <SubmitButton loading={busy} disabled={form.code.length !== 6 || expired} icon={CheckCircle2}>Verify Code</SubmitButton>
+            <SubmitButton loading={busy} loadingText="Verifying Code..." disabled={form.code.length !== 6 || expired} icon={CheckCircle2}>Verify Code</SubmitButton>
             <div className="text-center mt-3">
               <motion.button
                 type="button"

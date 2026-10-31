@@ -3481,30 +3481,41 @@ html[data-theme='dark'] .swal2-popup .swal2-cancel:focus {
 .otp-boxes {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 8px;
-  max-width: 380px;
+  gap: 10px;
+  max-width: 420px;
+  width: 100%;
   margin: 0 auto;
 }
 .otp-box {
-  height: 54px;
+  height: 56px;
   width: 100%;
+  min-width: 0;
   text-align: center;
-  font-size: 1.35rem;
+  font-size: 1.45rem;
   font-weight: 800;
   letter-spacing: 0;
-  padding: 0 4px;
+  padding: 0;
   border-radius: 12px;
-  border: 1.5px solid var(--cc-border-2);
+  border: 2px solid var(--cc-border-2);
   background: var(--cc-surface);
   color: var(--cc-text);
-  transition: border-color var(--cc-t) var(--cc-ease), box-shadow var(--cc-t) var(--cc-ease), transform var(--cc-t-fast) var(--cc-ease);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  transition: border-color var(--cc-t) var(--cc-ease), box-shadow var(--cc-t) var(--cc-ease), transform var(--cc-t-fast) var(--cc-ease), background-color var(--cc-t) var(--cc-ease);
   -moz-appearance: textfield;
+  touch-action: manipulation;
 }
 .otp-box:focus {
   border-color: var(--cc-primary);
-  box-shadow: 0 0 0 0.2rem var(--cc-primary-ring);
+  background: var(--cc-surface);
+  box-shadow: 0 0 0 0.22rem var(--cc-primary-ring), 0 4px 12px rgba(79, 70, 229, 0.12);
   outline: none;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+}
+.otp-box:not(:placeholder-shown) {
+  border-color: rgba(79, 70, 229, 0.45);
+}
+[data-theme='dark'] .otp-box:not(:placeholder-shown) {
+  border-color: rgba(99, 102, 241, 0.55);
 }
 .otp-box:disabled { opacity: 0.6; }
 .otp-box::-webkit-outer-spin-button,
@@ -3515,10 +3526,6 @@ html[data-theme='dark'] .swal2-popup .swal2-cancel:focus {
   40%, 80% { transform: translateX(5px); }
 }
 .otp-box.is-invalid { border-color: var(--cc-danger); animation: otpShake 0.4s ease; }
-@media (max-width: 480px) {
-  .otp-boxes { gap: 6px; }
-  .otp-box { height: 46px; font-size: 1.15rem; border-radius: 10px; }
-}
 
 .otp-email { font-weight: 600; color: var(--cc-text); }
 .otp-email-badge {
@@ -3530,38 +3537,108 @@ html[data-theme='dark'] .swal2-popup .swal2-cancel:focus {
   color: var(--cc-primary);
   background: var(--cc-primary-soft);
   border: 1px solid rgba(79, 70, 229, 0.16);
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: 999px;
   margin-top: 6px;
   word-break: break-all;
+  max-width: 100%;
 }
 [data-theme='dark'] .otp-email-badge {
   background: rgba(99, 102, 241, 0.16);
   border-color: rgba(99, 102, 241, 0.28);
   color: #a5b4fc;
 }
+
+/* Full-width balanced timer banner - eliminates right gap and fits beautifully on mobile */
 .otp-timer-wrap {
-  display: inline-flex;
-  flex-direction: column;
+  display: flex;
   align-items: center;
-  gap: 3px;
-  background: var(--cc-surface-2);
-  border: 1px solid var(--cc-border);
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(14, 165, 233, 0.05) 100%);
+  border: 1px solid rgba(79, 70, 229, 0.14);
   border-radius: 12px;
-  padding: 8px 18px;
-  margin: 0 auto;
+  padding: 9px 14px;
+  margin: 0 0 16px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+[data-theme='dark'] .otp-timer-wrap {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(56, 189, 248, 0.08) 100%);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+.otp-timer-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .otp-timer {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   color: var(--cc-primary);
   font-variant-numeric: tabular-nums;
+  background: var(--cc-surface);
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--cc-border);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
-.otp-timer.is-expired { color: var(--cc-danger); }
-.otp-timer-note { font-size: 0.72rem; color: var(--cc-muted); }
+[data-theme='dark'] .otp-timer {
+  background: rgba(15, 23, 42, 0.6);
+  color: #a5b4fc;
+  border-color: rgba(99, 102, 241, 0.3);
+}
+.otp-timer.is-expired {
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+}
+.otp-clock-pulse {
+  animation: otpClockPulse 2s ease-in-out infinite;
+}
+@keyframes otpClockPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+.otp-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+  animation: otpDotPulse 1.8s infinite;
+}
+@keyframes otpDotPulse {
+  0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+.otp-timer-note {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--cc-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+@media (max-width: 576px) {
+  .otp-boxes { gap: 6px; }
+  .otp-box { height: 48px; font-size: 1.25rem; border-radius: 10px; }
+  .otp-timer-wrap { padding: 8px 12px; margin-bottom: 14px; }
+  .otp-timer { font-size: 0.85rem; padding: 3px 8px; }
+  .otp-timer-note { font-size: 0.72rem; }
+}
+
+@media (max-width: 380px) {
+  .otp-boxes { gap: 4px; }
+  .otp-box { height: 42px; font-size: 1.15rem; border-radius: 8px; border-width: 1.5px; }
+  .otp-timer-wrap { flex-direction: column; gap: 6px; text-align: center; }
+  .otp-timer-left { justify-content: center; }
+}
 
 .otp-steps {
   display: flex;
