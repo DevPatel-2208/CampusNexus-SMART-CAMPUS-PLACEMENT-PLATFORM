@@ -535,3 +535,321 @@
     padding-bottom: max(14px, env(safe-area-inset-bottom));
   }
 }
+
+
+/* ============================================================
+   AI CHATBOT MARKDOWN TABLES & ENRICHED UI
+   Enterprise-grade tables, status badges, and headers
+   ============================================================ */
+
+/* Chat Window Responsive Sizing for Tables */
+.cc-ai-window {
+  width: 450px !important;
+}
+
+@media (min-width: 992px) {
+  .cc-ai-window {
+    width: 480px !important;
+    height: 650px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .cc-ai-window {
+    width: calc(100vw - 20px) !important;
+    right: 10px !important;
+    bottom: 84px !important;
+  }
+}
+
+/* Chat bubble expand for tables */
+.cc-ai-msg-row.bot .cc-ai-bubble {
+  max-width: 95% !important;
+}
+
+/* Table Wrapper with horizontal scrolling */
+.cc-ai-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 10px 0;
+  border-radius: 12px;
+  border: 1px solid var(--cc-border, #E2E8F0);
+  background: var(--cc-surface, #ffffff);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+}
+
+.cc-ai-table-wrap::-webkit-scrollbar {
+  height: 6px;
+}
+
+.cc-ai-table-wrap::-webkit-scrollbar-track {
+  background: rgba(241, 245, 249, 0.8);
+  border-radius: 4px;
+}
+
+.cc-ai-table-wrap::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.55);
+  border-radius: 4px;
+}
+
+.cc-ai-table-wrap::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.8);
+}
+
+/* Table */
+.cc-ai-table {
+  width: 100%;
+  min-width: 340px;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.cc-ai-table thead th {
+  background: var(--cc-surface-2, #F8FAFC);
+  color: var(--cc-dark, #0F172A);
+  font-weight: 750;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 9px 12px;
+  border-bottom: 2px solid var(--cc-border, #E2E8F0);
+  white-space: nowrap;
+}
+
+.cc-ai-table tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--cc-border, #F1F5F9);
+  color: var(--cc-text, #334155);
+  vertical-align: top;
+}
+
+.cc-ai-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.cc-ai-table tbody tr:nth-child(even) {
+  background: rgba(248, 250, 252, 0.65);
+}
+
+.cc-ai-table tbody tr:hover {
+  background: rgba(241, 245, 249, 0.85);
+}
+
+/* Dark mode table */
+[data-theme='dark'] .cc-ai-table-wrap {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: #1e293b;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .cc-ai-table thead th {
+  background: #0f172a;
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme='dark'] .cc-ai-table tbody td {
+  color: #cbd5e1;
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+[data-theme='dark'] .cc-ai-table tbody tr:nth-child(even) {
+  background: rgba(15, 23, 42, 0.45);
+}
+
+[data-theme='dark'] .cc-ai-table tbody tr:hover {
+  background: rgba(51, 65, 85, 0.55);
+}
+
+/* Level Pills */
+.cc-ai-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 750;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.cc-ai-pill.pill-expert {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.cc-ai-pill.pill-advanced {
+  background: #eef2ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+}
+
+.cc-ai-pill.pill-intermediate {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.cc-ai-pill.pill-beginner {
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+
+[data-theme='dark'] .cc-ai-pill.pill-expert {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+[data-theme='dark'] .cc-ai-pill.pill-advanced {
+  background: rgba(99, 102, 241, 0.18);
+  color: #a5b4fc;
+  border-color: rgba(99, 102, 241, 0.35);
+}
+
+[data-theme='dark'] .cc-ai-pill.pill-intermediate {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+[data-theme='dark'] .cc-ai-pill.pill-beginner {
+  background: rgba(244, 63, 94, 0.18);
+  color: #fda4af;
+  border-color: rgba(244, 63, 94, 0.35);
+}
+
+/* Callout tags inside recommendations */
+.cc-ai-tag {
+  display: inline-block;
+  font-weight: 750;
+  margin-right: 4px;
+}
+
+.cc-ai-tag.tag-strength {
+  color: #059669;
+}
+
+.cc-ai-tag.tag-critical {
+  color: #e11d48;
+  background: rgba(225, 29, 72, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 800;
+}
+
+.cc-ai-tag.tag-gap {
+  color: #d97706;
+  background: rgba(217, 119, 6, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.cc-ai-tag.tag-action {
+  color: #4f46e5;
+  font-weight: 800;
+}
+
+[data-theme='dark'] .cc-ai-tag.tag-strength {
+  color: #34d399;
+}
+
+[data-theme='dark'] .cc-ai-tag.tag-critical {
+  color: #fb7185;
+  background: rgba(244, 63, 94, 0.2);
+}
+
+[data-theme='dark'] .cc-ai-tag.tag-gap {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.2);
+}
+
+[data-theme='dark'] .cc-ai-tag.tag-action {
+  color: #a5b4fc;
+}
+
+/* Section Header (like 🛠️ Projects & Certifications) */
+.cc-ai-section-head {
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: var(--cc-dark, #0F172A);
+  margin: 14px 0 6px 0;
+  padding-bottom: 5px;
+  border-bottom: 1.5px dashed var(--cc-border, #E2E8F0);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: -0.01em;
+}
+
+[data-theme='dark'] .cc-ai-section-head {
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* Blockquote */
+.cc-ai-quote {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--cc-primary, #4f46e5);
+  background: rgba(79, 70, 229, 0.04);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.82rem;
+  color: var(--cc-text, #334155);
+}
+
+[data-theme='dark'] .cc-ai-quote {
+  background: rgba(99, 102, 241, 0.08);
+  color: #cbd5e1;
+}
+
+/* Code block */
+.cc-ai-code-block {
+  background: #0f172a;
+  color: #f8fafc;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 0.78rem;
+  margin: 6px 0;
+}
+
+.cc-ai-code-lang {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 3px 8px;
+  font-size: 0.68rem;
+  color: #94a3b8;
+  font-family: monospace;
+  text-transform: uppercase;
+}
+
+.cc-ai-code-block pre {
+  margin: 0;
+  padding: 8px 12px;
+  overflow-x: auto;
+}
+
+.cc-ai-code-block code {
+  color: inherit;
+  background: transparent;
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  .cc-ai-launcher {
+    right: 14px !important;
+    bottom: 14px !important;
+    width: 48px !important;
+    height: 48px !important;
+  }
+  .cc-ai-launcher svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+}

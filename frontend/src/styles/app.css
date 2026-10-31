@@ -717,6 +717,23 @@ textarea.form-control { height: auto; padding: 12px 14px; resize: vertical; min-
   -webkit-overflow-scrolling: touch;
 }
 .cc-assessment-table-wrap .cc-table { min-width: 860px; }
+.cc-assessment-title-cell {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  padding: 5px 0;
+}
+.cc-assessment-title-cell .cc-table-co-avatar { flex: 0 0 40px; }
+.cc-assessment-title-content { display: grid; gap: 7px; min-width: 0; flex: 1 1 auto; }
+.cc-assessment-title-content .cc-table-test-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.35;
+}
+.cc-assessment-title-content .cc-table-tags-row { display: flex; flex-wrap: wrap; gap: 5px; min-width: 0; }
 .cc-assessment-name,
 .cc-assessment-context { min-width: 150px; display: grid; gap: 4px; }
 .cc-assessment-name a { color: var(--cc-text); font-weight: 700; text-decoration: none; }
@@ -2295,7 +2312,8 @@ img.cc-job-logo {
   align-items: flex-start;
   gap: 16px;
   min-width: 0;
-  flex: 1 1 540px;
+  flex: 1 1 auto;
+  max-width: 100%;
 }
 
 .cc-page-header-icon {
@@ -2443,38 +2461,144 @@ img.cc-job-logo {
   box-shadow: 0 6px 18px -3px rgba(79, 70, 229, 0.4);
 }
 
-/* Responsive Mobile Layout for Page Header */
+/* Responsive Mobile Layout for Page Header & Common Student Elements */
 @media (max-width: 768px) {
+  .cc-page {
+    padding: 0 !important;
+  }
   .cc-page-header {
-    padding: 18px 16px;
-    border-radius: 16px;
-    gap: 16px;
-    flex-direction: column;
-    align-items: stretch;
+    padding: 16px 14px !important;
+    border-radius: 16px !important;
+    gap: 12px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    margin-bottom: 16px !important;
+    min-height: auto !important;
   }
   .cc-page-header-main {
-    gap: 14px;
-    align-items: flex-start;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
   }
   .cc-page-header-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+    flex-shrink: 0 !important;
   }
   .cc-page-header-icon svg {
-    width: 22px;
-    height: 22px;
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .cc-page-header-text {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+  .cc-page-header-eyebrow {
+    font-size: 0.65rem !important;
+    padding: 2px 9px !important;
+    margin-bottom: 4px !important;
   }
   .cc-page-header-title {
-    font-size: 1.35rem;
+    font-size: 1.25rem !important;
+    line-height: 1.25 !important;
+  }
+  .cc-page-header-desc {
+    font-size: 0.82rem !important;
+    margin-top: 4px !important;
+    line-height: 1.4 !important;
+  }
+  .cc-page-header-meta {
+    margin-top: 8px !important;
+    gap: 6px !important;
+  }
+  .cc-page-header-meta .cc-badge,
+  .cc-page-header-meta > span {
+    font-size: 0.72rem !important;
+    padding: 3px 10px !important;
   }
   .cc-page-header-actions {
-    width: 100%;
-    margin-top: 4px;
+    width: 100% !important;
+    margin-top: 2px !important;
+    display: flex !important;
+    gap: 8px !important;
   }
   .cc-page-header-actions > * {
-    width: 100%;
-    justify-content: center;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Responsive KPI Cards Across Student Portal */
+  .cc-kpis,
+  .cc-student-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    margin-bottom: 16px !important;
+  }
+  .cc-kpi {
+    padding: 12px 14px !important;
+    border-radius: 14px !important;
+  }
+  .cc-kpi-icon {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 10px !important;
+    margin-bottom: 8px !important;
+  }
+  .cc-kpi-icon svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  .cc-kpi-v {
+    font-size: 1.35rem !important;
+    font-weight: 750 !important;
+    line-height: 1.15 !important;
+  }
+  .cc-kpi-l {
+    font-size: 0.72rem !important;
+    line-height: 1.2 !important;
+  }
+  .cc-kpi-hint {
+    display: none !important;
+  }
+
+  /* Responsive Search and Filters */
+  .cc-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin-bottom: 16px !important;
+  }
+  .cc-toolbar-fields {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+  .cc-search {
+    width: 100% !important;
+  }
+  .cc-search-input {
+    width: 100% !important;
+    font-size: 0.85rem !important;
+  }
+  .cc-select-wrap,
+  .cc-select {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .cc-toolbar-clear {
+    align-self: flex-end !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .cc-kpis,
+  .cc-student-kpis {
+    grid-template-columns: 1fr !important;
   }
 }
 
@@ -3177,7 +3301,7 @@ button.cc-card:hover,
   .cc-chat-panel { left: 10px; right: 10px; width: auto; max-width: none; max-height: calc(100dvh - 24px); }
 }
 
-/* ---------- SweetAlert2 theme bridge (alerts.js / welcome.js) ---------- */
+/* ---------- SweetAlert2 theme bridge & button styling ---------- */
 .swal2-popup.cc-swal {
   border-radius: 18px !important;
   font-family: var(--cc-font) !important;
@@ -3190,14 +3314,98 @@ button.cc-card:hover,
 }
 .swal2-popup.cc-swal .swal2-title { font-size: 1.2rem !important; font-weight: 700 !important; }
 .swal2-popup.cc-swal .swal2-html-container { font-size: 0.9rem !important; margin-top: 4px; }
-.swal2-popup.cc-swal .swal2-confirm,
-.swal2-popup.cc-swal .swal2-cancel {
+.swal2-popup .swal2-confirm,
+.swal2-popup .swal2-cancel {
   border-radius: 10px !important;
   font-weight: 600 !important;
   padding: 0.55rem 1.3rem !important;
   font-size: 0.88rem !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
 }
-.swal2-popup.cc-swal .swal2-styled:focus { box-shadow: 0 0 0 0.2rem var(--cc-primary-ring) !important; }
+
+/* Fix SweetAlert Cancel Button across the entire app (Light & Dark theme) */
+.swal2-popup .swal2-cancel,
+.swal2-popup .swal2-styled.swal2-cancel,
+div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel),
+.cc-swal-cancel {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+}
+
+.swal2-popup .swal2-cancel:hover,
+.swal2-popup .swal2-styled.swal2-cancel:hover,
+div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel):hover,
+.cc-swal-cancel:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+  border-color: #94a3b8 !important;
+}
+
+.swal2-popup .swal2-cancel:active,
+.swal2-popup .swal2-styled.swal2-cancel:active,
+div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel):active {
+  background-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.swal2-popup .swal2-cancel:focus,
+.swal2-popup .swal2-styled.swal2-cancel:focus,
+div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel):focus {
+  box-shadow: 0 0 0 0.2rem rgba(148, 163, 184, 0.4) !important;
+  outline: none !important;
+}
+
+/* Dark theme cancel button */
+[data-theme='dark'] .swal2-popup .swal2-cancel,
+[data-theme='dark'] .swal2-popup .swal2-styled.swal2-cancel,
+[data-theme='dark'] div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel),
+[data-theme='dark'] .cc-swal-cancel,
+html[data-theme='dark'] .swal2-popup .swal2-cancel,
+html[data-theme='dark'] .swal2-popup .swal2-styled.swal2-cancel {
+  background-color: #1e293b !important;
+  color: #e2e8f0 !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+}
+
+[data-theme='dark'] .swal2-popup .swal2-cancel:hover,
+[data-theme='dark'] .swal2-popup .swal2-styled.swal2-cancel:hover,
+[data-theme='dark'] div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel):hover,
+[data-theme='dark'] .cc-swal-cancel:hover,
+html[data-theme='dark'] .swal2-popup .swal2-cancel:hover,
+html[data-theme='dark'] .swal2-popup .swal2-styled.swal2-cancel:hover {
+  background-color: #334155 !important;
+  color: #ffffff !important;
+  border-color: #475569 !important;
+}
+
+[data-theme='dark'] .swal2-popup .swal2-cancel:active,
+[data-theme='dark'] .swal2-popup .swal2-styled.swal2-cancel:active,
+html[data-theme='dark'] .swal2-popup .swal2-cancel:active {
+  background-color: #475569 !important;
+}
+
+[data-theme='dark'] .swal2-popup .swal2-cancel:focus,
+[data-theme='dark'] .swal2-popup .swal2-styled.swal2-cancel:focus,
+html[data-theme='dark'] .swal2-popup .swal2-cancel:focus {
+  box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.35) !important;
+}
+
+/* Confirm button polish */
+.swal2-popup .swal2-confirm,
+.swal2-popup .swal2-styled.swal2-confirm,
+.cc-swal-confirm {
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25) !important;
+}
+.swal2-popup .swal2-confirm:hover,
+.swal2-popup .swal2-styled.swal2-confirm:hover,
+.cc-swal-confirm:hover {
+  filter: brightness(1.06);
+}
+.swal2-popup .swal2-styled:focus { box-shadow: 0 0 0 0.2rem var(--cc-primary-ring) !important; }
 .cc-swal-extra { margin-top: 8px; }
 .cc-success-wrap {
   font-size: 0.9rem;
@@ -7837,6 +8045,9 @@ aside.cc-sidebar.cc-ss-student.is-collapsed [data-tip]:hover::after {
 .cc-test-card-title a:hover {
   color: var(--cc-primary);
 }
+.cc-test-card-title a { overflow-wrap: anywhere; }
+.cc-test-classification { margin-top: -3px; }
+.cc-test-chip-difficulty { color: #a3530b; background: #fff7e8; border-color: #f4d49b; }
 
 .cc-test-meta-chips {
   display: flex;
@@ -11510,6 +11721,24 @@ aside.cc-sidebar.is-collapsed [data-tip]:hover::after {
 
 .cc-assessment-table-wrap .cc-table tbody tr:hover {
   background: rgba(99, 102, 241, 0.035) !important;
+}
+
+@media (max-width: 991.98px) {
+  .cc-assessments-mobile-list { display: grid; gap: 12px; }
+  .cc-test-card-mobile { margin-bottom: 0 !important; }
+  .cc-test-card-body { padding: clamp(14px, 4vw, 20px); }
+  .cc-test-card-mobile .cc-test-co-name,
+  .cc-test-card-mobile .cc-test-role-name { max-width: min(58vw, 320px); }
+  .cc-test-card-title { margin: 14px 0 8px; font-size: clamp(1rem, 4vw, 1.15rem); }
+  .cc-test-meta-chips { gap: 7px; }
+  .cc-test-chip { max-width: 100%; overflow-wrap: anywhere; }
+}
+
+@media (max-width: 420px) {
+  .cc-test-card-body { padding: 13px; }
+  .cc-test-card-mobile .cc-test-co-name,
+  .cc-test-card-mobile .cc-test-role-name { max-width: 48vw; }
+  .cc-test-card-mobile .cc-test-chip { font-size: .72rem; padding: 4px 7px; }
 }
 
 [data-theme='dark'] .cc-assessment-table-wrap .cc-table tbody tr:hover {
