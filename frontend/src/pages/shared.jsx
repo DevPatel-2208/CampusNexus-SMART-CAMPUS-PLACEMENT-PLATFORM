@@ -692,14 +692,14 @@ export function JobDetails({ prefix = '', canApply = false }) {
               <div>
                 {user?.role === 'student' ? (
                   !isProfileComplete ? (
-                    <div className="card border-0 rounded-4 overflow-hidden shadow-sm p-3.5 mb-2" style={{ background: 'linear-gradient(180deg, #fffbeb 0%, #ffffff 100%)', border: '1.5px solid #fde68a' }}>
-                      <div className="d-flex align-items-center gap-2.5 mb-2.5">
+                    <div className="card cc-profile-incomplete-card border-0 rounded-4 overflow-hidden shadow-sm mb-2" style={{ background: 'linear-gradient(180deg, #fffbeb 0%, #ffffff 100%)', border: '1.5px solid #fde68a' }}>
+                      <div className="cc-profile-incomplete-header">
                         <div className="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style={{ width: 36, height: 36, background: '#fef3c7', color: '#d97706' }}>
                           <AlertTriangle size={18} />
                         </div>
                         <div className="min-w-0">
-                          <h4 className="fw-bold text-dark mb-0 fs-6">Profile Incomplete ({studentProfileCompletion}%)</h4>
-                          <span className="text-muted" style={{ fontSize: '0.74rem' }}>100% profile details required to apply</span>
+                          <h4 className="cc-profile-incomplete-title">Profile Incomplete ({studentProfileCompletion}%)</h4>
+                          <span className="cc-profile-incomplete-subtitle">100% profile details required to apply</span>
                         </div>
                       </div>
 
@@ -721,22 +721,22 @@ export function JobDetails({ prefix = '', canApply = false }) {
                         </div>
                       </div>
 
-                      <p className="text-secondary mb-3" style={{ fontSize: '0.82rem', lineHeight: 1.55 }}>
+                      <p className="cc-profile-incomplete-copy">
                         Recruiters and TPOs require full academic and personal credentials. Jab tak aapki profile <strong>100% complete</strong> nahi hoti, apply button unlock nahi hoga.
                       </p>
 
-                      <div className="d-grid gap-2">
+                      <div className="cc-profile-incomplete-actions">
                         <Link
                           to="/student/profile"
-                          className="btn btn-warning rounded-pill py-2.5 fw-bold d-inline-flex align-items-center justify-content-center gap-2 shadow-sm text-dark"
+                          className="btn btn-warning rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm text-dark cc-profile-incomplete-cta"
                         >
                           <User size={15} />
-                          <span>Complete My Profile ({100 - studentProfileCompletion}% remaining)</span>
+                          <span className="cc-profile-incomplete-cta-label">Complete My Profile ({100 - studentProfileCompletion}% remaining)</span>
                           <ArrowRight size={15} />
                         </Link>
                         <button
                           type="button"
-                          className="btn btn-light border text-muted rounded-pill py-2 small fw-semibold d-inline-flex align-items-center justify-content-center gap-1.5"
+                          className="btn btn-light border text-muted rounded-pill small fw-semibold d-flex align-items-center justify-content-center gap-2 cc-profile-locked-cta"
                           disabled
                           style={{ cursor: 'not-allowed', opacity: 0.65 }}
                         >
