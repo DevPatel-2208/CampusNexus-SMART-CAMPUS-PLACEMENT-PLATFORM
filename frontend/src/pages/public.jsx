@@ -4,7 +4,7 @@ import {
   ArrowLeft, ArrowRight, Award, BadgeCheck, BarChart3, Bookmark, BookmarkCheck,
   Bot, Briefcase, Building2, CalendarCheck, CheckCircle2, ChevronDown, ChevronRight,
   ClipboardList, Clock, Eye, GraduationCap, Home as HomeIcon, Info, IndianRupee,
-  Layers, Lightbulb, Loader2, Mail, MapPin, MessageCircle, Phone, Quote, Search, Send,
+  Layers, Lightbulb, Loader2, Mail, MapPin, MessageCircle, Phone, Search, Send,
   ExternalLink, FileText, HelpCircle, MessageSquare, PhoneCall, ShieldCheck, SlidersHorizontal, Sparkles, Target, TrendingUp, Trophy, User, UserPlus, Users, X, Zap,
 } from 'lucide-react';
 import Swal from 'sweetalert2';
@@ -330,23 +330,7 @@ const STEPS = [
   },
 ];
 
-const TESTIMONIALS = [
-  {
-    name: 'Rahul Sharma',
-    role: 'MCA Student • Placed at TCS',
-    text: 'CampusNexus completely transformed our campus placement experience. I found my software developer internship within two weeks and tracked my interview results in real time.',
-  },
-  {
-    name: 'Priya Mehta',
-    role: 'B.Tech CSE • Placed at Infosys',
-    text: 'The platform is fast, clean and intuitive. Applying for top tech companies, uploading updated resumes, and receiving shortlists became completely frictionless.',
-  },
-  {
-    name: 'Prof. Arjun Patel',
-    role: 'Training & Placement Officer',
-    text: 'Managing hundreds of drives manually was exhausting. CampusNexus gives our TPO team full transparency with live student shortlists, instant broadcast alerts, and analytics.',
-  },
-];
+
 
 const CONTACT_CARDS = [
   {
@@ -698,34 +682,7 @@ export function Home() {
         </Reveal>
       </section>
 
-      {/* Testimonials */}
-      <section className="cc-mkt-section">
-        <SecHead
-          eyebrow="Success Stories"
-          icon={<MessageCircle size={14} />}
-          title="What Our Users Say"
-          text="Real experiences from students and coordinators who used CampusNexus to reach their career goals."
-        />
-        <div className="row g-4">
-          {TESTIMONIALS.map((t, i) => (
-            <div key={t.name} className="col-lg-4 col-md-6">
-              <Reveal delay={i * 90}>
-                <div className="cc-quote-card">
-                  <span className="cc-quote-mark"><Quote size={32} /></span>
-                  <p className="cc-quote-text">"{t.text}"</p>
-                  <div className="cc-quote-author">
-                    <div className="cc-quote-avatar">{t.name[0]}</div>
-                    <div>
-                      <h5 className="cc-quote-name">{t.name}</h5>
-                      <small className="cc-quote-role">{t.role}</small>
-                    </div>
-                  </div>
-                </div>
-              </Reveal>
-            </div>
-          ))}
-        </div>
-      </section>
+      
 
       {/* Call to Action */}
       <section className="cc-mkt-section mb-5">
