@@ -35,7 +35,7 @@ services:
       - key: SMTP_PASS
         sync: false
       - key: MAIL_FROM
-        value: CampusNexus <no-reply@campusnexus.local>
+        value: CampusNexus <devkpatel426@gmail.com>
       - key: MAIL_REQUIRED
         value: "false"
       - key: ALLOW_SEED

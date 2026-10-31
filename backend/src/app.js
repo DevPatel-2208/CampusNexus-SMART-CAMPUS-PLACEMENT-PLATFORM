@@ -52,6 +52,7 @@ app.get('/health', (req, res) => {
     uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
     service: 'CampusNexus Backend API',
+    mailConfigured: Boolean(env.SMTP_USER && env.SMTP_PASS),
   });
 });
 
@@ -61,6 +62,7 @@ app.get('/api/v1/health', (req, res) => {
     uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
     service: 'CampusNexus Backend API',
+    mailConfigured: Boolean(env.SMTP_USER && env.SMTP_PASS),
   });
 });
 

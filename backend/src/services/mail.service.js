@@ -5,40 +5,32 @@ let transporter = null;
 
 function getTransporter() {
   if (!env.SMTP_USER || !env.SMTP_PASS) return null;
+  const isGmail = (env.SMTP_HOST || '').toLowerCase().includes('gmail');
+  if (isGmail) {
+    // Gmail aggressively terminates idle pooled sockets. Fresh transport avoids socket hang-ups.
+    return nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
+    });
+  }
   if (!transporter) {
-    const isGmail = (env.SMTP_HOST || '').toLowerCase().includes('gmail');
-    const opts = isGmail
-      ? {
-          service: 'gmail',
-          pool: true,
-          maxConnections: 3,
-          maxMessages: 100,
-          connectionTimeout: 8000,
-          greetingTimeout: 8000,
-          socketTimeout: 15000,
-          auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
-        }
-      : {
-          host: env.SMTP_HOST,
-          port: env.SMTP_PORT,
-          secure: env.SMTP_SECURE || env.SMTP_PORT === 465,
-          pool: true,
-          maxConnections: 3,
-          maxMessages: 100,
-          connectionTimeout: 8000,
-          greetingTimeout: 8000,
-          socketTimeout: 15000,
-          auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
-          tls: { rejectUnauthorized: env.NODE_ENV === 'production' },
-        };
-    transporter = nodemailer.createTransport(opts);
+    transporter = nodemailer.createTransport({
+      host: env.SMTP_HOST,
+      port: env.SMTP_PORT,
+      secure: env.SMTP_SECURE || env.SMTP_PORT === 465,
+      auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
+      tls: { rejectUnauthorized: env.NODE_ENV === 'production' },
+    });
   }
   return transporter;
 }
 
 async function sendMail(to, subject, html) {
   const tx = getTransporter();
-  const from = env.MAIL_FROM || (env.SMTP_USER ? `"CampusNexus" <${env.SMTP_USER}>` : '"CampusNexus" <no-reply@campusnexus.local>');
+  // Always use authenticated SMTP_USER address if MAIL_FROM is missing or uses local domain
+  const from = (env.SMTP_USER && (!env.MAIL_FROM || env.MAIL_FROM.includes('campusnexus.local')))
+    ? `"CampusNexus" <${env.SMTP_USER}>`
+    : (env.MAIL_FROM || (env.SMTP_USER ? `"CampusNexus" <${env.SMTP_USER}>` : '"CampusNexus" <no-reply@campusnexus.local>'));
 
   if (!tx) {
     if (env.NODE_ENV === 'production' && env.MAIL_REQUIRED) throw new Error('Email provider not configured');
@@ -52,6 +44,18 @@ async function sendMail(to, subject, html) {
     return { sent: true, messageId: info.messageId };
   } catch (err) {
     console.error('[mail:error] Failed to send email:', err.message);
+    // If a non-gmail pooled transporter failed with connection error, reset transporter and retry once
+    try {
+      transporter = null;
+      const retryTx = getTransporter();
+      if (retryTx) {
+        const retryInfo = await retryTx.sendMail({ from, to, subject, html });
+        console.log(`[mail:sent:retry] to=${to} messageId=${retryInfo.messageId}`);
+        return { sent: true, messageId: retryInfo.messageId };
+      }
+    } catch (retryErr) {
+      console.error('[mail:retry-error] Retry failed:', retryErr.message);
+    }
     throw new Error(`Email delivery error: ${err.message}`);
   }
 }
