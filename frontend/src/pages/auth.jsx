@@ -496,12 +496,19 @@ export function Register() {
       <AnimatePresence>
         {err && (
           <motion.div
-            className="alert alert-danger py-2"
+            className="alert alert-danger py-2 d-flex flex-column gap-1 text-start"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
           >
-            {err}
+            <div>{err}</div>
+            {(err.toLowerCase().includes('already') || err.toLowerCase().includes('sign in')) && (
+              <div className="mt-1">
+                <Link to="/login" className="btn btn-sm btn-outline-danger py-0 px-2 fw-semibold">
+                  Sign In to Your Account →
+                </Link>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

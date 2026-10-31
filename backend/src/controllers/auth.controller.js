@@ -27,7 +27,46 @@ const register = asyncHandler(async (req, res) => {
     throw ApiError.badRequest('Password must be at least 8 characters long and include both letters and numbers.');
   }
   const exists = await User.findOne({ email: email.toLowerCase() });
-  if (exists) throw ApiError.conflict('An account with this email already exists.');
+  if (exists) {
+    if (exists.emailVerifiedAt && exists.status === 'active') {
+      throw ApiError.conflict('An account with this email is already registered and verified. Please sign in instead.');
+    }
+    // Account exists but is unverified — update details, set active/inactive properly, and issue a fresh OTP
+    exists.name = name;
+    exists.password = await hashPassword(password);
+    exists.role = role;
+    exists.status = 'inactive';
+    await exists.save();
+
+    if (role === 'student') {
+      await StudentProfile.findOneAndUpdate(
+        { user: exists._id },
+        { $setOnInsert: { enrollmentNo: 'ENR' + String(exists._id).slice(-6).padStart(6, '0'), profileCompletion: 20 } },
+        { upsert: true }
+      );
+    } else {
+      await CompanyProfile.findOneAndUpdate(
+        { user: exists._id },
+        { $set: { companyName: name, email: exists.email, verificationStatus: 'pending' } },
+        { upsert: true }
+      );
+    }
+
+    let mailSent = true;
+    try { ({ mailSent } = await issueEmailOtp(exists)); } catch (e) { if (e.status !== 429) throw e; }
+    audit('register_retry', 'auth', `Unverified user re-submitted registration; new OTP issued`, exists._id, req);
+    return res.status(200).json({
+      success: true,
+      data: {
+        userId: exists._id,
+        email: exists.email,
+        pendingVerification: true,
+        alreadyExisted: true,
+        mailSent,
+      },
+    });
+  }
+
   const user = await User.create({ name, email: email.toLowerCase(), password: await hashPassword(password), role, status: 'inactive' });
   if (role === 'student') {
     await StudentProfile.create({ user: user._id, enrollmentNo: 'ENR' + String(user._id).slice(-6).padStart(6, '0'), profileCompletion: 20 });
@@ -47,13 +86,16 @@ const login = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email: String(email).toLowerCase() }).select('+password');
   const ok = user ? await verifyPassword(password, user.password) : false;
   if (!user || !ok) throw ApiError.unauthorized('Unable to sign in. Please check your credentials and try again.');
-  if (user.status !== 'active') throw ApiError.forbidden('Your account is currently inactive. Please contact your institution.');
+
+  // If email was never verified, prompt for OTP verification regardless of inactive flag
   if (!user.emailVerifiedAt) {
     try { await issueEmailOtp(user); } catch { /* cooldown — still require verify */ }
     const err = ApiError.forbidden('Please verify your email first. A verification code has been sent.');
     err.code = 'EMAIL_NOT_VERIFIED'; err.userId = user._id; err.email = user.email;
     throw err;
   }
+
+  if (user.status !== 'active') throw ApiError.forbidden('Your account is currently inactive. Please contact your institution.');
   // Atomically flip firstLogin true->false. Only one concurrent request can match,
   // so simultaneous logins cannot both classify the user as first-time.
   const flip = await User.updateOne({ _id: user._id, firstLogin: true }, { $set: { firstLogin: false } });
