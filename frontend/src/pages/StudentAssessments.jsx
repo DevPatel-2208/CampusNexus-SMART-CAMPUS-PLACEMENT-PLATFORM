@@ -9,9 +9,11 @@ import {
   MapPin, Percent, Play, RefreshCw, Search, Shield, ShieldCheck, Sparkles, Star, Target,
   TrendingUp, Trophy, User, Users, Video, Wifi, X, XCircle, Zap,
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import Swal from 'sweetalert2';
 import api, { apiErrorMessage, downloadFile, fileUrl } from '../services/api';
 import { useFetch } from '../hooks/useUnread';
-import { confirmAction, promptText } from '../services/alerts';
+import { confirmAction, promptText, swalBase } from '../services/alerts';
 import {
   DataTable, Empty, ErrorState, KpiCard, KpiGrid, Loading, PageHeader, Pager,
   SearchInput, SectionCard, SelectFilter, StatusBadge, DetailGrid, Toolbar,
@@ -280,9 +282,9 @@ export function Assessments() {
                       const coInitial = String(a.company?.companyName || 'C')[0]?.toUpperCase() || 'C';
                       const diffKey = String(a.difficulty || 'medium').toLowerCase();
                       return (
-                        <div className="d-flex align-items-center gap-2.5 py-1">
+                        <div className="cc-assessment-title-cell">
                           <span className="cc-table-co-avatar" aria-hidden="true">{coInitial}</span>
-                          <div className="min-w-0 flex-grow-1">
+                          <div className="cc-assessment-title-content">
                             <Link to={`/student/assessments/${a._id}`} className="cc-table-test-name text-truncate d-block" title={a.title}>
                               {a.title}
                             </Link>
@@ -393,6 +395,13 @@ export function Assessments() {
                     <h4 className="cc-test-card-title">
                       <Link to={`/student/assessments/${a._id}`}>{a.title}</Link>
                     </h4>
+
+                    <div className="cc-test-meta-chips cc-test-classification">
+                      <span className="cc-test-chip cc-test-chip-cat">{a.categories || 'Technical'}</span>
+                      <span className={`cc-test-chip cc-test-chip-difficulty cc-diff-${String(a.difficulty || 'medium').toLowerCase()}`}>
+                        {a.difficulty || 'Medium'}
+                      </span>
+                    </div>
 
                     {/* Meta chips */}
                     <div className="cc-test-meta-chips">
@@ -620,6 +629,75 @@ export function AttemptResult() {
   const { id } = useParams();
   const res = useFetch(async () => (await api.get(`/attempts/${id}/result`)).data.data, [id]);
   const [activeFilter, setActiveFilter] = useState('all'); // 'all', 'correct', 'wrong'
+  const celebratedRef = useRef(false);
+
+  const triggerPassCelebration = (isManual = false) => {
+    const attempt = res.data?.attempt;
+    const percentage = Math.max(0, Math.min(100, Number(attempt?.percentage) || 0));
+    const passingScore = attempt?.assessment?.passingPercentage ?? 60;
+    const assessmentTitle = attempt?.assessment?.title || 'Assessment';
+
+    try {
+      // Dual-cannon confetti burst for executive celebration
+      confetti({
+        particleCount: 90,
+        spread: 80,
+        origin: { x: 0.15, y: 0.55 },
+        colors: ['#4f46e5', '#7c3aed', '#10b981', '#f59e0b', '#ec4899', '#38bdf8'],
+        zIndex: 10001,
+      });
+      confetti({
+        particleCount: 90,
+        spread: 80,
+        origin: { x: 0.85, y: 0.55 },
+        colors: ['#4f46e5', '#7c3aed', '#10b981', '#f59e0b', '#ec4899', '#38bdf8'],
+        zIndex: 10001,
+      });
+      setTimeout(() => {
+        confetti({
+          particleCount: 120,
+          spread: 110,
+          origin: { x: 0.5, y: 0.38 },
+          colors: ['#4f46e5', '#10b981', '#fbbf24', '#38bdf8'],
+          zIndex: 10001,
+        });
+      }, 350);
+    } catch {
+      // safe fallback
+    }
+
+    Swal.fire(swalBase({
+      title: '🎉 Congratulations! You Passed!',
+      html: `
+        <div style="text-align: center; padding: 6px 0;">
+          <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 18px; border-radius: 999px; background: rgba(16, 185, 129, 0.12); color: #059669; font-weight: 750; font-size: 0.95rem; margin-bottom: 14px; border: 1px solid rgba(16, 185, 129, 0.28);">
+            <span>Score: ${percentage}%</span>
+            <span>•</span>
+            <span>Qualifying Cutoff: ${passingScore}%</span>
+          </div>
+          <p style="font-size: 0.95rem; color: var(--cc-muted, #64748b); line-height: 1.55; margin-bottom: 8px;">
+            Outstanding performance! You have successfully cleared <b>${assessmentTitle}</b>.
+          </p>
+          <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.84rem; color: #10b981; font-weight: 650; margin-top: 4px;">
+            <span>✨ Qualified for Next Stage & Interview Rounds</span>
+          </div>
+        </div>
+      `,
+      icon: 'success',
+      confirmButtonText: 'Review Full Breakdown 🚀',
+      confirmButtonColor: '#4f46e5',
+    }));
+  };
+
+  useEffect(() => {
+    if (res.data?.attempt?.result === 'Passed' && !celebratedRef.current) {
+      celebratedRef.current = true;
+      const t = setTimeout(() => {
+        triggerPassCelebration();
+      }, 400);
+      return () => clearTimeout(t);
+    }
+  }, [res.data]);
 
   if (res.loading) return <Loading rows={4} height={140} />;
   if (res.error) return <ErrorState message={apiErrorMessage(res.error)} onRetry={res.reload} />;
@@ -652,9 +730,21 @@ export function AttemptResult() {
         <Link to="/student/assessments" className="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-2">
           <ArrowLeft size={15} /> Back to Assessments
         </Link>
-        <button type="button" className="btn btn-sm btn-primary d-inline-flex align-items-center gap-2" onClick={downloadPdf}>
-          <Download size={15} /> Download PDF Report
-        </button>
+        <div className="d-flex align-items-center gap-2 flex-wrap">
+          {passed && (
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-2 rounded-pill px-3 fw-bold shadow-sm"
+              onClick={() => triggerPassCelebration(true)}
+              title="Replay celebratory fireworks & congratulations"
+            >
+              <Sparkles size={14} className="text-warning" /> Celebrate Again 🎉
+            </button>
+          )}
+          <button type="button" className="btn btn-sm btn-primary d-inline-flex align-items-center gap-2" onClick={downloadPdf}>
+            <Download size={15} /> Download PDF Report
+          </button>
+        </div>
       </div>
 
       <PageHeader
