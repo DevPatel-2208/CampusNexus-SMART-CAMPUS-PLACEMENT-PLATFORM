@@ -321,6 +321,65 @@ function forgotPasswordTemplate(code, minutes = 10) {
 </html>`;
 }
 
+function escapeEmailHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  })[char]);
+}
+
+function notificationEmailTemplate(title, message, { actionUrl, type = 'general', recipientName = '' } = {}) {
+  const safeTitle = escapeEmailHtml(title || 'CampusNexus update');
+  const safeName = escapeEmailHtml(recipientName);
+  const safeMessage = escapeEmailHtml(message).replace(/\r?\n/g, '<br>');
+  const localOrigin = env.CORS_ORIGINS.find((origin) => /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin));
+  const productionOrigin = env.CORS_ORIGINS.find((origin) => !/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin));
+  const appOrigin = env.NODE_ENV === 'production'
+    ? productionOrigin || env.CORS_ORIGINS[0] || 'https://campusnexus-placement-platform.netlify.app'
+    : localOrigin || env.CORS_ORIGINS[0] || 'http://localhost:5173';
+  let href = '';
+  if (actionUrl) {
+    try {
+      const parsed = new URL(actionUrl, appOrigin);
+      if (parsed.protocol === 'https:' || parsed.protocol === 'http:') href = parsed.toString();
+    } catch { /* omit an invalid action URL */ }
+  }
+  const actionLabel = title?.toLowerCase().includes('new application')
+    ? 'Review applications'
+    : type === 'application' ? 'View application' : 'Open CampusNexus';
+  const year = new Date().getFullYear();
+
+  return `<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${safeTitle}</title></head>
+<body style="margin:0;padding:0;background:#f3f5fb;font-family:Arial,Helvetica,sans-serif;color:#172033;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f5fb;padding:32px 12px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:580px;background:#ffffff;border:1px solid #e5e9f2;border-radius:18px;overflow:hidden;">
+        <tr><td style="height:5px;background:#5b4bef;font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td style="padding:26px 28px 18px;">
+          <table role="presentation" cellspacing="0" cellpadding="0"><tr>
+            <td align="center" valign="middle" width="40" height="40" style="width:40px;height:40px;border-radius:12px;background:#5b4bef;color:#ffffff;font-size:15px;font-weight:bold;">CN</td>
+            <td style="padding-left:11px;color:#172033;font-size:18px;font-weight:700;">CampusNexus</td>
+          </tr></table>
+        </td></tr>
+        <tr><td style="padding:12px 28px 30px;">
+          <p style="margin:0 0 10px;color:#6558e8;font-size:11px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;">${escapeEmailHtml(type)} update</p>
+          <h1 style="margin:0 0 14px;color:#172033;font-size:24px;line-height:1.3;">${safeTitle}</h1>
+          ${safeName ? `<p style="margin:0 0 12px;color:#47536b;font-size:15px;line-height:1.6;">Hello ${safeName},</p>` : ''}
+          <p style="margin:0;color:#47536b;font-size:15px;line-height:1.7;">${safeMessage}</p>
+          ${href ? `<table role="presentation" cellspacing="0" cellpadding="0" style="margin-top:24px;"><tr><td bgcolor="#5b4bef" style="border-radius:10px;"><a href="${escapeEmailHtml(href)}" style="display:inline-block;padding:12px 18px;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;">${actionLabel}</a></td></tr></table>` : ''}
+        </td></tr>
+        <tr><td style="padding:18px 28px;border-top:1px solid #edf0f6;color:#7a8499;font-size:12px;line-height:1.6;">
+          You received this message because of activity on your CampusNexus account.<br>
+          &copy; ${year} CampusNexus · Campus Placement Management
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
 function otpTemplate(code, purpose, minutes = 10) {
   if (purpose && purpose.toLowerCase().includes('password')) {
     return forgotPasswordTemplate(code, minutes);
@@ -328,4 +387,4 @@ function otpTemplate(code, purpose, minutes = 10) {
   return emailVerificationTemplate(code, minutes);
 }
 
-module.exports = { sendMail, otpTemplate, emailVerificationTemplate, forgotPasswordTemplate };
+module.exports = { sendMail, otpTemplate, emailVerificationTemplate, forgotPasswordTemplate, notificationEmailTemplate };
