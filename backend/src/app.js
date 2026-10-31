@@ -11,10 +11,15 @@ const { notFound, errorHandler } = require('./middleware/validate');
 
 const app = express();
 app.set('trust proxy', 1);
-// Install CORS before the other middleware and routes so preflight requests and
-// application error responses retain the appropriate browser access headers.
+// Install CORS before other middleware and routes so preflight requests and
+// application error responses retain browser access control headers.
 app.use(cors(corsOptions));
-app.use(helmet({ crossOriginResourcePolicy: false }));
+app.options('*', cors(corsOptions));
+
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+  crossOriginEmbedderPolicy: false,
+}));
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));

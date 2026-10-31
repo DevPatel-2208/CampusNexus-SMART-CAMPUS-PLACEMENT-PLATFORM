@@ -53,7 +53,7 @@ function refreshCookieOptions() {
     httpOnly: true,
     sameSite: isProd ? 'none' : 'lax',
     secure: isProd,
-    path: '/api/v1/auth',
+    path: '/',
     maxAge: 7 * 24 * 3600 * 1000,
   };
 }

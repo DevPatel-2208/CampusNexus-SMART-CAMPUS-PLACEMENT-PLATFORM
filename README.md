@@ -172,19 +172,24 @@ npm run seed
 
 ### 4. Run Locally
 
-Open two separate terminals:
+You can launch both frontend and backend together with a single root command:
+```bash
+npm run dev
+```
+
+Or run them in separate terminals:
 
 **Terminal 1 — Backend API:**
 ```bash
-cd backend
-npm run dev
+npm run dev:backend
+# Or: cd backend && npm run dev
 # Server listens on http://localhost:5002
 ```
 
 **Terminal 2 — Frontend Application:**
 ```bash
-cd frontend
-npm run dev
+npm run dev:frontend
+# Or: cd frontend && npm run dev
 # Vite runs on http://localhost:5173
 ```
 
