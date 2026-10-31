@@ -44,6 +44,7 @@ const env = {
   GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI || '',
   ALLOW_SEED: process.env.ALLOW_SEED === 'true',
   RESEND_API_KEY: (process.env.RESEND_API_KEY || '').trim(),
+  RESEND_FROM: (process.env.RESEND_FROM || '').trim(),
   BREVO_API_KEY: (process.env.BREVO_API_KEY || '').trim(),
   BREVO_SENDER: (process.env.BREVO_SENDER || process.env.SMTP_USER || '').trim(),
 };

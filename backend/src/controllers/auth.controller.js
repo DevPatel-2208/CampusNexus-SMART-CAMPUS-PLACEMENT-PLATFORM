@@ -89,8 +89,8 @@ const login = asyncHandler(async (req, res) => {
 
   // If email was never verified, prompt for OTP verification regardless of inactive flag
   if (!user.emailVerifiedAt) {
-    try { await issueEmailOtp(user); } catch { /* cooldown — still require verify */ }
-    const err = ApiError.forbidden('Please verify your email first. A verification code has been sent.');
+    try { await issueEmailOtp(user); } catch (sendError) { if (sendError.status !== 429) throw sendError; }
+    const err = ApiError.forbidden('Please verify your email first.');
     err.code = 'EMAIL_NOT_VERIFIED'; err.userId = user._id; err.email = user.email;
     throw err;
   }

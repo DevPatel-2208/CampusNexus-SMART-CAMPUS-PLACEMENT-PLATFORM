@@ -37,8 +37,10 @@ services:
       - key: MAIL_FROM
         value: CampusNexus <devkpatel426@gmail.com>
       - key: MAIL_REQUIRED
-        value: "false"
+        value: "true"
       - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM
         sync: false
       - key: BREVO_API_KEY
         sync: false

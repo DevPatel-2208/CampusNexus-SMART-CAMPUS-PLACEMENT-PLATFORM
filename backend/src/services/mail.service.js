@@ -11,6 +11,9 @@ function getTransporter() {
     return nodemailer.createTransport({
       service: 'gmail',
       auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
+      connectionTimeout: 8000,
+      greetingTimeout: 8000,
+      socketTimeout: 12000,
     });
   }
   if (!transporter) {
@@ -20,6 +23,9 @@ function getTransporter() {
       secure: env.SMTP_SECURE || env.SMTP_PORT === 465,
       auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
       tls: { rejectUnauthorized: env.NODE_ENV === 'production' },
+      connectionTimeout: 8000,
+      greetingTimeout: 8000,
+      socketTimeout: 12000,
     });
   }
   return transporter;
@@ -42,6 +48,7 @@ async function sendMail(to, subject, html) {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
+        signal: AbortSignal.timeout(8000),
         body: JSON.stringify({
           sender: { name: senderName, email: senderEmail },
           to: [{ email: to }],
@@ -69,8 +76,9 @@ async function sendMail(to, subject, html) {
           'Authorization': `Bearer ${env.RESEND_API_KEY}`,
           'Content-Type': 'application/json',
         },
+        signal: AbortSignal.timeout(8000),
         body: JSON.stringify({
-          from: 'CampusNexus <onboarding@resend.dev>',
+          from: env.RESEND_FROM || 'CampusNexus <onboarding@resend.dev>',
           to: [to],
           subject,
           html,
