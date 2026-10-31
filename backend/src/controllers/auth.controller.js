@@ -119,16 +119,25 @@ const refresh = asyncHandler(async (req, res) => {
   if (!token) {
     // No session cookie at all: answer "signed out" instead of 401. The SPA probes
     // this endpoint on every mount, and a 401 here would print a console/network
-    // error for every anonymous visitor. Invalid/expired/revoked cookies still 401.
+    // error for every anonymous visitor.
     return res.json({ success: true, data: { accessToken: null, authenticated: false } });
   }
   let payload;
-  try { payload = jwt.verify(token, env.JWT_REFRESH_SECRET); }
-  catch { throw ApiError.unauthorized('Session expired. Please sign in again.'); }
-  if (payload.typ !== 'refresh') throw ApiError.unauthorized('Invalid session');
+  try {
+    payload = jwt.verify(token, env.JWT_REFRESH_SECRET);
+  } catch {
+    res.clearCookie('cc_refresh', { ...refreshCookieOptions(), maxAge: 0 });
+    return res.json({ success: true, data: { accessToken: null, authenticated: false } });
+  }
+  if (payload.typ !== 'refresh') {
+    res.clearCookie('cc_refresh', { ...refreshCookieOptions(), maxAge: 0 });
+    return res.json({ success: true, data: { accessToken: null, authenticated: false } });
+  }
   const user = await User.findById(payload.sub).select('-password');
-  if (!user || user.status !== 'active') throw ApiError.unauthorized('Account unavailable');
-  if ((payload.tv ?? 0) !== (user.tokenVersion || 0)) throw ApiError.unauthorized('Session revoked. Please sign in again.');
+  if (!user || user.status !== 'active' || (payload.tv ?? 0) !== (user.tokenVersion || 0)) {
+    res.clearCookie('cc_refresh', { ...refreshCookieOptions(), maxAge: 0 });
+    return res.json({ success: true, data: { accessToken: null, authenticated: false } });
+  }
 
   // Rotate atomically. Concurrent refreshes (React StrictMode double-mount, multiple
   // tabs) present the same token; only one wins the compare-and-set. The losers are
@@ -147,7 +156,10 @@ const refresh = asyncHandler(async (req, res) => {
       && (current.refreshVersion || 0) === rv + 1
       && current.refreshRotatedAt
       && now.getTime() - current.refreshRotatedAt.getTime() < REFRESH_GRACE_MS;
-    if (!withinGrace) throw ApiError.unauthorized('Session revoked. Please sign in again.');
+    if (!withinGrace) {
+      res.clearCookie('cc_refresh', { ...refreshCookieOptions(), maxAge: 0 });
+      return res.json({ success: true, data: { accessToken: null, authenticated: false } });
+    }
     user.refreshVersion = current.refreshVersion; user.refreshRotatedAt = current.refreshRotatedAt;
   }
 
