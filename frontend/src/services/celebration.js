@@ -25,7 +25,7 @@ export function fireConfetti({ intensity = 'normal' } = {}) {
   const brand = ['#4f46e5', '#7c3aed', '#0f9d6b', '#fbbf24'];
 
   try {
-    confetti({
+    safeConfetti({
       particleCount: count,
       spread,
       origin: { x: 0.5, y: 0.28 },
@@ -44,7 +44,7 @@ export function fireConfetti({ intensity = 'normal' } = {}) {
   setTimeout(() => {
     if (prefersReducedMotion()) return;
     try {
-      confetti({
+      safeConfetti({
         particleCount: Math.floor(count / 2),
         spread: spread * 0.7,
         origin: { x: 0.32, y: 0.34 },
@@ -53,7 +53,7 @@ export function fireConfetti({ intensity = 'normal' } = {}) {
         disableForReducedMotion: true,
         scalar: 0.9,
       });
-      confetti({
+      safeConfetti({
         particleCount: Math.floor(count / 2),
         spread: spread * 0.7,
         origin: { x: 0.68, y: 0.34 },
@@ -64,4 +64,48 @@ export function fireConfetti({ intensity = 'normal' } = {}) {
       });
     } catch { /* Decorative animation only. */ }
   }, 120);
+}
+
+
+function safeConfetti(opts) {
+  try {
+    const shoot = typeof confetti === 'function' ? confetti : confetti?.default;
+    if (typeof shoot === 'function') {
+      shoot(opts);
+    }
+  } catch (err) {
+    console.warn('Confetti animation error:', err);
+  }
+}
+
+
+/**
+ * Multi-cannon grand celebration for passed assessments.
+ */
+export function firePassConfetti() {
+  safeConfetti({
+    particleCount: 85,
+    spread: 75,
+    origin: { x: 0.12, y: 0.55 },
+    colors: ['#4f46e5', '#7c3aed', '#10b981', '#f59e0b', '#ec4899', '#06b6d4'],
+    zIndex: 10005,
+  });
+
+  safeConfetti({
+    particleCount: 85,
+    spread: 75,
+    origin: { x: 0.88, y: 0.55 },
+    colors: ['#4f46e5', '#7c3aed', '#10b981', '#f59e0b', '#ec4899', '#06b6d4'],
+    zIndex: 10005,
+  });
+
+  setTimeout(() => {
+    safeConfetti({
+      particleCount: 110,
+      spread: 105,
+      origin: { x: 0.5, y: 0.35 },
+      colors: ['#4f46e5', '#10b981', '#fbbf24', '#38bdf8', '#8b5cf6'],
+      zIndex: 10005,
+    });
+  }, 280);
 }

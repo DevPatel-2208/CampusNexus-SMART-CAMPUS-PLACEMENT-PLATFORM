@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 import api, { apiErrorMessage, downloadFile, fileUrl } from '../services/api';
 import { useFetch } from '../hooks/useUnread';
 import { confirmAction, promptText, swalBase } from '../services/alerts';
+import { firePassConfetti } from '../services/celebration';
 import {
   DataTable, Empty, ErrorState, KpiCard, KpiGrid, Loading, PageHeader, Pager,
   SearchInput, SectionCard, SelectFilter, StatusBadge, DetailGrid, Toolbar,
@@ -744,7 +745,7 @@ export function AttemptResult() {
             <button
               type="button"
               className="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-2 rounded-pill px-3 fw-bold shadow-sm"
-              onClick={() => triggerPassCelebration(true)}
+              onClick={() => triggerPassCelebration(res.data?.attempt)}
               title="Replay celebratory fireworks & congratulations"
             >
               <Sparkles size={14} className="text-warning" /> Celebrate Again 🎉
