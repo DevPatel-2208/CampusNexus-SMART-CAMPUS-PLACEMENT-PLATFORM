@@ -3,7 +3,7 @@ const EmailOtp = EmailOtpModel;
 const ResetOtp = ResetOtpModel;
 const { randomOtp, sha256 } = require('../utils/crypto');
 const { ApiError } = require('../utils/helpers');
-const { sendMail, otpTemplate } = require('./mail.service');
+const { sendMail, otpTemplate, emailVerificationTemplate, forgotPasswordTemplate } = require('./mail.service');
 
 const OTP_TTL_MS = 10 * 60 * 1000;
 const COOLDOWN_MS = 60 * 1000;
@@ -22,7 +22,7 @@ async function issueEmailOtp(user) {
   const otp = await EmailOtp.create({ user: user._id, otpHash: sha256(code), expiresAt: new Date(Date.now() + OTP_TTL_MS), attempts: 0, lastSentAt: new Date() });
 
   // Dispatch email sending in the background so the HTTP request responds immediately (< 100ms)
-  sendMail(user.email, `Your CampusNexus verification code is ${code}`, otpTemplate(code, 'verify your email address', 10))
+  sendMail(user.email, `${code} is your CampusNexus verification code`, emailVerificationTemplate(code, 10))
     .then((r) => {
       console.log(`[otp:sent] user=${user._id} email=${user.email} status=${r.sent}`);
     })
@@ -61,7 +61,7 @@ async function issueResetOtp(email, role) {
   await ResetOtp.create({ email: email.toLowerCase(), role, otpHash: sha256(code), expiresAt: new Date(Date.now() + OTP_TTL_MS), attempts: 0, lastSentAt: new Date() });
 
   // Dispatch reset code email non-blocking in background
-  sendMail(email, `Your CampusNexus password reset code is ${code}`, otpTemplate(code, 'reset your password', 10))
+  sendMail(email, `Reset your CampusNexus password: ${code}`, forgotPasswordTemplate(code, 10))
     .then((r) => {
       console.log(`[otp:reset:sent] email=${email} status=${r.sent}`);
     })

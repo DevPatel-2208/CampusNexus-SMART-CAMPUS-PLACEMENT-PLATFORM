@@ -117,60 +117,95 @@ async function sendMail(to, subject, html) {
   }
 }
 
-function otpTemplate(code, purpose, minutes = 10) {
+function emailVerificationTemplate(code, minutes = 10) {
+  const year = new Date().getFullYear();
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CampusNexus Security Code</title>
+  <title>Verify Your CampusNexus Account</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #0b0f19; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #f1f5f9;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #0b0f19; padding: 40px 16px;">
+<body style="margin: 0; padding: 0; background-color: #0b0f19; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #f1f5f9; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #0b0f19; padding: 48px 16px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" style="max-width: 520px; background-color: #111827; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); overflow: hidden;">
-          <!-- Top Accent Bar -->
+        <!-- Main Container -->
+        <table role="presentation" width="100%" style="max-width: 540px; background-color: #111827; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); overflow: hidden;">
+          <!-- Top Gradient Accent -->
           <tr>
-            <td style="height: 4px; background: linear-gradient(90deg, #4f46e5, #9333ea, #ec4899);"></td>
+            <td style="height: 5px; background: linear-gradient(90deg, #3b82f6 0%, #6366f1 50%, #a855f7 100%);"></td>
           </tr>
-          <!-- Header Banner -->
+          
+          <!-- Header / Brand -->
           <tr>
-            <td style="padding: 36px 32px 20px; text-align: center;">
-              <div style="display: inline-block; width: 48px; height: 48px; line-height: 48px; background: linear-gradient(135deg, #4f46e5, #7c3aed); border-radius: 14px; color: #ffffff; font-weight: 800; font-size: 20px; box-shadow: 0 8px 20px -4px rgba(79, 70, 229, 0.5); margin-bottom: 14px;">CN</div>
-              <h1 style="margin: 0; color: #ffffff; font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">CampusNexus</h1>
-              <p style="margin: 6px 0 0; color: #94a3b8; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">Smart Campus Placement Platform</p>
-            </td>
-          </tr>
-          <!-- Main Body -->
-          <tr>
-            <td style="padding: 10px 32px 32px;">
-              <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 24px; text-align: center;">
-                <h2 style="margin: 0 0 10px; color: #ffffff; font-size: 19px; font-weight: 700;">One-Time Security Code</h2>
-                <p style="margin: 0 0 22px; color: #cbd5e1; font-size: 14px; line-height: 1.55;">
-                  Use this verification code to <strong>${purpose}</strong> on your CampusNexus account:
-                </p>
-                
-                <!-- OTP Box -->
-                <div style="background: #030712; border: 2px dashed rgba(99, 102, 241, 0.6); border-radius: 12px; padding: 18px 20px; margin: 0 auto 20px; max-width: 320px;">
-                  <span style="font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #818cf8; font-family: Consolas, 'Courier New', monospace; display: inline-block; padding-left: 8px;">${code}</span>
-                </div>
-
-                <p style="margin: 0; color: #94a3b8; font-size: 12px; font-weight: 500;">
-                  ⏱ Valid for <strong>${minutes} minutes</strong>. Do not disclose this code to anyone.
-                </p>
+            <td style="padding: 40px 36px 24px; text-align: center;">
+              <div style="display: inline-block; width: 52px; height: 52px; line-height: 52px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border-radius: 16px; color: #ffffff; font-weight: 800; font-size: 22px; box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5); margin-bottom: 16px;">
+                CN
               </div>
-
-              <p style="margin: 22px 0 0; color: #64748b; font-size: 12px; line-height: 1.5; text-align: center;">
-                If you did not request this verification, your account may be safe and you can ignore this email.
+              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">CampusNexus</h1>
+              <p style="margin: 6px 0 0; color: #94a3b8; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;">
+                Smart Placement & Recruitment Platform
               </p>
             </td>
           </tr>
+
+          <!-- Content Card -->
+          <tr>
+            <td style="padding: 0 36px 36px;">
+              <div style="background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 28px 24px; text-align: center;">
+                <!-- Badge -->
+                <div style="display: inline-block; padding: 6px 14px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.35); border-radius: 9999px; margin-bottom: 18px;">
+                  <span style="font-size: 11px; font-weight: 700; color: #a5b4fc; letter-spacing: 0.06em; text-transform: uppercase;">
+                    🔐 Account Verification
+                  </span>
+                </div>
+
+                <h2 style="margin: 0 0 12px; color: #ffffff; font-size: 20px; font-weight: 700;">
+                  Verify Your Email Address
+                </h2>
+                <p style="margin: 0 0 24px; color: #cbd5e1; font-size: 14px; line-height: 1.6;">
+                  Welcome to <strong>CampusNexus</strong>! Use the one-time verification code below to verify your email and activate your placement account:
+                </p>
+
+                <!-- OTP Display Box -->
+                <div style="background: #030712; border: 2px dashed #6366f1; border-radius: 14px; padding: 20px; margin: 0 auto 20px; max-width: 320px; box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);">
+                  <div style="font-size: 38px; font-weight: 800; letter-spacing: 10px; color: #818cf8; font-family: 'Consolas', 'Courier New', monospace; padding-left: 10px;">
+                    ${code}
+                  </div>
+                  <div style="margin-top: 6px; font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;">
+                    Single-Use Verification Code
+                  </div>
+                </div>
+
+                <!-- Expiry Chip -->
+                <p style="margin: 0 0 16px; color: #94a3b8; font-size: 13px; font-weight: 500;">
+                  ⏱ Valid for <strong>${minutes} minutes</strong>.
+                </p>
+
+                <!-- Security Note -->
+                <div style="background: rgba(15, 23, 42, 0.6); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); padding: 12px 16px; text-align: left;">
+                  <p style="margin: 0; color: #94a3b8; font-size: 12px; line-height: 1.5;">
+                    <strong style="color: #e2e8f0;">Security Tip:</strong> Never share this code with anyone. CampusNexus administrators and placement coordinators will never ask for your verification code.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Unsolicited request notice -->
+              <p style="margin: 24px 0 0; color: #64748b; font-size: 12px; line-height: 1.5; text-align: center;">
+                If you did not register for a CampusNexus account, you can safely ignore this email.
+              </p>
+            </td>
+          </tr>
+
           <!-- Footer -->
           <tr>
-            <td style="background-color: #0b0f19; border-top: 1px solid rgba(255, 255, 255, 0.06); padding: 18px 24px; text-align: center;">
-              <p style="margin: 0; color: #64748b; font-size: 11px;">
-                © ${new Date().getFullYear()} CampusNexus • Connecting Talent. Creating Futures.
+            <td style="background-color: #0b0f19; border-top: 1px solid rgba(255, 255, 255, 0.06); padding: 24px; text-align: center;">
+              <p style="margin: 0 0 6px; color: #64748b; font-size: 12px; font-weight: 500;">
+                CampusNexus • Connecting Students, TPOs & Top Recruiters
+              </p>
+              <p style="margin: 0; color: #475569; font-size: 11px;">
+                © ${year} CampusNexus Placement Platform. All rights reserved.
               </p>
             </td>
           </tr>
@@ -182,4 +217,111 @@ function otpTemplate(code, purpose, minutes = 10) {
 </html>`;
 }
 
-module.exports = { sendMail, otpTemplate };
+function forgotPasswordTemplate(code, minutes = 10) {
+  const year = new Date().getFullYear();
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Your CampusNexus Password</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #0b0f19; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #f1f5f9; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #0b0f19; padding: 48px 16px;">
+    <tr>
+      <td align="center">
+        <!-- Main Container -->
+        <table role="presentation" width="100%" style="max-width: 540px; background-color: #111827; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); overflow: hidden;">
+          <!-- Top Gradient Accent (Amber to Rose for Security Action) -->
+          <tr>
+            <td style="height: 5px; background: linear-gradient(90deg, #f59e0b 0%, #ec4899 50%, #8b5cf6 100%);"></td>
+          </tr>
+          
+          <!-- Header / Brand -->
+          <tr>
+            <td style="padding: 40px 36px 24px; text-align: center;">
+              <div style="display: inline-block; width: 52px; height: 52px; line-height: 52px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 16px; color: #ffffff; font-weight: 800; font-size: 22px; box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4); margin-bottom: 16px;">
+                🔑
+              </div>
+              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">CampusNexus</h1>
+              <p style="margin: 6px 0 0; color: #94a3b8; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;">
+                Account Security Center
+              </p>
+            </td>
+          </tr>
+
+          <!-- Content Card -->
+          <tr>
+            <td style="padding: 0 36px 36px;">
+              <div style="background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 28px 24px; text-align: center;">
+                <!-- Badge -->
+                <div style="display: inline-block; padding: 6px 14px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 9999px; margin-bottom: 18px;">
+                  <span style="font-size: 11px; font-weight: 700; color: #fcd34d; letter-spacing: 0.06em; text-transform: uppercase;">
+                    Password Reset Request
+                  </span>
+                </div>
+
+                <h2 style="margin: 0 0 12px; color: #ffffff; font-size: 20px; font-weight: 700;">
+                  Reset Your Password
+                </h2>
+                <p style="margin: 0 0 24px; color: #cbd5e1; font-size: 14px; line-height: 1.6;">
+                  We received a request to reset the password for your CampusNexus account. Use this one-time security code to authorize a new password:
+                </p>
+
+                <!-- OTP Display Box -->
+                <div style="background: #030712; border: 2px dashed #f59e0b; border-radius: 14px; padding: 20px; margin: 0 auto 20px; max-width: 320px; box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);">
+                  <div style="font-size: 38px; font-weight: 800; letter-spacing: 10px; color: #fbbf24; font-family: 'Consolas', 'Courier New', monospace; padding-left: 10px;">
+                    ${code}
+                  </div>
+                  <div style="margin-top: 6px; font-size: 11px; color: #78716c; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;">
+                    Password Reset Code
+                  </div>
+                </div>
+
+                <!-- Expiry Chip -->
+                <p style="margin: 0 0 18px; color: #94a3b8; font-size: 13px; font-weight: 500;">
+                  ⏱ This code expires in <strong>${minutes} minutes</strong>.
+                </p>
+
+                <!-- Warning / Alert Box -->
+                <div style="background: rgba(239, 68, 68, 0.08); border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.25); padding: 14px 16px; text-align: left;">
+                  <p style="margin: 0; color: #fca5a5; font-size: 12px; line-height: 1.55;">
+                    <strong style="color: #ffffff;">Didn't request this change?</strong> If you didn't ask to reset your password, please ignore this email. Your password will remain unchanged and your account is secure.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Support Note -->
+              <p style="margin: 24px 0 0; color: #64748b; font-size: 12px; line-height: 1.5; text-align: center;">
+                Need help? Contact your institution's Training and Placement Cell (TPO).
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #0b0f19; border-top: 1px solid rgba(255, 255, 255, 0.06); padding: 24px; text-align: center;">
+              <p style="margin: 0 0 6px; color: #64748b; font-size: 12px; font-weight: 500;">
+                CampusNexus • Connecting Students, TPOs & Top Recruiters
+              </p>
+              <p style="margin: 0; color: #475569; font-size: 11px;">
+                © ${year} CampusNexus Placement Platform. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+function otpTemplate(code, purpose, minutes = 10) {
+  if (purpose && purpose.toLowerCase().includes('password')) {
+    return forgotPasswordTemplate(code, minutes);
+  }
+  return emailVerificationTemplate(code, minutes);
+}
+
+module.exports = { sendMail, otpTemplate, emailVerificationTemplate, forgotPasswordTemplate };
