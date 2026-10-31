@@ -144,9 +144,17 @@ const forgotPassword = asyncHandler(async (req, res) => {
   const { email, role } = req.body;
   const user = await User.findOne({ email: String(email || '').toLowerCase(), ...(role ? { role } : {}) });
   // Anti-enumeration: always generic, issue OTP only if account exists
-  if (user) { try { await issueResetOtp(user.email, user.role); } catch (e) { if (e.status !== 429) throw e; } }
+  let mailSent = false;
+  if (user) {
+    try {
+      const r = await issueResetOtp(user.email, user.role);
+      mailSent = r.mailSent;
+    } catch (e) {
+      if (e.status !== 429) throw e;
+    }
+  }
   audit('password_reset_otp', 'auth', `Password reset OTP requested — ${email}`, user?._id || null, req);
-  res.json({ success: true, data: { message: 'If an account exists for this email, a reset code has been sent.' } });
+  res.json({ success: true, data: { message: 'If an account exists for this email, a reset code has been sent.', mailSent } });
 });
 
 const verifyResetOtp = asyncHandler(async (req, res) => {

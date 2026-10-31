@@ -254,6 +254,9 @@ function SubmitButton({ loading, disabled = false, icon: Icon, children }) {
 }
 
 function GoogleButton() {
+  // Temporary: Hidden from UI as requested, keeping code preserved
+  return null;
+  /*
   return (
     <>
       <div className="cc-auth-divider"><span>or</span></div>
@@ -273,6 +276,7 @@ function GoogleButton() {
       </motion.a>
     </>
   );
+  */
 }
 
 /* ---------- login ---------- */
