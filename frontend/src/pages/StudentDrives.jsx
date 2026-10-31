@@ -155,7 +155,6 @@ export function DriveCard({ drive: d, eligibility, myRegistration }) {
     </article>
   );
 }
-
 /* ------------------------------------------------------------------
    Drives Listing Page (/student/drives)
    ------------------------------------------------------------------ */
@@ -962,44 +961,6 @@ export function ApplicationDetails() {
               </Link>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------
-   Application Success Page (/student/apply-success/:id)
-   ------------------------------------------------------------------ */
-export function ApplicationSuccess() {
-  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, []);
-  const { id } = useParams();
-  const res = useFetch(async () => (await api.get(`/applications/${id}`)).data.data, [id]);
-
-  if (res.loading) return <Loading rows={3} height={120} />;
-  if (res.error) return <ErrorState message={apiErrorMessage(res.error)} onRetry={res.reload} />;
-
-  const a = res.data;
-  return (
-    <div className="cc-auth-wrap">
-      <div className="cc-card cc-card-body text-center p-4 p-md-5" style={{ maxWidth: 520, borderRadius: 20 }}>
-        <div className="mx-auto d-grid mb-3" style={{ width: 68, height: 68, borderRadius: '50%', placeItems: 'center', background: 'rgba(16, 185, 129, 0.12)', color: '#059669' }}>
-          <CheckCircle2 size={34} />
-        </div>
-        <h1 className="h4 fw-bold mb-2">Application Submitted!</h1>
-        <p className="text-muted small mb-3">
-          Your application for <strong className="text-dark">{a.job?.title}</strong> at <strong className="text-dark">{a.job?.company?.companyName || 'Recruiter Partner'}</strong> was successfully delivered to the hiring team.
-        </p>
-        <div className="d-flex justify-content-center my-2">
-          <StatusBadge value={a.status} />
-        </div>
-        <div className="d-flex gap-2 justify-content-center flex-wrap mt-4">
-          <Link className="btn btn-primary rounded-pill px-4 fw-bold" to={`/student/applications/${a._id}`}>
-            Track Application
-          </Link>
-          <Link className="btn btn-outline-primary rounded-pill px-4" to="/student/jobs">
-            Browse More Jobs
-          </Link>
         </div>
       </div>
     </div>

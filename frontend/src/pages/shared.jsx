@@ -3,7 +3,7 @@ import { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import html2pdf from 'html2pdf.js';
 import { toast } from 'react-toastify';
-import { confirmAction, confirmDanger } from '../services/alerts';
+import { confirmAction, confirmDanger, showApplicationSubmitted } from '../services/alerts';
 import api, { apiErrorMessage, fileUrl } from '../services/api';
 import { useFetch } from '../hooks/useUnread';
 import {
@@ -56,8 +56,14 @@ export function JobDetails({ prefix = '', canApply = false }) {
     setBusy(true);
     try {
       const { data } = await api.post('/applications', { jobId: id });
-      toast.success('Application submitted successfully!');
-      navigate(`/student/apply-success/${data.data._id}`);
+      res.reload();
+      myApps.reload();
+      const result = await showApplicationSubmitted({
+        jobTitle: job.title,
+        companyName: company.companyName,
+      });
+      if (result.isConfirmed) navigate(`/student/applications/${data.data._id}`);
+      else if (result.isDenied) navigate('/student/jobs');
     } catch (e) {
       toast.error(apiErrorMessage(e));
     } finally {

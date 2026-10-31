@@ -80,6 +80,40 @@ export async function showSuccess({ title, message, confirmButtonText = 'OK', co
   });
 }
 
+/** Branded application confirmation with clear next steps and a celebration. */
+export async function showApplicationSubmitted({ jobTitle, companyName } = {}) {
+  fireConfetti({ intensity: 'normal' });
+  const title = escapeHtml(jobTitle || 'this position');
+  const company = escapeHtml(companyName || 'the hiring team');
+  return Swal.fire({
+    ...swalBase({
+      title: 'Application submitted!',
+      html: `<div class="cc-swal-extra cc-success-wrap">
+        <p style="margin:0 0 14px">Your application for <strong>${title}</strong> has been sent to <strong>${company}</strong>.</p>
+        <div style="display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;background:rgba(16,185,129,.1);color:#059669;font-size:13px;font-weight:700">
+          <span aria-hidden="true">✓</span> Application received
+        </div>
+        <p style="margin:16px 0 0;font-size:13px">You can track your application status anytime from My Applications.</p>
+      </div>`,
+      icon: 'success',
+      showDenyButton: true,
+      confirmButtonText: 'Track Application',
+      denyButtonText: 'Browse More Jobs',
+      showCancelButton: false,
+      showCloseButton: true,
+      allowEscapeKey: true,
+      allowOutsideClick: true,
+      confirmButtonColor: '#4f46e5',
+      denyButtonColor: '#64748b',
+      customClass: {
+        popup: 'cc-swal',
+        confirmButton: 'cc-swal-confirm',
+        denyButton: 'cc-swal-cancel',
+      },
+    }),
+  });
+}
+
 function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',

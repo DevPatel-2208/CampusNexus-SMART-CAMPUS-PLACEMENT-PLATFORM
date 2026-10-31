@@ -61,7 +61,6 @@ export default function App() {
         <Route path="/student/drives/:id" element={<Role role="student" title="Drive details" crumb="Student / Drives"><SD.DriveDetails /></Role>} />
         <Route path="/student/applications" element={<Role role="student" title="Applications" crumb="Student"><SD.Applications /></Role>} />
         <Route path="/student/applications/:id" element={<Role role="student" title="Application" crumb="Student / Applications"><SD.ApplicationDetails /></Role>} />
-        <Route path="/student/apply-success/:id" element={<Role role="student" title="Application submitted" crumb="Student / Applications"><SD.ApplicationSuccess /></Role>} />
         <Route path="/student/assessments" element={<Role role="student" title="Assessments" crumb="Student"><SA.Assessments /></Role>} />
         <Route path="/student/assessments/:id" element={<Role role="student" title="Assessment" crumb="Student / Assessments"><SecureAssessmentOpen /></Role>} />
         <Route path="/student/exam/:id" element={<RoleRoute roles={['student']}><SecureExam /></RoleRoute>} />
