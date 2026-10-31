@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Briefcase, GraduationCap, Building2, School, ShieldCheck, Check, Rocket,
   Mail, Lock, Eye, EyeOff, LogIn, UserPlus, User, KeyRound, Loader2, Circle, Clock,
-  CheckCircle2, Info, Send,
+  CheckCircle2, Info, Send, Zap,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { apiErrorMessage } from '../services/api';
@@ -307,6 +307,20 @@ export function Login() {
     defaultValues: { email: '', password: '', role: 'student' },
   });
   const role = watch('role');
+
+  const DEMO_ACCOUNTS = {
+    student: { email: 'student@careerconnect.local', password: 'Student@123', label: 'Student' },
+    tpo: { email: 'tpo@careerconnect.local', password: 'Tpo@12345', label: 'TPO' },
+    company: { email: 'company@careerconnect.local', password: 'Company@123', label: 'Company' },
+  };
+
+  const handleDemoFill = () => {
+    const cred = DEMO_ACCOUNTS[role];
+    if (cred) {
+      setValue('email', cred.email, { shouldValidate: true });
+      setValue('password', cred.password, { shouldValidate: true });
+    }
+  };
   const submit = async (values) => {
     if (inFlightRef.current) return;
     inFlightRef.current = true;
@@ -359,6 +373,22 @@ export function Login() {
         ))}
       </div>
       <input type="hidden" {...register('role')} />
+
+      {import.meta.env.DEV && (
+        <div className="d-flex justify-content-between align-items-center mt-2 mb-3 px-1">
+          <span className="small text-muted" style={{ fontSize: '0.8rem' }}>Need demo access?</span>
+          <button
+            type="button"
+            onClick={handleDemoFill}
+            className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 py-1 px-2 rounded-pill"
+            style={{ fontSize: '0.78rem', fontWeight: 600 }}
+            title={`Click to fill demo credentials for ${DEMO_ACCOUNTS[role]?.label}`}
+          >
+            <Zap size={13} />
+            Auto-fill {DEMO_ACCOUNTS[role]?.label} Demo
+          </button>
+        </div>
+      )}
 
       <AnimatePresence>
         {(err || googleError) && (
