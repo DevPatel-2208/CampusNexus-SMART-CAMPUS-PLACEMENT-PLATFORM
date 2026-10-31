@@ -15,10 +15,10 @@ import { useTheme } from '../context/ThemeContext';
 import { PublicHeader } from '../components/public/Header';
 import { PublicFooter } from '../components/public/Footer';
 import {
-  AlertCircle, ArrowLeft, ArrowRight, Award, BadgeCheck, Sun, Moon, Key, Lock, Check, Bell, Briefcase, Building2, Calendar, CalendarDays,
+  AlertCircle, AlertTriangle, ArrowLeft, ArrowRight, Award, BadgeCheck, Sun, Moon, Key, Lock, Check, Bell, Briefcase, Building2, Calendar, CalendarDays,
   CheckCircle2, ClipboardCheck, Clock, Compass, Copy, Download, ExternalLink, Eye, EyeOff, FileText, Globe, GraduationCap,
   HelpCircle, IndianRupee, Laptop, Layers, LogIn, MapPin, Play, Printer, Share2, ShieldAlert, ShieldCheck, Sparkles,
-  Target, Users, Video, XCircle, Zap,
+  Target, User, Users, Video, XCircle, Zap,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -37,7 +37,15 @@ export function JobDetails({ prefix = '', canApply = false }) {
   const [busy, setBusy] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
 
+  const studentProfileCompletion = Number(elig.data?.completion ?? user?.profile?.profileCompletion ?? 0);
+  const isProfileComplete = user?.role === 'student' ? studentProfileCompletion >= 100 : true;
+
   const apply = async () => {
+    if (user?.role === 'student' && !isProfileComplete) {
+      toast.warning(`Your profile is currently ${studentProfileCompletion}% complete. You must complete 100% of your profile before applying.`);
+      navigate('/student/profile');
+      return;
+    }
     const ok = await confirmAction({
       title: 'Apply for this position?',
       text: 'Your verified academic profile and resume will be submitted directly to the recruiter hiring roster.',
@@ -304,15 +312,24 @@ export function JobDetails({ prefix = '', canApply = false }) {
 
               <div className="d-flex justify-content-center gap-2.5 flex-wrap">
                 {user?.role === 'student' ? (
-                  <button
-                    type="button"
-                    className="btn btn-primary rounded-pill px-4 py-2.5 fw-bold shadow-sm d-inline-flex align-items-center gap-2"
-                    onClick={apply}
-                    disabled={busy || isClosed}
-                  >
-                    {busy ? 'Submitting Application...' : 'Apply for this Job to Unlock Assessment'}
-                    <ArrowRight size={16} />
-                  </button>
+                  !isProfileComplete ? (
+                    <Link
+                      to="/student/profile"
+                      className="btn btn-warning rounded-pill px-4 py-2.5 fw-bold shadow-sm d-inline-flex align-items-center gap-2 text-dark"
+                    >
+                      <AlertTriangle size={16} /> Complete 100% Profile to Apply & Unlock Test ({studentProfileCompletion}% complete)
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn btn-primary rounded-pill px-4 py-2.5 fw-bold shadow-sm d-inline-flex align-items-center gap-2"
+                      onClick={apply}
+                      disabled={busy || isClosed}
+                    >
+                      {busy ? 'Submitting Application...' : 'Apply for this Job to Unlock Assessment'}
+                      <ArrowRight size={16} />
+                    </button>
+                  )
                 ) : !user ? (
                   <Link to="/login" className="btn btn-primary rounded-pill px-4 py-2.5 fw-bold shadow-sm d-inline-flex align-items-center gap-1.5">
                     <LogIn size={15} /> <span>Login as Student to Apply</span>
@@ -674,29 +691,85 @@ export function JobDetails({ prefix = '', canApply = false }) {
             ) : !isClosed ? (
               <div>
                 {user?.role === 'student' ? (
-                  <div className="d-grid gap-2">
-                    <button
-                      type="button"
-                      className="cc-apply-cta-btn"
-                      disabled={busy}
-                      onClick={apply}
-                    >
-                      {busy ? (
-                        <>
-                          <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-                          <span>Submitting Application...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Apply for this Position</span>
-                          <ArrowRight size={16} />
-                        </>
-                      )}
-                    </button>
-                    <p className="small text-muted text-center mb-0 mt-2" style={{ fontSize: '0.78rem' }}>
-                      Your verified student profile, CGPA credentials, and resume will be submitted to {company.companyName || 'the recruiter'}.
-                    </p>
-                  </div>
+                  !isProfileComplete ? (
+                    <div className="card border-0 rounded-4 overflow-hidden shadow-sm p-3.5 mb-2" style={{ background: 'linear-gradient(180deg, #fffbeb 0%, #ffffff 100%)', border: '1.5px solid #fde68a' }}>
+                      <div className="d-flex align-items-center gap-2.5 mb-2.5">
+                        <div className="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style={{ width: 36, height: 36, background: '#fef3c7', color: '#d97706' }}>
+                          <AlertTriangle size={18} />
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="fw-bold text-dark mb-0 fs-6">Profile Incomplete ({studentProfileCompletion}%)</h4>
+                          <span className="text-muted" style={{ fontSize: '0.74rem' }}>100% profile details required to apply</span>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="mb-3">
+                        <div className="d-flex justify-content-between align-items-center mb-1" style={{ fontSize: '0.75rem' }}>
+                          <span className="text-muted fw-semibold">Profile Strength</span>
+                          <strong className="text-warning fw-bold">{studentProfileCompletion}% / 100%</strong>
+                        </div>
+                        <div className="progress" style={{ height: 8, borderRadius: 99, background: '#f1f5f9' }}>
+                          <div
+                            className="progress-bar bg-warning progress-bar-striped progress-bar-animated"
+                            role="progressbar"
+                            style={{ width: `${Math.max(5, studentProfileCompletion)}%` }}
+                            aria-valuenow={studentProfileCompletion}
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                          />
+                        </div>
+                      </div>
+
+                      <p className="text-secondary mb-3" style={{ fontSize: '0.82rem', lineHeight: 1.55 }}>
+                        Recruiters and TPOs require full academic and personal credentials. Jab tak aapki profile <strong>100% complete</strong> nahi hoti, apply button unlock nahi hoga.
+                      </p>
+
+                      <div className="d-grid gap-2">
+                        <Link
+                          to="/student/profile"
+                          className="btn btn-warning rounded-pill py-2.5 fw-bold d-inline-flex align-items-center justify-content-center gap-2 shadow-sm text-dark"
+                        >
+                          <User size={15} />
+                          <span>Complete My Profile ({100 - studentProfileCompletion}% remaining)</span>
+                          <ArrowRight size={15} />
+                        </Link>
+                        <button
+                          type="button"
+                          className="btn btn-light border text-muted rounded-pill py-2 small fw-semibold d-inline-flex align-items-center justify-content-center gap-1.5"
+                          disabled
+                          style={{ cursor: 'not-allowed', opacity: 0.65 }}
+                        >
+                          <Lock size={13} />
+                          <span>Apply Locked (100% Profile Required)</span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="d-grid gap-2">
+                      <button
+                        type="button"
+                        className="cc-apply-cta-btn"
+                        disabled={busy}
+                        onClick={apply}
+                      >
+                        {busy ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                            <span>Submitting Application...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>Apply for this Position</span>
+                            <ArrowRight size={16} />
+                          </>
+                        )}
+                      </button>
+                      <p className="small text-muted text-center mb-0 mt-2" style={{ fontSize: '0.78rem' }}>
+                        Your verified student profile, CGPA credentials, and resume will be submitted to {company.companyName || 'the recruiter'}.
+                      </p>
+                    </div>
+                  )
                 ) : !user ? (
                   <div className="cc-guest-wrap text-center">
                     <div className="cc-guest-icon-badge">

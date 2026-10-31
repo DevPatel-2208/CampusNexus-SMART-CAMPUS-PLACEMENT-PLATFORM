@@ -12,6 +12,19 @@ const apply = asyncHandler(async (req, res) => {
   if (!job) throw ApiError.notFound('Job not found');
   if (job.status !== 'Open' || job.approvalStatus !== 'approved') throw ApiError.badRequest('This job is not open for applications.');
   if (new Date(job.deadline) < new Date(new Date().toDateString())) throw ApiError.badRequest('Application deadline has passed.');
+
+  if (req.user.role === 'student') {
+    const StudentProfile = require('../models/StudentProfile');
+    const profile = await StudentProfile.findOne({ user: req.user._id });
+    const completion = profile ? (typeof profile.recalcCompletion === 'function' ? profile.recalcCompletion() : (profile.profileCompletion ?? 0)) : 0;
+    if (profile && typeof profile.isModified === 'function' && profile.isModified('profileCompletion')) {
+      await profile.save();
+    }
+    if (completion < 100) {
+      throw ApiError.badRequest(`Your profile is ${completion}% complete. You must complete 100% of your profile before applying for jobs.`);
+    }
+  }
+
   let drive = null;
   if (driveId) {
     drive = await PlacementDrive.findById(driveId);

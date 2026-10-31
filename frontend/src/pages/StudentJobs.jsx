@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 import {
@@ -1354,6 +1355,9 @@ export function External() {
 
 /* ------------------------------------------------------------------ */
 export function Saved() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const profileCompletion = Number(user?.profile?.profileCompletion ?? 0);
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
   const res = useFetch(async () => (await api.get('/saved-jobs', { params: { q, page, limit: 9 } })).data, [q, page]);
@@ -1366,6 +1370,11 @@ export function Saved() {
     catch (e) { toast.error(apiErrorMessage(e)); }
   };
   const apply = async (jobId) => {
+    if (profileCompletion < 100) {
+      toast.warning(`Your profile is currently ${profileCompletion}% complete. Please complete 100% of your profile before applying.`);
+      navigate('/student/profile');
+      return;
+    }
     const ok = await confirmAction({ title: 'Apply for this role?', text: 'Your profile and resume will be shared with the recruiter.', icon: 'question', confirmButtonText: 'Apply' });
     if (!ok) return;
     try {

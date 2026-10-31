@@ -14,12 +14,26 @@ async function studentSnapshot(userId) {
 /** Job-level eligibility for the browse badge + apply gate. */
 function checkJobEligibility(job, profile) {
   const reasons = [];
-  if (!profile || profile.cgpa === null || profile.cgpa === undefined || !profile.course || !profile.branch || !profile.passingYear) {
-    reasons.push('Complete profile');
+  const completion = profile ? (typeof profile.recalcCompletion === 'function' ? profile.recalcCompletion() : (profile.profileCompletion ?? 0)) : 0;
+  if (!profile || completion < 100) {
+    reasons.push({
+      label: 'Profile Incomplete',
+      detail: `Your student profile must be 100% complete before applying for jobs (currently ${completion}%).`,
+      completion,
+    });
   }
-  if (job.approvalStatus !== 'approved' || job.status !== 'Open') reasons.push('Job not open');
-  if (job.deadline && new Date(job.deadline) < new Date(new Date().toDateString())) reasons.push('Deadline over');
-  return { eligible: reasons.length === 0, reasons };
+  if (job.approvalStatus !== 'approved' || job.status !== 'Open') {
+    reasons.push({ label: 'Status', detail: 'This job is not currently open for applications.' });
+  }
+  if (job.deadline && new Date(job.deadline) < new Date(new Date().toDateString())) {
+    reasons.push({ label: 'Deadline', detail: 'The application deadline for this position has passed.' });
+  }
+  return {
+    eligible: reasons.length === 0,
+    reasons,
+    completion,
+    isProfileComplete: completion >= 100,
+  };
 }
 
 /** Drive-level eligibility breakdown.
