@@ -18,21 +18,26 @@ async function issueEmailOtp(user) {
     throw err;
   }
   const code = randomOtp();
-  const otp = await EmailOtp.create({ user: user._id, otpHash: sha256(code), expiresAt: new Date(Date.now() + OTP_TTL_MS), attempts: 0, lastSentAt: new Date() });
+  const otp = await EmailOtp.create({
+    user: user._id,
+    otpHash: sha256(code),
+    expiresAt: new Date(Date.now() + OTP_TTL_MS),
+    attempts: 0,
+    lastSentAt: new Date(),
+  });
+  await EmailOtp.updateMany({ user: user._id, _id: { $ne: otp._id }, verifiedAt: null }, { verifiedAt: new Date() });
 
+  let mailSent = false;
   try {
     const result = await sendMail(user.email, `${code} is your CampusNexus verification code`, emailVerificationTemplate(code, 10));
-    if (!result?.sent) throw new Error('No email provider accepted the verification code');
-    await EmailOtp.updateMany({ user: user._id, _id: { $ne: otp._id }, verifiedAt: null }, { verifiedAt: new Date() });
-    console.log(`[otp:delivery] user=${user._id} sent=true`);
+    mailSent = Boolean(result?.sent);
+    console.log(`[otp:delivery] user=${user._id} email=${user.email} sent=${mailSent}`);
   } catch (err) {
-    await EmailOtp.deleteOne({ _id: otp._id });
     console.error(`[otp:send-error] user=${user._id}:`, err.message);
-    throw new ApiError(503, 'We could not send the verification email. Please try again shortly.');
   }
 
   if (process.env.NODE_ENV !== 'production') console.log(`[otp:dev] verify user=${user._id} code=${code}`);
-  return { otpId: otp._id, mailSent: true };
+  return { otpId: otp._id, mailSent };
 }
 
 async function verifyEmailOtp(user, code) {
@@ -58,21 +63,27 @@ async function issueResetOtp(email, role) {
     throw err;
   }
   const code = randomOtp();
-  const otp = await ResetOtp.create({ email: email.toLowerCase(), role, otpHash: sha256(code), expiresAt: new Date(Date.now() + OTP_TTL_MS), attempts: 0, lastSentAt: new Date() });
+  const otp = await ResetOtp.create({
+    email: email.toLowerCase(),
+    role,
+    otpHash: sha256(code),
+    expiresAt: new Date(Date.now() + OTP_TTL_MS),
+    attempts: 0,
+    lastSentAt: new Date(),
+  });
+  await ResetOtp.updateMany({ email: email.toLowerCase(), role, _id: { $ne: otp._id }, verifiedAt: null }, { verifiedAt: new Date() });
 
+  let mailSent = false;
   try {
     const result = await sendMail(email, `Reset your CampusNexus password: ${code}`, forgotPasswordTemplate(code, 10));
-    if (!result?.sent) throw new Error('No email provider accepted the password reset code');
-    await ResetOtp.updateMany({ email: email.toLowerCase(), role, _id: { $ne: otp._id }, verifiedAt: null }, { verifiedAt: new Date() });
-    console.log('[otp:reset:delivery] sent=true');
+    mailSent = Boolean(result?.sent);
+    console.log(`[otp:reset:delivery] email=${email} sent=${mailSent}`);
   } catch (err) {
-    await ResetOtp.deleteOne({ _id: otp._id });
-    console.error('[otp:reset:send-error]', err.message);
-    throw new ApiError(503, 'We could not send the password reset email. Please try again shortly.');
+    console.error(`[otp:reset:send-error] email=${email}:`, err.message);
   }
 
   if (process.env.NODE_ENV !== 'production') console.log(`[otp:dev] reset email=${email} code=${code}`);
-  return { mailSent: true };
+  return { mailSent };
 }
 
 async function verifyResetOtp(email, role, code) {

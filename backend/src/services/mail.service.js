@@ -38,8 +38,7 @@ async function sendMail(to, subject, html) {
       console.error('[mail:brevo:error] Misconfigured key! The key starts with "xsmtpsib-", which is an SMTP password. Brevo REST API requires an API key starting with "xkeysib-" from https://app.brevo.com/settings/keys/api');
     }
     try {
-      const senderEmail = env.BREVO_SENDER || env.SMTP_USER;
-      if (!senderEmail) throw new Error('Set BREVO_SENDER to an email address verified in Brevo.');
+      const senderEmail = env.BREVO_SENDER || env.SMTP_USER || 'devkpatel426@gmail.com';
       const senderName = 'CampusNexus';
       const res = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
@@ -48,7 +47,7 @@ async function sendMail(to, subject, html) {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(4000),
         body: JSON.stringify({
           sender: { name: senderName, email: senderEmail },
           to: [{ email: to }],
@@ -76,7 +75,7 @@ async function sendMail(to, subject, html) {
           'Authorization': `Bearer ${env.RESEND_API_KEY}`,
           'Content-Type': 'application/json',
         },
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(4000),
         body: JSON.stringify({
           from: env.RESEND_FROM || 'CampusNexus <onboarding@resend.dev>',
           to: [to],
@@ -93,6 +92,14 @@ async function sendMail(to, subject, html) {
     } catch (err) {
       console.error('[mail:resend:error] Fallback to SMTP:', err.message);
     }
+  }
+
+  // 3. Fallback: On Render/Production cloud with blocked SMTP ports, do NOT hang in Nodemailer timeouts
+  const isCloudHost = Boolean(process.env.RENDER || process.env.VERCEL || process.env.NODE_ENV === 'production');
+  if (isCloudHost && !env.SMTP_HOST?.includes('localhost')) {
+    // If HTTPS providers (Brevo / Resend) failed on Render, attempting raw port 587 will hang and fail
+    console.warn(`[mail:cloud:warn] HTTPS email delivery failed. Outbound SMTP ports are blocked on Render free tier. to=${to}`);
+    return { sent: false, error: 'Cloud email provider rejected delivery or requires IP authorization.' };
   }
 
   const tx = getTransporter();
@@ -112,20 +119,8 @@ async function sendMail(to, subject, html) {
     console.log(`[mail:sent] to=${to} messageId=${info.messageId}`);
     return { sent: true, messageId: info.messageId };
   } catch (err) {
-    console.error('[mail:error] Failed to send email:', err.message);
-    // If a non-gmail pooled transporter failed with connection error, reset transporter and retry once
-    try {
-      transporter = null;
-      const retryTx = getTransporter();
-      if (retryTx) {
-        const retryInfo = await retryTx.sendMail({ from, to, subject, html });
-        console.log(`[mail:sent:retry] to=${to} messageId=${retryInfo.messageId}`);
-        return { sent: true, messageId: retryInfo.messageId };
-      }
-    } catch (retryErr) {
-      console.error('[mail:retry-error] Retry failed:', retryErr.message);
-    }
-    throw new Error(`Email delivery error: ${err.message}`);
+    console.error('[mail:error] Failed to send email via SMTP:', err.message);
+    return { sent: false, error: err.message };
   }
 }
 
