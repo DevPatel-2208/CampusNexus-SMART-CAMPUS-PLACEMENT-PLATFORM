@@ -251,7 +251,7 @@ export function CompanyCard({ company, approvedJobs = 0, delay = 0, primary = fa
             <span className="cc-co-logo" aria-hidden="true">{logoInitial}</span>
             <div className="cc-co-info">
               <h4 className="cc-co-title">
-                <span className="text-truncate">{companyName}</span>
+                <span className="cc-co-title-name">{companyName}</span>
                 {company.verificationStatus === 'verified' && (
                   <BadgeCheck size={16} className="text-success flex-shrink-0" title="Verified Recruiter" />
                 )}
@@ -269,7 +269,7 @@ export function CompanyCard({ company, approvedJobs = 0, delay = 0, primary = fa
 
           <p className="cc-co-desc">
             {company.description
-              ? (company.description.length > 120 ? `${company.description.slice(0, 120)}...` : company.description)
+              ? company.description
               : <span className="text-muted fst-italic">Trusted recruitment partner hiring students through campus drives.</span>}
           </p>
 

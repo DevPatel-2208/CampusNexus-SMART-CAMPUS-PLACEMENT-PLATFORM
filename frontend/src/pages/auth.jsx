@@ -145,7 +145,7 @@ function AuthShell({ title, lead, features, children, showTheme = true }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.5 }}
           >
-            <div className="cc-auth-mobile-brand">
+            <div className="cc-auth-mobile-brand d-lg-none">
               <Brand compact />
             </div>
             {children}
@@ -854,16 +854,18 @@ export function VerifyEmail() {
         steps={[{ icon: Check, label: 'Account' }, { icon: KeyRound, label: 'Verify OTP' }, { icon: LogIn, label: 'Sign In' }]}
         current={1}
       />
-      <div className="cc-auth-head">
-        <span className="cc-auth-logo-mark"><Mail size={20} /></span>
-        <h1 className="cc-auth-title">Verify Your Email</h1>
+      <div className="text-center mb-4">
+        <div className="otp-icon-bubble mx-auto mb-3">
+          <Mail size={24} />
+        </div>
+        <h1 className="cc-auth-title mb-1.5" style={{ fontSize: '1.65rem' }}>Verify Your Email</h1>
+        <p className="cc-auth-sub mb-0 text-muted" style={{ fontSize: '0.88rem' }}>
+          Enter the 6-digit code sent to<br />
+          <span className="otp-email-badge mt-1.5">
+            <Mail size={13} /> {form.email || 'your email'}
+          </span>
+        </p>
       </div>
-      <p className="cc-auth-sub">
-        Enter the 6-digit code sent to<br />
-        <span className="otp-email-badge">
-          <Mail size={13} /> {form.email || 'your email'}
-        </span>
-      </p>
       <AnimatePresence>
         {justRegistered && !msg && !err && (
           <motion.div

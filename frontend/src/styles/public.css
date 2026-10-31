@@ -3429,11 +3429,20 @@ img.cc-job-logo {
   color: var(--cc-muted);
   line-height: 1.6;
   margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  min-height: 42px;
+  padding: 0;
+  display: block;
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.cc-co-title-name {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .cc-co-foot {
