@@ -650,39 +650,114 @@ export function Home() {
       </section>
 
       {/* Live Stats Impact */}
-      <section className="cc-mkt-section">
+      <section className="cc-mkt-section cc-stats-section-wrap">
         <Reveal>
-          <div className="cc-stats-band cc-stats-band-pro">
-            <div className="cc-stats-band-glow-1" aria-hidden="true" />
-            <div className="cc-stats-band-glow-2" aria-hidden="true" />
-            <div className="text-center cc-stats-band-head">
-              <span className="cc-stats-band-eyebrow">
-                <Sparkles size={14} /> Proven Track Record
-              </span>
-              <h2>CampusNexus in Numbers</h2>
-              <p>Empowering student careers and driving campus hiring excellence year over year.</p>
+          <div className="cc-stats-band-pro">
+            {/* Ambient Background Lights & Mesh Pattern */}
+            <div className="cc-stats-bg-grid" aria-hidden="true" />
+            <div className="cc-stats-ambient-glow cc-glow-left" aria-hidden="true" />
+            <div className="cc-stats-ambient-glow cc-glow-right" aria-hidden="true" />
+            <div className="cc-stats-ambient-glow cc-glow-center" aria-hidden="true" />
+
+            {/* Header */}
+            <div className="cc-stats-head-pro">
+              <div className="cc-stats-badge-pill">
+                <span className="cc-stats-live-dot" />
+                <Sparkles size={14} className="cc-sparkle-spin" />
+                <span>Proven Track Record</span>
+              </div>
+              <h2 className="cc-stats-title-pro">CampusNexus in Numbers</h2>
+              <p className="cc-stats-sub-pro">
+                Empowering student careers and driving campus hiring excellence year over year.
+              </p>
             </div>
-            <div className="cc-stat-grid cc-stat-grid-pro">
+
+            {/* Grid of 4 Stat Cards */}
+            <div className="cc-stats-cards-grid">
               {[
-                [plus(statStudents), 'Registered Students', Users],
-                [plus(statCompanies), 'Partner Companies', Building2],
-                [plus(statJobs), 'Total Jobs Posted', Briefcase],
-                [statValue(stats.placed), 'Placed Students', Trophy],
-              ].map(([v, l, I]) => (
-                <article key={l} className="cc-stat-glass cc-stat-glass-pro">
-                  <div className="cc-stat-glass-icon"><I size={24} /></div>
-                  <div className="cc-stat-glass-content">
-                    <div className="cc-stat-glass-value">{v}</div>
-                    <div className="cc-stat-glass-label">{l}</div>
-                  </div>
-                </article>
-              ))}
+                {
+                  value: plus(statStudents),
+                  label: 'Registered Students',
+                  desc: 'Active & verified student talent pool',
+                  badge: 'Talent Pool',
+                  icon: Users,
+                  theme: 'indigo',
+                },
+                {
+                  value: plus(statCompanies),
+                  label: 'Partner Companies',
+                  desc: 'Tier-1 employers, MNCs & unicorns',
+                  badge: 'Top Recruiters',
+                  icon: Building2,
+                  theme: 'emerald',
+                },
+                {
+                  value: plus(statJobs),
+                  label: 'Total Jobs Posted',
+                  desc: 'Active campus drives & FTE openings',
+                  badge: 'Direct Openings',
+                  icon: Briefcase,
+                  theme: 'amber',
+                },
+                {
+                  value: statValue(stats.placed),
+                  label: 'Placed Students',
+                  desc: 'Multi-discipline confirmed offers',
+                  badge: 'Success Metrics',
+                  icon: Trophy,
+                  theme: 'rose',
+                },
+              ].map((card, idx) => {
+                const IconComponent = card.icon;
+                return (
+                  <article
+                    key={card.label}
+                    className={'cc-stat-pro-card cc-theme-' + card.theme}
+                    style={{ '--card-index': idx }}
+                  >
+                    <div className="cc-stat-card-top">
+                      <div className="cc-stat-icon-wrapper">
+                        <IconComponent size={24} />
+                      </div>
+                      <span className="cc-stat-pill-tag">{card.badge}</span>
+                    </div>
+
+                    <div className="cc-stat-card-body">
+                      <div className="cc-stat-main-number">{card.value}</div>
+                      <h3 className="cc-stat-card-label">{card.label}</h3>
+                      <p className="cc-stat-card-desc">{card.desc}</p>
+                    </div>
+
+                    <div className="cc-stat-card-footer">
+                      <span className="cc-stat-growth-indicator">
+                        <TrendingUp size={12} /> Live Verified Telemetry
+                      </span>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+
+            {/* Bottom Real-time Trust Bar */}
+            <div className="cc-stats-trust-strip">
+              <div className="cc-trust-item">
+                <ShieldCheck size={16} className="text-success" />
+                <span>100% Verified Campus Drives</span>
+              </div>
+              <div className="cc-trust-divider" />
+              <div className="cc-trust-item">
+                <CheckCircle2 size={16} className="text-info" />
+                <span>Direct TPO & Coordinator Audited</span>
+              </div>
+              <div className="cc-trust-divider" />
+              <div className="cc-trust-item">
+                <Zap size={16} className="text-warning" />
+                <span>Instant 1-Click Applications</span>
+              </div>
             </div>
           </div>
         </Reveal>
       </section>
-
-      
 
       {/* Call to Action */}
       <section className="cc-mkt-section mb-5">
