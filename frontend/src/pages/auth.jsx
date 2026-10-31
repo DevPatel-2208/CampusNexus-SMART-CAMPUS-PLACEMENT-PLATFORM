@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -145,7 +145,9 @@ function AuthShell({ title, lead, features, children, showTheme = true }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.5 }}
           >
-            <Brand compact />
+            <div className="cc-auth-mobile-brand">
+              <Brand compact />
+            </div>
             {children}
           </motion.div>
         </main>
@@ -465,9 +467,19 @@ export function Register() {
     setErr('');
     try {
       const { data } = await api.post('/auth/register', values);
-      await showSuccess({ title: 'Account created!', message: 'Your CampusNexus account has been created. Please verify your email to continue.', confirmButtonText: 'Continue', intensity: 'small' });
-      navigate('/verify-email', { state: { userId: data.data.userId, email: data.data.email } });
-    } catch (e2) { setErr(apiErrorMessage(e2)); }
+      try {
+        sessionStorage.setItem('cc-pending', JSON.stringify({ userId: data.data.userId, email: data.data.email }));
+      } catch {}
+      navigate('/verify-email', {
+        state: {
+          userId: data.data.userId,
+          email: data.data.email,
+          justRegistered: true,
+        },
+      });
+    } catch (e2) {
+      setErr(apiErrorMessage(e2));
+    }
   };
   return (
     <AuthShell
@@ -775,21 +787,46 @@ function PasswordStrength({ value }) {
 
 export function VerifyEmail() {
   const navigate = useNavigate();
-  const state = window.history.state?.usr || {};
-  const [form, setForm] = useState({ userId: state?.userId || '', email: state?.email || '', code: '' });
+  const location = useLocation();
+  const state = location.state || window.history.state?.usr || {};
+  const [form, setForm] = useState(() => {
+    let saved = null;
+    try { saved = JSON.parse(sessionStorage.getItem('cc-pending') || 'null'); } catch {}
+    return {
+      userId: state?.userId || saved?.userId || '',
+      email: state?.email || saved?.email || '',
+      code: '',
+    };
+  });
+  const [justRegistered, setJustRegistered] = useState(Boolean(state?.justRegistered));
   const [msg, setMsg] = useState('');
   const [err, setErr] = useState('');
   const [cool, setCool] = useState(0);
   const [busy, setBusy] = useState(false);
   const [left, setLeft] = useCountdown(600);
-  useState(() => { try { const s = JSON.parse(sessionStorage.getItem('cc-pending') || 'null'); if (s) setForm((f) => ({ ...f, ...s })); } catch { /* */ } });
+
+  useEffect(() => {
+    if (form.userId && form.email) {
+      try {
+        sessionStorage.setItem('cc-pending', JSON.stringify({ userId: form.userId, email: form.email }));
+      } catch {}
+    }
+  }, [form.userId, form.email]);
+
   const expired = left <= 0;
   const submit = async (e) => {
-    e.preventDefault(); setBusy(true); setErr(''); setMsg('');
+    if (e) e.preventDefault();
+    if (form.code.length !== 6 || busy || expired) return;
+    setBusy(true); setErr(''); setMsg('');
     try {
       await api.post('/auth/verify-email', form);
       sessionStorage.removeItem('cc-pending');
-      await showSuccess({ title: 'Email verified!', message: 'Your email has been verified successfully. You can now sign in to CampusNexus.', confirmButtonText: 'Go to Login', intensity: 'small' });
+      await showSuccess({
+        title: 'Account Verified & Activated!',
+        message: 'Your email has been verified successfully. Your CampusNexus account is now active and ready to sign in.',
+        confirmButtonText: 'Go to Sign In',
+        intensity: 'medium',
+      });
       navigate('/login');
     } catch (e2) { setErr(apiErrorMessage(e2)); } finally { setBusy(false); }
   };
@@ -797,14 +834,14 @@ export function VerifyEmail() {
     setErr(''); setMsg('');
     try {
       await api.post('/auth/resend-otp', { userId: form.userId || undefined, email: form.email || undefined });
-      setMsg('A new code was sent.'); setCool(60); setLeft(600);
+      setMsg('A fresh 6-digit verification code was sent to your email.'); setCool(60); setLeft(600); setJustRegistered(false);
     } catch (e2) { const r = e2.response?.data?.resendAfter; if (r) setCool(r); setErr(apiErrorMessage(e2)); }
   };
   return (
     <AuthShell
       title={<>One last step — verify your email.</>}
-      lead="We sent a 6-digit verification code to your inbox. Enter it here to activate your account and start your placement journey."
-      features={['Code expires in 10 minutes', '5 attempts per code — then resend', 'Verified accounts sign in instantly']}
+      lead="Enter the 6-digit verification code sent to your inbox. Once verified, your account will be fully activated."
+      features={['Fast 6-digit OTP verification', 'Protects your account identity', 'Direct access to jobs & placement drives']}
     >
       <OtpSteps
         steps={[{ icon: Check, label: 'Account' }, { icon: KeyRound, label: 'Verify OTP' }, { icon: LogIn, label: 'Sign In' }]}
@@ -816,9 +853,25 @@ export function VerifyEmail() {
       </div>
       <p className="cc-auth-sub">
         Enter the 6-digit code sent to<br />
-        <b className="otp-email">{form.email || 'your email'}</b>
+        <span className="otp-email-badge">
+          <Mail size={13} /> {form.email || 'your email'}
+        </span>
       </p>
       <AnimatePresence>
+        {justRegistered && !msg && !err && (
+          <motion.div
+            className="alert alert-info py-2.5 px-3 d-flex align-items-center gap-2 mb-3 text-start"
+            style={{ borderRadius: 12, border: '1px solid rgba(14, 165, 233, 0.25)', background: 'rgba(14, 165, 233, 0.08)' }}
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <Info size={16} className="text-info flex-shrink-0" />
+            <div className="small">
+              <strong>Almost there!</strong> Enter the OTP code sent to your inbox to complete registration and activate your account.
+            </div>
+          </motion.div>
+        )}
         {err && (
           <motion.div
             className="alert alert-danger py-2"
@@ -842,19 +895,19 @@ export function VerifyEmail() {
       </AnimatePresence>
       <form onSubmit={submit}>
         {!form.userId && (
-          <div className="mb-2">
-            <label className="form-label">Email <span className="text-danger">*</span></label>
+          <div className="mb-3 text-start">
+            <label className="form-label small fw-semibold">Email Address <span className="text-danger">*</span></label>
             <input type="email" required className="form-control" placeholder="Enter your email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
           </div>
         )}
         <div className="otp-timer-wrap mb-3" role="timer" aria-live="polite">
           <span className={`otp-timer${expired ? ' is-expired' : ''}`}><Clock size={13} /> {expired ? 'Code expired' : fmtClock(left)}</span>
-          <span className="otp-timer-note">Code expires in 10 minutes</span>
+          <span className="otp-timer-note">{expired ? 'Request a new code below' : 'Code expires in 10 minutes'}</span>
         </div>
         <div className="mb-3">
           <OtpBoxes value={form.code} onChange={(code) => setForm((f) => ({ ...f, code }))} disabled={busy || expired} autoFocus />
         </div>
-        <SubmitButton loading={busy} disabled={form.code.length !== 6 || expired} icon={CheckCircle2}>Verify Email</SubmitButton>
+        <SubmitButton loading={busy} disabled={form.code.length !== 6 || expired} icon={CheckCircle2}>Verify &amp; Activate Account</SubmitButton>
       </form>
       <div className="otp-resend mt-3">
         <span>Didn&apos;t get the code?</span>
@@ -864,10 +917,10 @@ export function VerifyEmail() {
       </div>
       <div className="otp-help mt-3">
         <Info size={15} />
-        <span>Check your spam folder. The code is valid for 10 minutes and 5 attempts.</span>
+        <span>Check your spam or junk folder. The code is valid for 10 minutes and 5 attempts.</span>
       </div>
       <p className="cc-auth-switch text-center mt-3">
-        <Link to="/login">Back to Sign In</Link> <span aria-hidden="true">•</span> <Link to="/register">Wrong email? Register again</Link>
+        <Link to="/login">← Back to Sign In</Link> <span aria-hidden="true">•</span> <Link to="/register">Wrong email? Register again</Link>
       </p>
     </AuthShell>
   );

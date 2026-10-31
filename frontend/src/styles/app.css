@@ -3516,15 +3516,35 @@ html[data-theme='dark'] .swal2-popup .swal2-cancel:focus {
 }
 
 .otp-email { font-weight: 600; color: var(--cc-text); }
+.otp-email-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--cc-primary);
+  background: var(--cc-primary-soft);
+  border: 1px solid rgba(79, 70, 229, 0.16);
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-top: 6px;
+  word-break: break-all;
+}
+[data-theme='dark'] .otp-email-badge {
+  background: rgba(99, 102, 241, 0.16);
+  border-color: rgba(99, 102, 241, 0.28);
+  color: #a5b4fc;
+}
 .otp-timer-wrap {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   background: var(--cc-surface-2);
   border: 1px solid var(--cc-border);
-  border-radius: var(--cc-radius-sm);
-  padding: 6px 14px;
+  border-radius: 12px;
+  padding: 8px 18px;
+  margin: 0 auto;
 }
 .otp-timer {
   display: inline-flex;
