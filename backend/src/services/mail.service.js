@@ -26,7 +26,37 @@ function getTransporter() {
 }
 
 async function sendMail(to, subject, html) {
-  // 1. If RESEND_API_KEY is present, send via Resend HTTPS REST API (Port 443 - never blocked by cloud firewalls like Render Free Tier)
+  // 1. If BREVO_API_KEY is present, send via Brevo (Sendinblue) HTTPS REST API (Port 443 - no domain lock, 300 free/day)
+  if (env.BREVO_API_KEY) {
+    try {
+      const senderEmail = env.BREVO_SENDER || env.SMTP_USER || 'devkpatel426@gmail.com';
+      const senderName = 'CampusNexus';
+      const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'api-key': env.BREVO_API_KEY,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          sender: { name: senderName, email: senderEmail },
+          to: [{ email: to }],
+          subject,
+          htmlContent: html,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data?.messageId) {
+        console.log(`[mail:brevo:sent] to=${to} messageId=${data.messageId}`);
+        return { sent: true, messageId: data.messageId, provider: 'brevo' };
+      }
+      console.warn('[mail:brevo:warn] Brevo API rejected email delivery:', data);
+    } catch (err) {
+      console.error('[mail:brevo:error] Brevo fetch error:', err.message);
+    }
+  }
+
+  // 2. If RESEND_API_KEY is present, send via Resend HTTPS REST API (Port 443)
   if (env.RESEND_API_KEY) {
     try {
       const res = await fetch('https://api.resend.com/emails', {
@@ -45,7 +75,7 @@ async function sendMail(to, subject, html) {
       const data = await res.json();
       if (res.ok && data?.id) {
         console.log(`[mail:resend:sent] to=${to} messageId=${data.id}`);
-        return { sent: true, messageId: data.id };
+        return { sent: true, messageId: data.id, provider: 'resend' };
       }
       console.warn('[mail:resend:warn] Resend API failed, falling back to SMTP:', data);
     } catch (err) {

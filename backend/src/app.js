@@ -47,22 +47,48 @@ app.use('/uploads', express.static('uploads'));
 
 // Health check endpoints for Render and uptime monitoring
 app.get('/health', (req, res) => {
+  const mailProvider = env.BREVO_API_KEY
+    ? 'brevo'
+    : env.RESEND_API_KEY
+    ? 'resend'
+    : (env.SMTP_USER && env.SMTP_PASS ? 'smtp' : 'none');
+
   res.status(200).json({
     status: 'ok',
     uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
     service: 'CampusNexus Backend API',
-    mailConfigured: Boolean(env.SMTP_USER && env.SMTP_PASS),
+    mailConfigured: mailProvider !== 'none',
+    mailProvider,
   });
 });
 
 app.get('/api/v1/health', (req, res) => {
+  const mailProvider = env.BREVO_API_KEY
+    ? 'brevo'
+    : env.RESEND_API_KEY
+    ? 'resend'
+    : (env.SMTP_USER && env.SMTP_PASS ? 'smtp' : 'none');
+
   res.status(200).json({
     status: 'ok',
     uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
     service: 'CampusNexus Backend API',
-    mailConfigured: Boolean(env.SMTP_USER && env.SMTP_PASS),
+    mailConfigured: mailProvider !== 'none',
+    mailProvider,
+  });
+});
+
+app.get('/api/v1/health/mail-check', (req, res) => {
+  res.status(200).json({
+    hasBrevo: Boolean(env.BREVO_API_KEY),
+    hasResend: Boolean(env.RESEND_API_KEY),
+    hasSmtp: Boolean(env.SMTP_USER && env.SMTP_PASS),
+    smtpUser: env.SMTP_USER || null,
+    smtpHost: env.SMTP_HOST || null,
+    activeProvider: env.BREVO_API_KEY ? 'brevo (HTTPS:443)' : env.RESEND_API_KEY ? 'resend (HTTPS:443)' : (env.SMTP_USER ? 'smtp (BLOCKED on Render free tier)' : 'none'),
+    note: 'Render free tier blocks raw outbound SMTP ports 25, 465, and 587. Email delivery requires Brevo or Resend via HTTPS (port 443).'
   });
 });
 

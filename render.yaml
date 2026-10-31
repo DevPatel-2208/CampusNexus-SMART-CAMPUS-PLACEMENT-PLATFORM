@@ -40,5 +40,9 @@ services:
         value: "false"
       - key: RESEND_API_KEY
         sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_SENDER
+        value: devkpatel426@gmail.com
       - key: ALLOW_SEED
         value: "false"

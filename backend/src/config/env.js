@@ -44,6 +44,8 @@ const env = {
   GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI || '',
   ALLOW_SEED: process.env.ALLOW_SEED === 'true',
   RESEND_API_KEY: process.env.RESEND_API_KEY || '',
+  BREVO_API_KEY: process.env.BREVO_API_KEY || '',
+  BREVO_SENDER: process.env.BREVO_SENDER || process.env.SMTP_USER || 'devkpatel426@gmail.com',
 };
 
 if (env.NODE_ENV === 'production') {
