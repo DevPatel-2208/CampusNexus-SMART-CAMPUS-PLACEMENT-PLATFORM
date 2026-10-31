@@ -477,6 +477,7 @@ export function Register() {
           userId: data.data.userId,
           email: data.data.email,
           justRegistered: true,
+          mailSent: data.data.mailSent !== false,
         },
       });
     } catch (e2) {
@@ -808,6 +809,7 @@ export function VerifyEmail() {
     };
   });
   const [justRegistered, setJustRegistered] = useState(Boolean(state?.justRegistered));
+  const [mailSent, setMailSent] = useState(typeof state?.mailSent === 'boolean' ? state.mailSent : null);
   const [msg, setMsg] = useState('');
   const [err, setErr] = useState('');
   const [cool, setCool] = useState(0);
@@ -842,8 +844,13 @@ export function VerifyEmail() {
   const resend = async () => {
     setErr(''); setMsg('');
     try {
-      await api.post('/auth/resend-otp', { userId: form.userId || undefined, email: form.email || undefined });
-      setMsg('A fresh 6-digit verification code was sent to your email.'); setCool(60); setLeft(600); setJustRegistered(false);
+      const { data } = await api.post('/auth/resend-otp', { userId: form.userId || undefined, email: form.email || undefined });
+      const delivered = data?.data?.mailSent === true;
+      setMailSent(delivered);
+      setMsg(delivered
+        ? 'A fresh 6-digit verification code was sent to your email.'
+        : 'The account is ready, but email delivery failed. Check the server mail configuration and try again shortly.');
+      setCool(60); setLeft(600); setJustRegistered(false);
     } catch (e2) { const r = e2.response?.data?.resendAfter; if (r) setCool(r); setErr(apiErrorMessage(e2)); }
   };
   return (
@@ -871,15 +878,17 @@ export function VerifyEmail() {
       <AnimatePresence>
         {justRegistered && !msg && !err && (
           <motion.div
-            className="alert alert-info py-2.5 px-3 d-flex align-items-center gap-2 mb-3 text-start"
-            style={{ borderRadius: 12, border: '1px solid rgba(14, 165, 233, 0.25)', background: 'rgba(14, 165, 233, 0.08)' }}
+            className={`alert ${mailSent === false ? 'alert-warning' : 'alert-info'} py-2.5 px-3 d-flex align-items-center gap-2 mb-3 text-start`}
+            style={{ borderRadius: 12 }}
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, height: 0 }}
           >
             <Info size={16} className="text-info flex-shrink-0" />
             <div className="small">
-              <strong>Almost there!</strong> Enter the OTP code sent to your inbox to complete registration and activate your account.
+              {mailSent === false
+                ? <><strong>Account created, email not delivered.</strong> Check the mail configuration and use Resend code once delivery is available.</>
+                : <><strong>Almost there!</strong> Enter the OTP code sent to your inbox to complete registration and activate your account.</>}
             </div>
           </motion.div>
         )}
@@ -895,7 +904,7 @@ export function VerifyEmail() {
         )}
         {msg && (
           <motion.div
-            className="alert alert-success py-2"
+            className={`alert ${mailSent === false ? 'alert-warning' : 'alert-success'} py-2`}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}

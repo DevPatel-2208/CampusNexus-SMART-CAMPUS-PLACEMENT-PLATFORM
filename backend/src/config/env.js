@@ -43,17 +43,22 @@ const env = {
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
   GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI || '',
   ALLOW_SEED: process.env.ALLOW_SEED === 'true',
-  RESEND_API_KEY: process.env.RESEND_API_KEY || '',
-  BREVO_API_KEY: process.env.BREVO_API_KEY || '',
-  BREVO_SENDER: process.env.BREVO_SENDER || process.env.SMTP_USER || 'devkpatel426@gmail.com',
+  RESEND_API_KEY: (process.env.RESEND_API_KEY || '').trim(),
+  BREVO_API_KEY: (process.env.BREVO_API_KEY || '').trim(),
+  BREVO_SENDER: (process.env.BREVO_SENDER || process.env.SMTP_USER || '').trim(),
 };
 
 if (env.NODE_ENV === 'production') {
   if (env.JWT_ACCESS_SECRET.length < 32 || env.JWT_REFRESH_SECRET.length < 32) {
     throw new Error('JWT secrets must be at least 32 characters in production');
   }
-  if (env.MAIL_REQUIRED && (!env.SMTP_HOST || !env.SMTP_USER || !env.SMTP_PASS)) {
-    throw new Error('MAIL_REQUIRED=true but SMTP credentials are missing');
+  const mailConfigured = Boolean(
+    (env.BREVO_API_KEY && env.BREVO_SENDER) ||
+    env.RESEND_API_KEY ||
+    (env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS)
+  );
+  if (env.MAIL_REQUIRED && !mailConfigured) {
+    throw new Error('MAIL_REQUIRED=true but no complete mail provider configuration is set');
   }
 }
 

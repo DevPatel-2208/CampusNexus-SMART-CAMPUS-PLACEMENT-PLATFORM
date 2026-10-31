@@ -203,11 +203,12 @@ Navigate to **`http://localhost:5173`** in your browser.
 
 1. Create a free M0 cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 2. Under **Database Access**, create a user with `Read and write to any database` privileges.
-3. Under **Network Access**, add IP `0.0.0.0/0` (Allow access from anywhere) so Render can connect.
+3. Open the Render service’s **Connect → Outbound** tab and copy its outbound IP ranges. Add those ranges under Atlas **Network Access** → **IP Access List**. Avoid `0.0.0.0/0` for a production database; use Render dedicated outbound IPs if you need a smaller fixed allowlist and your plan supports them.
 4. Click **Connect** → **Drivers** → Copy the SRV connection string:
    ```text
    mongodb+srv://<username>:<password>@cluster0.mongodb.net/careerconnect?retryWrites=true&w=majority
    ```
+   Render’s outbound ranges must be included in this IP access list. If the backend log reports an IP whitelist rejection, the API exits before it can handle registration or send an OTP. Keep the database user password strong and its role limited to the app database.
 
 ---
 
@@ -237,7 +238,10 @@ Navigate to **`http://localhost:5173`** in your browser.
    | `SMTP_USER` | *your-smtp-username* | Email provider login |
    | `SMTP_PASS` | *your-smtp-password* | App password or API key |
    | `MAIL_FROM` | `"CampusNexus <no-reply@campusnexus.com>"` | Sender address |
-   | `MAIL_REQUIRED` | `true` | Requires email delivery for OTPs in production |
+   | `MAIL_REQUIRED` | `true` | Requires at least one complete email provider configuration |
+   | `BREVO_API_KEY` | *Brevo API key* | Optional HTTPS provider; keep it only in Render variables |
+   | `BREVO_SENDER` | *verified sender email* | Must be active/verified in Brevo; API key format alone does not verify delivery |
+   | `RESEND_API_KEY` | *Resend API key* | Optional fallback provider |
    | `GROQ_API_KEY` | *your-groq-api-key* | Optional AI features |
 5. Click **Create Web Service**.
 6. Once deployed, test your live health endpoint:
@@ -287,9 +291,10 @@ The backend includes zero-dependency health monitoring endpoints for Render and 
 
 | Issue | Root Cause | Solution |
 |---|---|---|
+| **MongoDB Atlas whitelist error / backend exits** | Render cannot reach the Atlas cluster from its current outbound IP | Add the Render outbound address to Atlas **Network Access** and restart the Render service. Until the API logs `MongoDB connected` and starts listening, registration and OTP delivery cannot work. |
 | **CORS error in browser** | Frontend origin not allowlisted or the service has old settings | Set Render `CORS_ORIGIN` to the exact frontend origin (scheme and host, no path or trailing slash), then redeploy/restart the backend. OPTIONS is handled by the global CORS middleware before routes. |
 | **Page Refresh 404 on Netlify** | SPA client-side routing fallback missing | `frontend/public/_redirects` and `netlify.toml` include `/* /index.html 200` to resolve all sub-paths. |
-| **MongoDB connection timeout** | Atlas IP allowlist blocking Render | In Atlas &rarr; Network Access &rarr; add `0.0.0.0/0` to allow dynamic Render IP addresses. |
+| **MongoDB connection timeout** | Atlas IP access list or credentials block Render | Allowlist the Render service outbound ranges in Atlas and confirm the database user credentials and permissions. |
 | **JWT startup error on Render** | Secrets shorter than 32 characters | Set `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` to random 32+ character strings. |
 | **OTP not received** | SMTP credentials empty | In dev, check terminal output for OTP codes; in prod, configure valid SMTP credentials (e.g. Brevo). |
 

@@ -81,53 +81,31 @@ app.get('/api/v1/health', (req, res) => {
 });
 
 app.get('/api/v1/health/mail-check', (req, res) => {
-  const brevoKeyPrefix = env.BREVO_API_KEY ? env.BREVO_API_KEY.slice(0, 8) : null;
   const brevoKeyValid = Boolean(env.BREVO_API_KEY && env.BREVO_API_KEY.startsWith('xkeysib-'));
   const brevoIsSmtpPassword = Boolean(env.BREVO_API_KEY && env.BREVO_API_KEY.startsWith('xsmtpsib-'));
+  const fallbackProvider = env.RESEND_API_KEY
+    ? 'resend'
+    : env.SMTP_USER && env.SMTP_PASS
+    ? 'smtp'
+    : 'none';
 
   res.status(200).json({
     hasBrevo: Boolean(env.BREVO_API_KEY),
-    brevoKeyPrefix,
     brevoKeyStatus: brevoKeyValid
-      ? 'VALID_API_KEY_FORMAT'
+      ? 'FORMAT_OK_AUTH_NOT_VERIFIED'
       : brevoIsSmtpPassword
       ? 'WRONG_KEY_TYPE: You pasted an SMTP password (starts with xsmtpsib-). You need an API Key (starts with xkeysib-) from https://app.brevo.com/settings/keys/api'
       : env.BREVO_API_KEY
       ? 'UNKNOWN_KEY_FORMAT'
       : 'NOT_SET',
+    brevoSenderConfigured: Boolean(env.BREVO_SENDER),
     hasResend: Boolean(env.RESEND_API_KEY),
     hasSmtp: Boolean(env.SMTP_USER && env.SMTP_PASS),
     activeProvider: brevoKeyValid
-      ? 'brevo (HTTPS:443 - ACTIVE)'
-      : env.RESEND_API_KEY
-      ? 'resend (HTTPS:443)'
-      : 'none',
-    instruction: 'To fix: Go to https://app.brevo.com/settings/keys/api -> Generate a new API key -> Copy the key starting with xkeysib- -> Paste into BREVO_API_KEY in Render.'
+      ? 'brevo (configured; credentials and delivery not verified)'
+      : fallbackProvider,
+    instruction: 'A key prefix check does not authenticate the key or confirm delivery. Set BREVO_SENDER to a sender verified in Brevo, then check Render logs for [mail:brevo:sent] or [mail:brevo:warn].'
   });
-});
-
-app.get('/api/v1/health/brevo-senders', async (req, res) => {
-  if (!env.BREVO_API_KEY) return res.status(400).json({ error: 'BREVO_API_KEY not configured' });
-  try {
-    const r = await fetch('https://api.brevo.com/v3/senders', {
-      headers: { 'api-key': env.BREVO_API_KEY.trim(), 'Accept': 'application/json' },
-    });
-    const d = await r.json();
-    res.status(r.status).json({ status: r.status, data: d });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
-app.get('/api/v1/health/test-email', async (req, res) => {
-  const { sendMail, emailVerificationTemplate } = require('./services/mail.service');
-  const to = req.query.to || env.SMTP_USER || 'devkpatel426@gmail.com';
-  try {
-    const result = await sendMail(to, 'CampusNexus Live Test OTP: 123456', emailVerificationTemplate('123456', 10));
-    res.json({ success: true, to, result });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
 });
 
 // API Routes

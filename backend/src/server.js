@@ -24,7 +24,10 @@ connectDB().then(() => {
     process.exit(1);
   });
 }).catch((err) => {
-  logger.error('MongoDB connection failed', { message: err.message });
+  const atlasIpHint = /not authorized|whitelist|ip address/i.test(err.message)
+    ? 'Add the Render service outbound IP to MongoDB Atlas Network Access, then restart the Render service.'
+    : undefined;
+  logger.error('MongoDB connection failed', { message: err.message, action: atlasIpHint });
   process.exit(1);
 });
 
