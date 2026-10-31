@@ -8,7 +8,8 @@
     "dev": "node --watch src/server.js",
     "test": "jest --runInBand --forceExit",
     "migrate": "node scripts/migrate-mysql-to-mongodb.js",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "seed:companies-jobs": "node scripts/seedCompaniesAndJobs.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

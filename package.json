@@ -10,6 +10,7 @@
     "build": "npm --prefix frontend run build",
     "build:frontend": "npm --prefix frontend run build",
     "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "seed:companies-jobs": "npm --prefix backend run seed:companies-jobs",
     "test:backend": "npm --prefix backend test"
   },
   "devDependencies": {
