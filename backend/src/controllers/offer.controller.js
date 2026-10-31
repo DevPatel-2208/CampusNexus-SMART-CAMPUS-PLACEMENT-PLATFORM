@@ -262,9 +262,9 @@ const letterPdf = asyncHandler(async (req, res) => {
   const fmt = (v) => (v ? new Date(v).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '—');
 
   const pdf = buildPdf({
-    title: String(company.companyName || 'CareerConnect'),
+    title: String(company.companyName || 'CampusNexus'),
     subtitle: [company.city, company.website].filter(Boolean).join('  |  ') || '',
-    footer: `CareerConnect · Offer Letter · ${ref}`,
+    footer: `CampusNexus · Offer Letter · ${ref}`,
   });
 
   // ---- Letterhead ----
@@ -313,7 +313,7 @@ const letterPdf = asyncHandler(async (req, res) => {
   }
 
   // ---- Closing ----
-  pdf.paragraph('We look forward to welcoming you to our team. Please accept or respond to this offer through the CareerConnect portal.');
+  pdf.paragraph('We look forward to welcoming you to our team. Please accept or respond to this offer through the CampusNexus portal.');
   pdf.paragraph('Sincerely,');
   pdf.paragraph(`${offer.representativeName || ''}${offer.representativeDesignation ? `, ${offer.representativeDesignation}` : ''}`);
   pdf.paragraph(`${company.companyName || 'Company'}`);

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * CareerConnect Enterprise PDF Generation Engine
+ * CampusNexus Enterprise PDF Generation Engine
  * Generates publication-ready, mathematically aligned institutional PDF ledgers.
  * Compatible with all standard PDF readers (Adobe Acrobat, Chrome, Preview).
  */
@@ -73,9 +73,9 @@ function wrapCellText(text, maxChars, maxLines = 3) {
 class Pdf {
   constructor({
     title = 'Official Report',
-    subtitle = 'CareerConnect Campus Placement Management',
-    institution = 'CareerConnect Institutional Placement Cell',
-    footer = 'CareerConnect Official Record • Confidential',
+    subtitle = 'CampusNexus Smart Campus Placement Platform',
+    institution = 'CampusNexus Institutional Placement Cell',
+    footer = 'CampusNexus Official Record • Confidential',
     landscape = false,
   } = {}) {
     this.size = landscape ? A4_LANDSCAPE : A4_PORTRAIT;
@@ -119,7 +119,7 @@ class Pdf {
     this._rect(MARGIN.left, this.y, 6, bannerH, '0.15 0.39 0.92');
 
     // Brand eyebrow
-    this._text('CAREERCONNECT • CAMPUS PLACEMENT MANAGEMENT SYSTEM', MARGIN.left + 16, this.y + 16, 7.5, 'F2', '0.38 0.65 0.98');
+    this._text('CAMPUSNEXUS • SMART CAMPUS PLACEMENT PLATFORM', MARGIN.left + 16, this.y + 16, 7.5, 'F2', '0.38 0.65 0.98');
 
     // Report Title
     this._text(this.title.toUpperCase(), MARGIN.left + 16, this.y + 34, 14, 'F2', '1 1 1');
@@ -146,7 +146,7 @@ class Pdf {
 
     // Compact running banner
     this._rect(MARGIN.left, this.y, totalW, headerH, '0.96 0.97 0.99', '0.88 0.91 0.95', 0.5);
-    this._text(`CareerConnect Institutional Ledger  •  ${this.title}`, MARGIN.left + 10, this.y + 16, 8.5, 'F2', '0.15 0.20 0.30');
+    this._text(`CampusNexus Institutional Ledger  •  ${this.title}`, MARGIN.left + 10, this.y + 16, 8.5, 'F2', '0.15 0.20 0.30');
 
     const curPage = this.pages.length;
     const rightText = `Document Ref: CC-${this.title.slice(0, 3).toUpperCase()} • Active Registry`;

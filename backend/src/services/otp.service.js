@@ -22,7 +22,7 @@ async function issueEmailOtp(user) {
   const otp = await EmailOtp.create({ user: user._id, otpHash: sha256(code), expiresAt: new Date(Date.now() + OTP_TTL_MS), attempts: 0, lastSentAt: new Date() });
   let mailSent = true;
   try {
-    const r = await sendMail(user.email, `Your CareerConnect verification code is ${code}`, otpTemplate(code, 'verify your email address', 10));
+    const r = await sendMail(user.email, `Your CampusNexus verification code is ${code}`, otpTemplate(code, 'verify your email address', 10));
     mailSent = r.sent !== false;
   } catch (e) { mailSent = false; }
   if (process.env.NODE_ENV !== 'production') console.log(`[otp:dev] verify user=${user._id} code=${code} mailSent=${mailSent}`);
@@ -56,7 +56,7 @@ async function issueResetOtp(email, role) {
   await ResetOtp.create({ email: email.toLowerCase(), role, otpHash: sha256(code), expiresAt: new Date(Date.now() + OTP_TTL_MS), attempts: 0, lastSentAt: new Date() });
   let mailSent = true;
   try {
-    const r = await sendMail(email, `Your CareerConnect password reset code is ${code}`, otpTemplate(code, 'reset your password', 10));
+    const r = await sendMail(email, `Your CampusNexus password reset code is ${code}`, otpTemplate(code, 'reset your password', 10));
     mailSent = r.sent !== false;
   } catch (e) { mailSent = false; }
   if (process.env.NODE_ENV !== 'production') console.log(`[otp:dev] reset email=${email} code=${code} mailSent=${mailSent}`);

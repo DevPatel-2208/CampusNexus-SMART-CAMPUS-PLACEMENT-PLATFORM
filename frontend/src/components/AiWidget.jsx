@@ -173,7 +173,7 @@ export function AiWidget() {
           setOverview(data.data);
           // Set personalized welcome message
           const welcome = data.data.welcomeMessage ||
-            `Hello, ${studentFirstName}! 👋 I'm your CareerConnect AI Assistant. I can help you understand your profile, skills, job opportunities, applications, and placement progress. What would you like to know today?`;
+            `Hello, ${studentFirstName}! 👋 I'm your CampusNexus AI Assistant. I can help you understand your profile, skills, job opportunities, applications, and placement progress. What would you like to know today?`;
 
           setMsgs([
             {
@@ -191,7 +191,7 @@ export function AiWidget() {
             {
               id: 'welcome-fallback',
               from: 'bot',
-              text: `Hello, ${studentFirstName}! 👋 I'm your CareerConnect AI Assistant. I can help you explore jobs, track applications, analyze your skills, and guide your placement journey. What would you like to check today?`,
+              text: `Hello, ${studentFirstName}! 👋 I'm your CampusNexus AI Assistant. I can help you explore jobs, track applications, analyze your skills, and guide your placement journey. What would you like to check today?`,
               time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             },
           ]);
@@ -274,7 +274,7 @@ export function AiWidget() {
     } catch (err) {
       const errorMessage =
         err?.response?.data?.message ||
-        'I ran into an issue connecting with the CareerConnect AI service. Please try again in a moment.';
+        'I ran into an issue connecting with the CampusNexus AI service. Please try again in a moment.';
 
       setMsgs((prev) => [
         ...prev,
@@ -312,7 +312,7 @@ export function AiWidget() {
 
     if (result.isConfirmed) {
       const welcome = overview?.welcomeMessage ||
-        `Hello, ${studentFirstName}! 👋 I'm your CareerConnect AI Assistant. How can I help with your placements today?`;
+        `Hello, ${studentFirstName}! 👋 I'm your CampusNexus AI Assistant. How can I help with your placements today?`;
 
       setMsgs([
         {
@@ -350,8 +350,8 @@ export function AiWidget() {
           setOpen((prev) => !prev);
           setMinimized(false);
         }}
-        aria-label="Open CareerConnect AI Assistant"
-        title="CareerConnect AI Assistant"
+        aria-label="Open CampusNexus AI Assistant"
+        title="CampusNexus AI Assistant"
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.94 }}
         initial={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -392,7 +392,7 @@ export function AiWidget() {
           <motion.div
             className={`cc-ai-window ${minimized ? 'cc-ai-minimized' : ''}`}
             role="dialog"
-            aria-label="CareerConnect AI Assistant Window"
+            aria-label="CampusNexus AI Assistant Window"
             initial={{ opacity: 0, y: 30, scale: 0.94 }}
             animate={{
               opacity: 1,
@@ -412,7 +412,7 @@ export function AiWidget() {
                 </div>
                 <div className="cc-ai-head-titles">
                   <h6 className="cc-ai-head-title">
-                    CareerConnect AI
+                    CampusNexus AI
                     <span className="cc-ai-online-pill">
                       <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#34D399' }} />
                       Active
@@ -507,7 +507,7 @@ export function AiWidget() {
                       className={`cc-ai-msg-row ${msg.from === 'me' ? 'student' : 'bot'}`}
                     >
                       {msg.from === 'bot' && (
-                        <div className="cc-ai-msg-avatar bot" title="CareerConnect AI">
+                        <div className="cc-ai-msg-avatar bot" title="CampusNexus AI">
                           <Bot size={17} />
                         </div>
                       )}
@@ -559,9 +559,9 @@ export function AiWidget() {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      placeholder={`Ask CareerConnect AI, ${studentFirstName}…`}
+                      placeholder={`Ask CampusNexus AI, ${studentFirstName}…`}
                       disabled={busy}
-                      aria-label="Message CareerConnect AI Assistant"
+                      aria-label="Message CampusNexus AI Assistant"
                     />
 
                     <motion.button
@@ -579,7 +579,7 @@ export function AiWidget() {
                   </div>
 
                   <div className="cc-ai-foot-note">
-                    <Sparkles size={11} /> Grounded in your verified CareerConnect academic & placement records
+                    <Sparkles size={11} /> Grounded in your verified CampusNexus academic & placement records
                   </div>
                 </div>
               </>

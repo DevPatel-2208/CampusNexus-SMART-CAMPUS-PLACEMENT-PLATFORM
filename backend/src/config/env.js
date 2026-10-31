@@ -29,7 +29,7 @@ const env = {
   SMTP_SECURE: process.env.SMTP_SECURE === 'true',
   SMTP_USER: process.env.SMTP_USER || '',
   SMTP_PASS: process.env.SMTP_PASS || '',
-  MAIL_FROM: process.env.MAIL_FROM || 'CareerConnect <no-reply@careerconnect.local>',
+  MAIL_FROM: process.env.MAIL_FROM || 'CampusNexus <no-reply@campusnexus.local>',
   MAIL_REQUIRED: process.env.MAIL_REQUIRED === 'true',
   GROQ_API_KEY: process.env.GROQ_API_KEY || '',
   GROQ_MODEL: process.env.GROQ_MODEL || 'qwen/qwen3.8-27b',

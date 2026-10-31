@@ -44,7 +44,7 @@ export async function showWelcomeDialog({ name = 'there', isFirstLogin = false }
     await Swal.fire({
       ...swalBase(),
       icon: 'success',
-      title: first ? 'Welcome to CareerConnect!' : `Welcome Back, ${escapeHtml(name)}!`,
+      title: first ? 'Welcome to CampusNexus!' : `Welcome Back, ${escapeHtml(name)}!`,
       html: `
         <div class="cc-swal-extra cc-welcome-wrap">
           <button type="button" class="cc-welcome-dismiss" aria-label="Close welcome message">&times;</button>
@@ -52,7 +52,7 @@ export async function showWelcomeDialog({ name = 'there', isFirstLogin = false }
             <div class="cc-welcome-lead">
               ${first
                 ? 'We\u2019re excited to have you here. Your career journey starts now.'
-                : 'Great to see you again. Ready to continue your journey with CareerConnect?'
+                : 'Great to see you again. Ready to continue your journey with CampusNexus?'
               }
             </div>
           </div>

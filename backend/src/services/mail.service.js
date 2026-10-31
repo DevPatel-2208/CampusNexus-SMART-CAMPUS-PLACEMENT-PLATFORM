@@ -30,7 +30,7 @@ async function sendMail(to, subject, html) {
 }
 
 function otpTemplate(code, purpose, minutes) {
-  return `<div style="font-family:sans-serif;max-width:480px"><h2>CareerConnect verification</h2><p>Your code to ${purpose}:</p><p style="font-size:28px;letter-spacing:6px"><b>${code}</b></p><p>This code expires in ${minutes} minutes. Never share it.</p></div>`;
+  return `<div style="font-family:sans-serif;max-width:480px"><h2>CampusNexus verification</h2><p>Your code to ${purpose}:</p><p style="font-size:28px;letter-spacing:6px"><b>${code}</b></p><p>This code expires in ${minutes} minutes. Never share it.</p></div>`;
 }
 
 module.exports = { sendMail, otpTemplate };

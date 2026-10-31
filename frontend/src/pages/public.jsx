@@ -334,7 +334,7 @@ const TESTIMONIALS = [
   {
     name: 'Rahul Sharma',
     role: 'MCA Student • Placed at TCS',
-    text: 'CareerConnect completely transformed our campus placement experience. I found my software developer internship within two weeks and tracked my interview results in real time.',
+    text: 'CampusNexus completely transformed our campus placement experience. I found my software developer internship within two weeks and tracked my interview results in real time.',
   },
   {
     name: 'Priya Mehta',
@@ -344,7 +344,7 @@ const TESTIMONIALS = [
   {
     name: 'Prof. Arjun Patel',
     role: 'Training & Placement Officer',
-    text: 'Managing hundreds of drives manually was exhausting. CareerConnect gives our TPO team full transparency with live student shortlists, instant broadcast alerts, and analytics.',
+    text: 'Managing hundreds of drives manually was exhausting. CampusNexus gives our TPO team full transparency with live student shortlists, instant broadcast alerts, and analytics.',
   },
 ];
 
@@ -354,8 +354,8 @@ const CONTACT_CARDS = [
     title: 'Email Support',
     badge: 'General & Support',
     subtitle: 'Direct response within 24 hours',
-    text: 'support@careerconnect.com',
-    link: 'mailto:support@careerconnect.com',
+    text: 'support@campusnexus.com',
+    link: 'mailto:support@campusnexus.com',
     linkText: 'Send Email',
     tone: 'primary',
   },
@@ -385,8 +385,8 @@ const CONTACT_CARDS = [
     title: 'Recruiter Inquiries',
     badge: 'Corporate Drives',
     subtitle: 'Company registration & partnerships',
-    text: 'recruiter@careerconnect.com',
-    link: 'mailto:recruiter@careerconnect.com',
+    text: 'recruiter@campusnexus.com',
+    link: 'mailto:recruiter@campusnexus.com',
     linkText: 'Partner With Us',
     tone: 'info',
   },
@@ -399,11 +399,11 @@ const FAQS = [
   },
   {
     q: 'Can companies post jobs and conduct campus drives?',
-    a: 'Yes! Verified companies can sign up, create job postings with specific eligibility criteria, view applicant resumes, schedule assessment tests, and shortlist candidates directly on CareerConnect.',
+    a: 'Yes! Verified companies can sign up, create job postings with specific eligibility criteria, view applicant resumes, schedule assessment tests, and shortlist candidates directly on CampusNexus.',
   },
   {
-    q: 'Is CareerConnect free for students?',
-    a: 'Yes, CareerConnect is 100% free for students throughout their college tenure. There are no application fees or hidden charges.',
+    q: 'Is CampusNexus free for students?',
+    a: 'Yes, CampusNexus is 100% free for students throughout their college tenure. There are no application fees or hidden charges.',
   },
   {
     q: 'How are companies and job postings verified?',
@@ -445,7 +445,7 @@ export function Home() {
               <span className="cc-text-gradient">Find Your Next Opportunity.</span>
             </h1>
             <p className="lead cc-hero-lead">
-              CareerConnect is an intelligent campus placement platform connecting ambitious students with verified recruiters. Discover high-growth internships, crack placement drives, and launch your professional journey.
+              CampusNexus is a smart campus placement platform connecting ambitious students with verified recruiters. Discover high-growth internships, crack placement drives, and launch your professional journey.
             </p>
 
             <div className="cc-hero-cta">
@@ -571,7 +571,7 @@ export function Home() {
         <SecHead
           eyebrow="Simple Process"
           icon={<Zap size={14} />}
-          title="How CareerConnect Works"
+          title="How CampusNexus Works"
           text="Get from student registration to your official job offer letter in four easy, guided steps."
         />
         <div className="cc-steps cc-steps-pro">
@@ -605,7 +605,7 @@ export function Home() {
           eyebrow="Hiring Partners"
           icon={<Building2 size={14} />}
           title="Top Recruiting Companies"
-          text="Trusted organizations that regularly hire talented students through CareerConnect."
+          text="Trusted organizations that regularly hire talented students through CampusNexus."
         />
         {companies.loading ? (
           <div className="d-flex justify-content-center py-5"><Loading rows={2} height={130} /></div>
@@ -647,7 +647,7 @@ export function Home() {
         <SecHead
           eyebrow="Platform Highlights"
           icon={<Sparkles size={14} />}
-          title="Why Choose CareerConnect?"
+          title="Why Choose CampusNexus?"
           text="Everything students, recruitment managers, and university placement cells need on one modern, intelligent portal."
         />
         <div className="row g-4">
@@ -675,7 +675,7 @@ export function Home() {
               <span className="cc-stats-band-eyebrow">
                 <Sparkles size={14} /> Proven Track Record
               </span>
-              <h2>CareerConnect in Numbers</h2>
+              <h2>CampusNexus in Numbers</h2>
               <p>Empowering student careers and driving campus hiring excellence year over year.</p>
             </div>
             <div className="cc-stat-grid cc-stat-grid-pro">
@@ -704,7 +704,7 @@ export function Home() {
           eyebrow="Success Stories"
           icon={<MessageCircle size={14} />}
           title="What Our Users Say"
-          text="Real experiences from students and coordinators who used CareerConnect to reach their career goals."
+          text="Real experiences from students and coordinators who used CampusNexus to reach their career goals."
         />
         <div className="row g-4">
           {TESTIMONIALS.map((t, i) => (
@@ -731,7 +731,7 @@ export function Home() {
       <section className="cc-mkt-section mb-5">
         <CtaBanner
           title="Ready to Launch Your Career?"
-          text="Join CareerConnect today. Discover placement drives, connect with leading recruiters, and take the confident next step toward your dream job."
+          text="Join CampusNexus today. Discover placement drives, connect with leading recruiters, and take the confident next step toward your dream job."
           primary={
             <Link className="btn btn-light btn-lg fw-semibold" to="/jobs">
               <Briefcase size={18} className="me-1" /> Explore All Jobs
@@ -761,14 +761,14 @@ export function About() {
           <div className="col-lg-7 col-12">
             <span className="cc-eyebrow">
               <Sparkles size={14} className="text-warning" />
-              <span>About CareerConnect &bull; Institutional Placement Platform</span>
+              <span>About CampusNexus &bull; Smart Campus Placement Platform</span>
             </span>
             <h1 className="cc-hero-title">
               Empowering Campus Talent.<br />
               <span className="cc-text-gradient">Elevating Placements.</span>
             </h1>
             <p className="lead mt-3 mb-4">
-              CareerConnect is an intelligent campus recruitment ecosystem built in collaboration with university placement cells. We bridge talented students with verified global employers, eliminating placement friction through automation, transparency, and real-time tracking.
+              CampusNexus is an intelligent campus recruitment ecosystem built in collaboration with university placement cells. We bridge talented students with verified global employers, eliminating placement friction through automation, transparency, and real-time tracking.
             </p>
             <div className="d-flex gap-3 flex-wrap">
               <Link className="btn btn-primary btn-lg cc-glow-btn" to="/jobs">
@@ -785,7 +785,7 @@ export function About() {
                 <div className="d-flex align-items-center gap-3 mb-3">
                   <div className="cc-brand-mark">C</div>
                   <div>
-                    <h3 className="h5 m-0 fw-bold">CareerConnect</h3>
+                    <h3 className="h5 m-0 fw-bold">CampusNexus</h3>
                     <small className="text-muted">Smart Campus Recruitment Portal</small>
                   </div>
                 </div>
@@ -864,7 +864,7 @@ export function About() {
               <div className="cc-bento-card cc-bento-solution h-100">
                 <div className="cc-bento-badge cc-bento-badge-success">
                   <span className="cc-badge-dot bg-success" />
-                  <span>The CareerConnect Innovation</span>
+                  <span>The CampusNexus Innovation</span>
                 </div>
                 <h3 className="h4 fw-bold mt-3 mb-3">Unified, Automated & Transparent</h3>
                 <ul className="cc-bento-list">
@@ -893,14 +893,14 @@ export function About() {
           eyebrow="Our Guiding Values"
           icon={<ShieldCheck size={14} />}
           title="The Pillars We Build On"
-          text="The foundational standards that make CareerConnect trusted by universities and top employers."
+          text="The foundational standards that make CampusNexus trusted by universities and top employers."
         />
         <div className="row g-4">
           {[
             {
               icon: ShieldCheck,
               title: '100% Verified Opportunities',
-              text: 'Every job role and internship drive on CareerConnect undergoes strict verification by college placement coordinators to prevent unverified or fraudulent postings.',
+              text: 'Every job role and internship drive on CampusNexus undergoes strict verification by college placement coordinators to prevent unverified or fraudulent postings.',
             },
             {
               icon: Users,
@@ -1027,7 +1027,7 @@ export function About() {
       <section className="cc-mkt-section mb-5">
         <CtaBanner
           title="Ready to Elevate Your Campus Placement Journey?"
-          text="Whether you are a student preparing for campus drives or an employer seeking exceptional university talent, CareerConnect has the tools you need."
+          text="Whether you are a student preparing for campus drives or an employer seeking exceptional university talent, CampusNexus has the tools you need."
           primary={<Link className="btn btn-light btn-lg" to="/jobs">Browse Verified Jobs &rarr;</Link>}
           secondary={<Link className="btn btn-outline-light btn-lg" to="/contact">Get in Touch</Link>}
         />
@@ -1376,7 +1376,7 @@ export function CompaniesPublic() {
         <span className="cc-eyebrow"><Building2 size={14} /> Recruiting Partners</span>
         <h1 className="cc-hero-title">Top Recruiting Companies</h1>
         <p className="lead">
-          Connect with trusted organizations, leading tech firms, and industry innovators regularly hiring graduates through CareerConnect.
+          Connect with trusted organizations, leading tech firms, and industry innovators regularly hiring graduates through CampusNexus.
         </p>
         <div className="cc-hero-chips">
           {chips.map(([v, l, I]) => (
@@ -1516,7 +1516,7 @@ export function CompaniesPublic() {
       <section className="cc-mkt-section mt-5 mb-5">
         <CtaBanner
           title="Looking to Hire Talented Campus Students?"
-          text="Register as an employer on CareerConnect to post jobs, screen verified applicant resumes, and conduct campus recruitment drives seamlessly."
+          text="Register as an employer on CampusNexus to post jobs, screen verified applicant resumes, and conduct campus recruitment drives seamlessly."
           primary={<Link className="btn btn-light btn-lg" to="/register">Register as Recruiter &rarr;</Link>}
           secondary={<Link className="btn btn-outline-light btn-lg" to="/contact">Contact Placement Cell</Link>}
         />

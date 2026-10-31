@@ -15,16 +15,16 @@ export function PublicFooter() {
         <div className="cc-footer-grid">
           {/* Brand Info */}
           <div className="cc-footer-col cc-footer-col-brand">
-            <Link to="/" className="cc-brand mb-3" aria-label="CareerConnect home">
+            <Link to="/" className="cc-brand mb-3" aria-label="CampusNexus home">
               <span className="cc-brand-mark">
                 <span className="cc-brand-letter">C</span>
               </span>
               <span className="cc-brand-name">
-                Career<span>Connect</span>
+                Campus<span>Nexus</span>
               </span>
             </Link>
             <p className="cc-footer-about">
-              Intelligent campus recruitment & internship ecosystem connecting talented students with verified global employers and university placement cells.
+              One platform for students, institutions and recruiters. Connecting talent and creating futures with intelligent campus recruitment.
             </p>
             <div className="cc-footer-badges">
               <span className="cc-footer-badge">
@@ -38,7 +38,7 @@ export function PublicFooter() {
               <Link to="/contact" className="cc-footer-social-btn" aria-label="Contact Support" title="Contact Support">
                 <Mail size={16} />
               </Link>
-              <Link to="/about" className="cc-footer-social-btn" aria-label="About CareerConnect" title="About">
+              <Link to="/about" className="cc-footer-social-btn" aria-label="About CampusNexus" title="About">
                 <Info size={16} />
               </Link>
               <Link to="/companies" className="cc-footer-social-btn" aria-label="Partner Companies" title="Companies">
@@ -112,7 +112,7 @@ export function PublicFooter() {
                 <Mail size={16} className="cc-contact-icon text-primary flex-shrink-0" />
                 <div>
                   <span className="d-block small text-muted">Email Support</span>
-                  <a href="mailto:support@careerconnect.com">support@careerconnect.com</a>
+                  <a href="mailto:support@campusnexus.com">support@campusnexus.com</a>
                 </div>
               </li>
               <li>
@@ -144,7 +144,7 @@ export function PublicFooter() {
         <div className="cc-footer-bottom">
           <div className="d-flex align-items-center gap-3 flex-wrap">
             <div className="cc-footer-copy">
-              &copy; {new Date().getFullYear()} <b>CareerConnect</b>. Empowering campus talent with intelligence & transparency.
+              &copy; {new Date().getFullYear()} <b>CampusNexus</b>. Connecting Talent. Creating Futures.
             </div>
             <div className="cc-footer-status">
               <span className="cc-status-dot" />

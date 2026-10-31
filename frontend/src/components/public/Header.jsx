@@ -260,12 +260,12 @@ export function PublicHeader() {
         <div className="cc-header-inner">
           {/* Brand Logo (Left Section) */}
           <div className="cc-header-left">
-            <Link to="/" className="cc-brand" aria-label="CareerConnect home" onClick={closeAll}>
+            <Link to="/" className="cc-brand" aria-label="CampusNexus home" onClick={closeAll}>
               <span className="cc-brand-mark">
                 <span className="cc-brand-letter">C</span>
               </span>
               <span className="cc-brand-name">
-                Career<span>Connect</span>
+                Campus<span>Nexus</span>
               </span>
             </Link>
           </div>
@@ -363,7 +363,7 @@ export function PublicHeader() {
                     <span className="cc-brand-letter">C</span>
                   </span>
                   <span className="cc-brand-name">
-                    Career<span>Connect</span>
+                    Campus<span>Nexus</span>
                   </span>
                 </Link>
                 <button

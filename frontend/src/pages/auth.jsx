@@ -65,7 +65,7 @@ function Brand({ compact = false }) {
     >
       <span className="cc-auth-brand-icon"><Briefcase size={20} /></span>
       <span>
-        <span className="cc-auth-brand-name">CareerConnect</span>
+        <span className="cc-auth-brand-name">CampusNexus</span>
         <span className="cc-auth-brand-sub">Smart College Placement & Recruitment Management System</span>
       </span>
     </motion.div>
@@ -79,7 +79,7 @@ function AuthShell({ title, lead, features, children, showTheme = true }) {
       <div className="cc-auth-panel">
         <motion.aside
           className="cc-auth-visual"
-          aria-label="About CareerConnect"
+          aria-label="About CampusNexus"
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
@@ -284,7 +284,7 @@ const LOGIN_ROLES = [
 ];
 
 const ROLE_SUB = {
-  student: 'Sign in to continue to CareerConnect. Your placement journey continues here.',
+  student: 'Sign in to continue to CampusNexus. Your placement journey continues here.',
   company: 'Sign in to post jobs, review applications and roll out offers.',
   tpo: 'Sign in to run drives, verify companies and track placements.',
 };
@@ -461,21 +461,21 @@ export function Register() {
     setErr('');
     try {
       const { data } = await api.post('/auth/register', values);
-      await showSuccess({ title: 'Account created!', message: 'Your CareerConnect account has been created. Please verify your email to continue.', confirmButtonText: 'Continue', intensity: 'small' });
+      await showSuccess({ title: 'Account created!', message: 'Your CampusNexus account has been created. Please verify your email to continue.', confirmButtonText: 'Continue', intensity: 'small' });
       navigate('/verify-email', { state: { userId: data.data.userId, email: data.data.email } });
     } catch (e2) { setErr(apiErrorMessage(e2)); }
   };
   return (
     <AuthShell
-      title="Create Your CareerConnect Account"
-      lead="Join CareerConnect and connect with placement opportunities across your campus and beyond."
+      title="Create Your CampusNexus Account"
+      lead="Join CampusNexus and connect with placement opportunities across your campus and beyond."
       features={['Build your professional student profile', 'Connect directly with companies', 'Track placements, offers & progress']}
     >
       <div className="cc-auth-head">
         <span className="cc-auth-logo-mark"><UserPlus size={20} /></span>
         <h1 className="cc-auth-title">Create Account</h1>
       </div>
-      <p className="cc-auth-sub">Join CareerConnect and connect with placement opportunities.</p>
+      <p className="cc-auth-sub">Join CampusNexus and connect with placement opportunities.</p>
 
       <AnimatePresence>
         {err && (
@@ -785,7 +785,7 @@ export function VerifyEmail() {
     try {
       await api.post('/auth/verify-email', form);
       sessionStorage.removeItem('cc-pending');
-      await showSuccess({ title: 'Email verified!', message: 'Your email has been verified successfully. You can now sign in to CareerConnect.', confirmButtonText: 'Go to Login', intensity: 'small' });
+      await showSuccess({ title: 'Email verified!', message: 'Your email has been verified successfully. You can now sign in to CampusNexus.', confirmButtonText: 'Go to Login', intensity: 'small' });
       navigate('/login');
     } catch (e2) { setErr(apiErrorMessage(e2)); } finally { setBusy(false); }
   };

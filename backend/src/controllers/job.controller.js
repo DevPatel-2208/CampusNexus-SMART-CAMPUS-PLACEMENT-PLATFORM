@@ -71,7 +71,7 @@ const externalJobs = asyncHandler(async (req, res) => {
     try {
       const ctrl = new AbortController();
       const t = setTimeout(() => ctrl.abort(), 8000);
-      const r = await fetch('https://www.arbeitnow.com/api/job-board-api?search=' + encodeURIComponent(q), { signal: ctrl.signal, headers: { 'User-Agent': 'CareerConnect/1.0' } });
+      const r = await fetch('https://www.arbeitnow.com/api/job-board-api?search=' + encodeURIComponent(q), { signal: ctrl.signal, headers: { 'User-Agent': 'CampusNexus/1.0' } });
       clearTimeout(t);
       if (r.ok) {
         const data = await r.json();

@@ -500,7 +500,7 @@ export function OfferLetterPreview() {
       const images = letterRef.current.querySelectorAll('img');
       await Promise.all(Array.from(images).map((img) => (img.complete ? Promise.resolve() : new Promise((r) => { img.onload = r; img.onerror = r; }))));
       const safeName = String(student.name || 'Candidate').replace(/[\/:*?"<>|]/g, '').trim() || 'Candidate';
-      const filename = `CareerConnect_Official_Offer_${safeName}_${ref}.pdf`;
+      const filename = `CampusNexus_Official_Offer_${safeName}_${ref}.pdf`;
       await html2pdf().set({
         margin: [8, 8, 8, 8],
         filename,
@@ -626,7 +626,7 @@ export function OfferLetterPreview() {
             <div className="small text-muted d-flex gap-3 flex-wrap">
               {student.email && <span>Email: <b>{student.email}</b></span>}
               {student.phone && <span>Contact: <b>{student.phone}</b></span>}
-              <span>Institution: <b>CareerConnect Partner University</b></span>
+              <span>Institution: <b>CampusNexus Partner University</b></span>
             </div>
           </div>
 
@@ -674,7 +674,7 @@ export function OfferLetterPreview() {
           )}
 
           <p className="text-secondary small mt-4" style={{ lineHeight: '1.7' }}>
-            Please signify your acceptance of this appointment by reviewing and endorsing this offer through your authenticated CareerConnect student portal on or before <strong>{fmt(o.offerExpiry)}</strong>.
+            Please signify your acceptance of this appointment by reviewing and endorsing this offer through your authenticated CampusNexus student portal on or before <strong>{fmt(o.offerExpiry)}</strong>.
           </p>
 
           {/* Signatory Blocks */}
@@ -693,7 +693,7 @@ export function OfferLetterPreview() {
               <div className="small text-muted mb-1">Verified &amp; Endorsed by:</div>
               <div className="fw-bold text-dark h6 mb-3">University Placement Directorate</div>
               <div className="d-inline-flex align-items-center gap-1.5 p-2 border rounded-2 bg-success-subtle text-success small mb-2 fw-semibold">
-                <ShieldCheck size={14} /> CareerConnect Institutional Seal
+                <ShieldCheck size={14} /> CampusNexus Institutional Seal
               </div>
               <div className="small text-muted">Office of Career Services &amp; Corporate Relations</div>
             </div>

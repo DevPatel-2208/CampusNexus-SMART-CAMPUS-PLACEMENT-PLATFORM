@@ -1,7 +1,7 @@
 {
   "name": "careerconnect-backend",
   "version": "1.0.0",
-  "description": "CareerConnect MERN backend — Express + Mongoose",
+  "description": "CampusNexus MERN backend — Express + Mongoose",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

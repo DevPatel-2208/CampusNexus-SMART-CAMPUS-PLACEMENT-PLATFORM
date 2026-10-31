@@ -54,7 +54,7 @@ app.get('/health', (req, res) => {
     status: 'ok',
     uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
-    service: 'CareerConnect Backend API',
+    service: 'CampusNexus Backend API',
   });
 });
 
@@ -63,7 +63,7 @@ app.get('/api/v1/health', (req, res) => {
     status: 'ok',
     uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
-    service: 'CareerConnect Backend API',
+    service: 'CampusNexus Backend API',
   });
 });
 
@@ -77,7 +77,7 @@ app.use('/api/v1/tpo', require('./routes/tpo.routes'));
 app.use('/api/v1/contact', require('./routes/contact.routes'));
 app.use('/api/v1', require('./routes/api.routes'));
 
-app.get('/', (req, res) => res.json({ success: true, data: { name: 'CareerConnect API', version: '1.0.0', status: 'live' } }));
+app.get('/', (req, res) => res.json({ success: true, data: { name: 'CampusNexus API', version: '1.0.0', status: 'live' } }));
 
 app.use(notFound);
 app.use(errorHandler);

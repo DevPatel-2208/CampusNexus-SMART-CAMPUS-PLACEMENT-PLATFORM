@@ -1,5 +1,5 @@
 /**
- * CareerConnect — Student Context Service
+ * CampusNexus — Student Context Service
  * Retrieves authenticated student-specific information from the database
  * with strict access control and security scoping.
  */
@@ -406,7 +406,7 @@ ${offersStr}
 Registered Campus Drives (${campusDrives.length}):
 ${drivesStr}
 
-Active Job Openings in CareerConnect:
+Active Job Openings in CampusNexus:
 ${jobsAvailableStr}
 --------------------------------------------------`;
 }

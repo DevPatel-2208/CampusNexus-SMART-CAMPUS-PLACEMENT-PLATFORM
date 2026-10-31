@@ -131,7 +131,7 @@ const aiChat = asyncHandler(async (req, res) => {
     try {
       const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + GROQ_API_KEY },
-        body: JSON.stringify({ model: GROQ_MODEL, temperature: 0.6, max_tokens: 650, messages: [{ role: 'system', content: 'You are CareerConnect placement assistant. Be concise and practical.' }, { role: 'user', content: message }] }),
+        body: JSON.stringify({ model: GROQ_MODEL, temperature: 0.6, max_tokens: 650, messages: [{ role: 'system', content: 'You are CampusNexus placement assistant. Be concise and practical.' }, { role: 'user', content: message }] }),
       });
       if (r.ok) {
         const data = await r.json();

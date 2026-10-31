@@ -9,7 +9,7 @@ let server;
 connectDB().then(() => {
   logger.info('MongoDB connected');
   server = app.listen(env.PORT, () => {
-    logger.info('CareerConnect API listening', { port: env.PORT, env: env.NODE_ENV });
+    logger.info('CampusNexus API listening', { port: env.PORT, env: env.NODE_ENV });
   });
 
   server.on('error', (err) => {
@@ -19,7 +19,7 @@ connectDB().then(() => {
         code: err.code,
       });
     } else {
-      logger.error('CareerConnect API failed to start', { message: err.message, code: err.code });
+      logger.error('CampusNexus API failed to start', { message: err.message, code: err.code });
     }
     process.exit(1);
   });

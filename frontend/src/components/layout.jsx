@@ -189,15 +189,15 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }) {
             to={roleMeta.home}
             className="cc-ss-brand-link"
             onClick={collapsed ? onToggleCollapse : onClose}
-            title={collapsed ? 'Expand sidebar' : 'CareerConnect Home'}
-            data-tip={collapsed ? 'CareerConnect Home (Click to expand)' : undefined}
+            title={collapsed ? 'Expand sidebar' : 'CampusNexus Home'}
+            data-tip={collapsed ? 'CampusNexus Home (Click to expand)' : undefined}
           >
             <span className={`cc-ss-logo ${roleMeta.colorClass}`} aria-hidden="true">
               <RoleIcon size={22} />
             </span>
             {!collapsed && (
               <span className="cc-ss-brand-txt">
-                <b>CareerConnect</b>
+                <b>CampusNexus</b>
                 <span className={`cc-ss-brand-tag ${roleMeta.tagClass}`}>{roleMeta.label}</span>
               </span>
             )}
@@ -356,14 +356,14 @@ export function Topbar({ onMenu, onToggleCollapse, title, crumb, collapsed }) {
       {collapsed && (
         <button className="cc-icon-btn cc-desktop-only" onClick={onToggleCollapse} aria-label="Expand sidebar" title="Expand sidebar"><PanelLeft size={18} /></button>
       )}
-      <Link to={roleMeta.home} className="cc-topbar-brand cc-mobile-only" aria-label="CareerConnect home">
+      <Link to={roleMeta.home} className="cc-topbar-brand cc-mobile-only" aria-label="CampusNexus home">
         <span className={`cc-brand-mark ${roleMeta.colorClass}`}>
           <RoleIcon size={18} />
         </span>
-        <span className="cc-topbar-brand-title">CareerConnect</span>
+        <span className="cc-topbar-brand-title">CampusNexus</span>
       </Link>
       <div className="cc-topbar-heading">
-        <h1>{title || 'CareerConnect'}</h1>
+        <h1>{title || 'CampusNexus'}</h1>
         <span className="cc-topbar-sub">Campus Placement Management</span>
       </div>
       <div className="cc-topbar-actions">

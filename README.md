@@ -1,11 +1,13 @@
-# CareerConnect — Modern Campus Placement & Internship Management System
+# CampusNexus — Smart Campus Placement Platform
+
+> **Connecting Talent. Creating Futures.** — *One platform for students, institutions and recruiters.*
 
 [![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61DAFB?logo=react&logoColor=black)](https://vitejs.dev/)
 [![Backend](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-339933?logo=node.js&logoColor=white)](https://expressjs.com/)
 [![Database](https://img.shields.io/badge/Database-MongoDB%20Atlas-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/cloud/atlas)
 [![Deployment](https://img.shields.io/badge/Deployment-Netlify%20%2B%20Render-00C7B7?logo=netlify&logoColor=white)](https://netlify.com/)
 
-CareerConnect is a production-grade campus recruitment portal and talent pipeline system. It seamlessly bridges university students, verified corporate recruiters, and Training & Placement Officers (TPO) with automated eligibility verification, placement drives, proctored assessments, real-time application pipelines, offer letters, and AI-powered career matching.
+CampusNexus is a production-grade smart campus recruitment platform and talent pipeline system. It seamlessly bridges university students, verified corporate recruiters, and Training & Placement Officers (TPO) with automated eligibility verification, placement drives, proctored assessments, real-time application pipelines, offer letters, and AI-powered career matching.
 
 ---
 
@@ -39,7 +41,7 @@ CareerConnect is a production-grade campus recruitment portal and talent pipelin
 ## Directory Structure
 
 ```text
-CareerConnect/
+CampusNexus/
 │
 ├── frontend/                     # React + Vite Frontend
 │   ├── public/                   # Static public assets & _redirects (SPA routing)
@@ -137,7 +139,7 @@ SMTP_HOST=
 SMTP_PORT=587
 SMTP_USER=
 SMTP_PASS=
-MAIL_FROM="CareerConnect <no-reply@careerconnect.local>"
+MAIL_FROM="CampusNexus <no-reply@campusnexus.local>"
 MAIL_REQUIRED=false
 
 # Optional AI Features (Groq API Key)
@@ -210,7 +212,7 @@ Navigate to **`http://localhost:5173`** in your browser.
 1. Log in to [Render](https://render.com/) and click **New +** → **Web Service**.
 2. Connect your GitHub repository.
 3. Configure the following settings:
-   - **Name:** `careerconnect-api`
+   - **Name:** `campusnexus-api`
    - **Root Directory:** `backend`
    - **Runtime:** `Node`
    - **Build Command:** `npm install`
@@ -230,14 +232,14 @@ Navigate to **`http://localhost:5173`** in your browser.
    | `SMTP_PORT` | `587` | Standard TLS port |
    | `SMTP_USER` | *your-smtp-username* | Email provider login |
    | `SMTP_PASS` | *your-smtp-password* | App password or API key |
-   | `MAIL_FROM` | `"CareerConnect <no-reply@careerconnect.com>"` | Sender address |
+   | `MAIL_FROM` | `"CampusNexus <no-reply@campusnexus.com>"` | Sender address |
    | `MAIL_REQUIRED` | `true` | Requires email delivery for OTPs in production |
    | `GROQ_API_KEY` | *your-groq-api-key* | Optional AI features |
 5. Click **Create Web Service**.
 6. Once deployed, test your live health endpoint:
    ```text
-   https://careerconnect-api.onrender.com/health
-   # Returns: {"status":"ok","uptime":...,"service":"CareerConnect Backend API"}
+   https://campusnexus-api.onrender.com/health
+   # Returns: {"status":"ok","uptime":...,"service":"CampusNexus Backend API"}
    ```
 
 ---
@@ -253,12 +255,12 @@ Navigate to **`http://localhost:5173`** in your browser.
 4. Under **Site configuration** → **Environment variables**, add:
    | Key | Value |
    |---|---|
-   | `VITE_API_BASE_URL` | `https://careerconnect-api.onrender.com/api/v1` |
+   | `VITE_API_BASE_URL` | `https://campusnexus-api.onrender.com/api/v1` |
 5. Click **Deploy Site**.
 6. Once Netlify finishes deploying:
-   - Copy your Netlify URL (e.g. `https://careerconnect-demo.netlify.app`).
+   - Copy your Netlify URL (e.g. `https://campusnexus-demo.netlify.app`).
    - Return to Render and update `CORS_ORIGIN` with your actual Netlify URL:
-     `CORS_ORIGIN=https://careerconnect-demo.netlify.app`
+     `CORS_ORIGIN=https://campusnexus-demo.netlify.app`
 
 ---
 
@@ -266,8 +268,8 @@ Navigate to **`http://localhost:5173`** in your browser.
 
 The backend includes zero-dependency health monitoring endpoints for Render and uptime pings:
 
-- `GET /health` &rarr; `{"status":"ok","uptime":120,"timestamp":"...","service":"CareerConnect Backend API"}`
-- `GET /api/v1/health` &rarr; `{"status":"ok","uptime":120,"timestamp":"...","service":"CareerConnect Backend API"}`
+- `GET /health` &rarr; `{"status":"ok","uptime":120,"timestamp":"...","service":"CampusNexus Backend API"}`
+- `GET /api/v1/health` &rarr; `{"status":"ok","uptime":120,"timestamp":"...","service":"CampusNexus Backend API"}`
 
 ---
 

@@ -267,7 +267,7 @@ export function AssessmentAttemptDetail() {
 
       <div className="alert alert-light border small mt-3 mb-0 text-muted rounded-3 d-flex align-items-center gap-2">
         <Sparkles size={16} className="text-primary flex-shrink-0" />
-        <span>CareerConnect Automated Proctoring: Real-time window switch detection, copy-paste prevention, and submission telemetry.</span>
+        <span>CampusNexus Automated Proctoring: Real-time window switch detection, copy-paste prevention, and submission telemetry.</span>
       </div>
     </div>
   );

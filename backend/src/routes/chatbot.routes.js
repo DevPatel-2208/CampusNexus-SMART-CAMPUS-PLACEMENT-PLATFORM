@@ -1,5 +1,5 @@
 /**
- * CareerConnect — Student AI Chatbot Routes
+ * CampusNexus — Student AI Chatbot Routes
  * Guarded by JWT authentication and student role authorization.
  */
 

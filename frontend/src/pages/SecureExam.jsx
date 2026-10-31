@@ -19,7 +19,7 @@ export function AssessmentOpen() {
   useEffect(() => {
     const receiveSubmission = (event) => {
       if (event.origin !== window.location.origin) return;
-      if (event.data?.type !== 'careerconnect:assessment-submitted') return;
+      if (event.data?.type !== 'campusnexus:assessment-submitted' && event.data?.type !== 'careerconnect:assessment-submitted') return;
       const attemptId = String(event.data.attemptId || '');
       if (!/^[a-f\d]{24}$/i.test(attemptId)) return;
       navigate(`/student/attempt/${attemptId}`, { replace: true });
@@ -96,7 +96,7 @@ export function Exam() {
     const resultPath = `/student/attempt/${attempt}`;
     try {
       if (window.opener && !window.opener.closed) {
-        window.opener.postMessage({ type: 'careerconnect:assessment-submitted', attemptId: attempt }, window.location.origin);
+        window.opener.postMessage({ type: 'campusnexus:assessment-submitted', attemptId: attempt }, window.location.origin);
         window.close();
         window.setTimeout(() => { if (!window.closed) navigate(resultPath, { replace: true }); }, 250);
         return;
@@ -257,7 +257,7 @@ export function Exam() {
 
   if (!paper) return (
     <main className="cc-exam-page cc-exam-gate">
-      <div className="cc-exam-gate-brand"><span className="cc-exam-brand-mark">C</span><span>CareerConnect<small>SECURE EXAM</small></span></div>
+      <div className="cc-exam-gate-brand"><span className="cc-exam-brand-mark">C</span><span>CampusNexus<small>SECURE EXAM</small></span></div>
       <section className="cc-exam-gate-card">
         <div className="cc-exam-gate-icon"><Shield size={27} /></div>
         <span className="cc-exam-eyebrow">SECURE SESSION READY</span>
@@ -267,7 +267,7 @@ export function Exam() {
         <button className="cc-exam-start-btn" disabled={starting} onClick={beginExam}>{starting ? <><span className="cc-exam-spinner" /> Preparing secure attempt…</> : <><Maximize size={17} /> Enter fullscreen &amp; start</>}</button>
         <Link className="cc-exam-exit-link" to={`/student/assessments/${id}`}>Return to assessment instructions</Link>
       </section>
-      <p className="cc-exam-gate-foot">CareerConnect secure assessment · Do not close this window while an attempt is active</p>
+      <p className="cc-exam-gate-foot">CampusNexus secure assessment · Do not close this window while an attempt is active</p>
     </main>
   );
 
@@ -288,7 +288,7 @@ export function Exam() {
   return (
     <main className="cc-exam-page">
       <header className="cc-exam-topbar">
-        <div className="cc-exam-brand"><span className="cc-exam-brand-mark">C</span><span>CareerConnect<small>SECURE ASSESSMENT</small></span></div>
+        <div className="cc-exam-brand"><span className="cc-exam-brand-mark">C</span><span>CampusNexus<small>SECURE ASSESSMENT</small></span></div>
         <div className="cc-exam-title"><span>Assessment in progress</span><strong>{paper.title || 'Assessment'}</strong></div>
         <div className="cc-exam-status"><span className={`cc-exam-save ${saveStatus !== 'All changes saved' ? 'is-saving' : ''}`}>{online ? <Wifi size={14} /> : <WifiOff size={14} />}{online ? saveStatus : 'Offline · reconnecting'}</span><span className={`cc-exam-clock ${secondsLeft !== null && secondsLeft < 300 ? 'is-low' : ''}`}><Clock size={16} /><b>{timer}</b><small>REMAINING</small></span></div>
       </header>
