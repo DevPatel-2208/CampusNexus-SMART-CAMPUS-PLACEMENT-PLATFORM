@@ -10,12 +10,24 @@ function getTransporter() {
     const opts = isGmail
       ? {
           service: 'gmail',
+          pool: true,
+          maxConnections: 3,
+          maxMessages: 100,
+          connectionTimeout: 8000,
+          greetingTimeout: 8000,
+          socketTimeout: 15000,
           auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
         }
       : {
           host: env.SMTP_HOST,
           port: env.SMTP_PORT,
           secure: env.SMTP_SECURE || env.SMTP_PORT === 465,
+          pool: true,
+          maxConnections: 3,
+          maxMessages: 100,
+          connectionTimeout: 8000,
+          greetingTimeout: 8000,
+          socketTimeout: 15000,
           auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
           tls: { rejectUnauthorized: env.NODE_ENV === 'production' },
         };

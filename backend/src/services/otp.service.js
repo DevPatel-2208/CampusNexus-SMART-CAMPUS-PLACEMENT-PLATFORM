@@ -20,13 +20,18 @@ async function issueEmailOtp(user) {
   await EmailOtp.updateMany({ user: user._id, verifiedAt: null }, { verifiedAt: new Date() });
   const code = randomOtp();
   const otp = await EmailOtp.create({ user: user._id, otpHash: sha256(code), expiresAt: new Date(Date.now() + OTP_TTL_MS), attempts: 0, lastSentAt: new Date() });
-  let mailSent = true;
-  try {
-    const r = await sendMail(user.email, `Your CampusNexus verification code is ${code}`, otpTemplate(code, 'verify your email address', 10));
-    mailSent = r.sent !== false;
-  } catch (e) { mailSent = false; }
-  if (process.env.NODE_ENV !== 'production') console.log(`[otp:dev] verify user=${user._id} code=${code} mailSent=${mailSent}`);
-  return { otpId: otp._id, mailSent };
+
+  // Dispatch email sending in the background so the HTTP request responds immediately (< 100ms)
+  sendMail(user.email, `Your CampusNexus verification code is ${code}`, otpTemplate(code, 'verify your email address', 10))
+    .then((r) => {
+      console.log(`[otp:sent] user=${user._id} email=${user.email} status=${r.sent}`);
+    })
+    .catch((err) => {
+      console.error(`[otp:send-error] user=${user._id} email=${user.email}:`, err.message);
+    });
+
+  if (process.env.NODE_ENV !== 'production') console.log(`[otp:dev] verify user=${user._id} code=${code}`);
+  return { otpId: otp._id, mailSent: true };
 }
 
 async function verifyEmailOtp(user, code) {
@@ -54,13 +59,18 @@ async function issueResetOtp(email, role) {
   await ResetOtp.updateMany({ email: email.toLowerCase(), role, verifiedAt: null }, { verifiedAt: new Date() });
   const code = randomOtp();
   await ResetOtp.create({ email: email.toLowerCase(), role, otpHash: sha256(code), expiresAt: new Date(Date.now() + OTP_TTL_MS), attempts: 0, lastSentAt: new Date() });
-  let mailSent = true;
-  try {
-    const r = await sendMail(email, `Your CampusNexus password reset code is ${code}`, otpTemplate(code, 'reset your password', 10));
-    mailSent = r.sent !== false;
-  } catch (e) { mailSent = false; }
-  if (process.env.NODE_ENV !== 'production') console.log(`[otp:dev] reset email=${email} code=${code} mailSent=${mailSent}`);
-  return { mailSent };
+
+  // Dispatch reset code email non-blocking in background
+  sendMail(email, `Your CampusNexus password reset code is ${code}`, otpTemplate(code, 'reset your password', 10))
+    .then((r) => {
+      console.log(`[otp:reset:sent] email=${email} status=${r.sent}`);
+    })
+    .catch((err) => {
+      console.error(`[otp:reset:send-error] email=${email}:`, err.message);
+    });
+
+  if (process.env.NODE_ENV !== 'production') console.log(`[otp:dev] reset email=${email} code=${code}`);
+  return { mailSent: true };
 }
 
 async function verifyResetOtp(email, role, code) {
