@@ -419,6 +419,7 @@ const getOne = asyncHandler(async (req, res) => {
     if (!cp || String(a.company?._id || a.company) !== String(cp._id)) throw ApiError.forbidden('Access denied');
   }
   if (req.user.role === 'student' && a.job) {
+    if (a.status !== 'active') throw ApiError.forbidden('This assessment is not currently available.');
     const hasApplied = await Application.findOne({ student: req.user._id, job: a.job });
     if (!hasApplied) {
       throw ApiError.forbidden('You must apply for this company\'s job before accessing its assessment.');

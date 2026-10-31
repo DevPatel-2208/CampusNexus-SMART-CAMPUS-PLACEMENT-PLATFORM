@@ -64,7 +64,7 @@ router.post('/assessments/:id/generate', protect, requireRole('company'), assess
 router.get('/assessments/:id/questions', protect, assess.listQuestions);
 router.post('/assessments/:id/questions', protect, requireRole('company'), questionRules, validate, assess.addQuestion);
 router.post('/assessments/:id/questions/:qid/regenerate', protect, requireRole('company'), assess.regenerateQuestion);
-router.get('/assessments/:id', protect, requireRole('company', 'tpo'), assess.getOne);
+router.get('/assessments/:id', protect, requireRole('company', 'tpo', 'student'), assess.getOne);
 router.patch('/assessments/:id/questions/:qid', protect, requireRole('company'), assess.patchQuestion);
 router.delete('/assessments/:id/questions/:qid', protect, requireRole('company'), assess.deleteQuestion);
 router.get('/assessments/:id/results', protect, requireRole('company', 'tpo'), assess.results);
