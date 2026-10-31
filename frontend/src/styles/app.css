@@ -4414,6 +4414,19 @@ html[data-theme='dark'] .swal2-popup .swal2-cancel:focus {
   text-align: left !important;
   align-items: stretch !important;
 }
+
+/* Keep form labels and input fields strictly left-aligned */
+.cc-auth-card form,
+.cc-auth-main form {
+  width: 100% !important;
+  text-align: left !important;
+}
+.cc-auth-card .form-label,
+.cc-auth-main .form-label {
+  text-align: left !important;
+  display: block !important;
+  width: 100% !important;
+}
 .otp-icon-bubble {
   width: 56px;
   height: 56px;
