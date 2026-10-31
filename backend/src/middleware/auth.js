@@ -48,7 +48,14 @@ function signRefresh(user) {
   return jwt.sign({ sub: String(user._id), tv: user.tokenVersion || 0, rv: user.refreshVersion || 0, typ: 'refresh' }, env.JWT_REFRESH_SECRET, { expiresIn: env.JWT_REFRESH_EXPIRES });
 }
 function refreshCookieOptions() {
-  return { httpOnly: true, sameSite: 'lax', secure: env.NODE_ENV === 'production', path: '/api/v1/auth', maxAge: 7 * 24 * 3600 * 1000 };
+  const isProd = env.NODE_ENV === 'production';
+  return {
+    httpOnly: true,
+    sameSite: isProd ? 'none' : 'lax',
+    secure: isProd,
+    path: '/api/v1/auth',
+    maxAge: 7 * 24 * 3600 * 1000,
+  };
 }
 
 module.exports = { protect, optionalAuth, requireRole, signAccess, signRefresh, refreshCookieOptions };
