@@ -38,14 +38,23 @@ const list = asyncHandler(async (req, res) => {
   let filter = {};
   if (req.user.role === 'student') {
     const apps = await Application.find({ student: req.user._id }).select('job');
-    const jobIds = apps.map((a) => a.job);
-    filter = { status: 'active', job: { $in: jobIds } };
+    const appliedJobIds = apps.map((a) => String(a.job));
+    if (req.query.jobId) {
+      if (!appliedJobIds.includes(String(req.query.jobId))) {
+        return res.json({ success: true, data: [], pagination: { page: 1, limit, total: 0, pages: 1 } });
+      }
+      filter = { status: 'active', job: req.query.jobId };
+    } else {
+      filter = { status: 'active', job: { $in: appliedJobIds } };
+    }
   } else if (req.user.role === 'company') {
     const cp = await ownCompany(req.user._id);
     filter = { company: cp._id };
+    if (req.query.jobId) filter.job = req.query.jobId;
+  } else if (req.query.jobId) {
+    filter.job = req.query.jobId;
   }
   if (req.query.status && req.user.role !== 'student') filter.status = req.query.status;
-  if (req.query.jobId) filter.job = req.query.jobId;
   const [items, total] = await Promise.all([
     Assessment.find(filter).populate('company', 'companyName').populate('job', 'title').sort({ createdAt: -1 }).skip(skip).limit(limit),
     Assessment.countDocuments(filter),
@@ -403,11 +412,17 @@ const attemptMonitor = asyncHandler(async (req, res) => {
   res.json({ success: true, data: { attempt, violations } });
 });
 const getOne = asyncHandler(async (req, res) => {
-  const a = await Assessment.findById(req.params.id).populate('company', 'companyName').populate('job', 'title');
+  const a = await Assessment.findById(req.params.id).populate('company', 'companyName logo').populate('job', 'title');
   if (!a) throw ApiError.notFound('Assessment not found');
   if (req.user.role === 'company') {
     const cp = await CompanyProfile.findOne({ user: req.user._id });
     if (!cp || String(a.company?._id || a.company) !== String(cp._id)) throw ApiError.forbidden('Access denied');
+  }
+  if (req.user.role === 'student' && a.job) {
+    const hasApplied = await Application.findOne({ student: req.user._id, job: a.job });
+    if (!hasApplied) {
+      throw ApiError.forbidden('You must apply for this company\'s job before accessing its assessment.');
+    }
   }
   res.json({ success: true, data: a });
 });

@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
   AlertCircle, ArrowLeft, ArrowRight, Award, BookOpen, Briefcase, Building2,
+  ClipboardCheck, Eye, HelpCircle, Play,
   Calendar, CalendarDays, CheckCircle2, ChevronRight, CircleX, ClipboardList,
   Clock, ExternalLink, FileText, GraduationCap, IndianRupee, Info, Laptop,
   Layers, ListChecks, MapPin, RefreshCw, Search, ShieldAlert, ShieldCheck,

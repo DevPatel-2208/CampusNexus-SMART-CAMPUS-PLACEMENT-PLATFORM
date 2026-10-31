@@ -16,9 +16,9 @@ import { PublicHeader } from '../components/public/Header';
 import { PublicFooter } from '../components/public/Footer';
 import {
   AlertCircle, ArrowLeft, ArrowRight, Award, BadgeCheck, Sun, Moon, Key, Lock, Check, Bell, Briefcase, Building2, Calendar, CalendarDays,
-  CheckCircle2, Clock, Compass, Copy, Download, ExternalLink, Eye, EyeOff, FileText, Globe, GraduationCap,
-  IndianRupee, Laptop, Layers, LogIn, MapPin, Printer, Share2, ShieldAlert, ShieldCheck, Sparkles,
-  Users, Video, XCircle, Zap,
+  CheckCircle2, ClipboardCheck, Clock, Compass, Copy, Download, ExternalLink, Eye, EyeOff, FileText, Globe, GraduationCap,
+  HelpCircle, IndianRupee, Laptop, Layers, LogIn, MapPin, Play, Printer, Share2, ShieldAlert, ShieldCheck, Sparkles,
+  Target, Users, Video, XCircle, Zap,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -35,6 +35,7 @@ export function JobDetails({ prefix = '', canApply = false }) {
   const elig = useFetch(async () => (user?.role === 'student' ? (await api.get(`/jobs/${id}/eligibility`)).data.data : null), [id, user?.role]);
   const myApps = useFetch(async () => (user?.role === 'student' ? (await api.get('/applications/mine', { params: { limit: 100 } })).data?.data || [] : []), [user?.role]);
   const [busy, setBusy] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
 
   const apply = async () => {
     const ok = await confirmAction({
@@ -69,7 +70,8 @@ export function JobDetails({ prefix = '', canApply = false }) {
   if (res.error) return <div className="container py-5"><ErrorState message={apiErrorMessage(res.error)} onRetry={res.reload} /></div>;
   if (!res.data?.data) return <div className="container py-5"><Empty title="Job position not found" hint="This opening may have been unlisted, filled, or removed." /></div>;
 
-  const { job, skills = [], hasApplied: serverHasApplied, application: serverApp } = res.data.data;
+  const { job, skills = [], hasApplied: serverHasApplied, application: serverApp, assessment: serverAssessment } = res.data.data;
+  const assessment = serverAssessment || null;
   const clientApp = myApps.data?.find((a) => String(a.job?._id || a.job) === String(id));
   const hasApplied = Boolean(serverHasApplied || clientApp);
   const application = serverApp || clientApp || null;
@@ -215,6 +217,306 @@ export function JobDetails({ prefix = '', canApply = false }) {
         </div>
       )}
 
+      {/* Navigation Tabs Bar */}
+      <div className="cc-job-tabs mb-4">
+        <div className="d-flex align-items-center gap-2 border-bottom pb-2 flex-wrap">
+          <button
+            type="button"
+            className={`btn btn-sm d-inline-flex align-items-center gap-2 rounded-pill px-3.5 py-2 fw-semibold ${activeTab === 'overview' ? 'btn-primary shadow-sm' : 'btn-light text-secondary'}`}
+            onClick={() => setActiveTab('overview')}
+          >
+            <Briefcase size={15} />
+            <span>Job Overview</span>
+          </button>
+
+          <button
+            type="button"
+            className={`btn btn-sm d-inline-flex align-items-center gap-2 rounded-pill px-3.5 py-2 fw-semibold ${activeTab === 'assessment' ? 'btn-primary shadow-sm' : 'btn-light text-secondary'}`}
+            onClick={() => setActiveTab('assessment')}
+          >
+            {hasApplied ? <ClipboardCheck size={15} /> : <Lock size={14} />}
+            <span>Online Assessment</span>
+            {assessment && (
+              <span
+                className={`badge rounded-pill ms-1 ${
+                  !hasApplied
+                    ? 'bg-secondary-subtle text-secondary border'
+                    : assessment.attempt?.status === 'submitted'
+                    ? assessment.attempt.result === 'Passed'
+                      ? 'bg-success text-white'
+                      : 'bg-danger text-white'
+                    : assessment.attempt?.status === 'active'
+                    ? 'bg-warning text-dark'
+                    : 'bg-primary text-white'
+                }`}
+                style={{ fontSize: '0.68rem' }}
+              >
+                {!hasApplied
+                  ? 'Locked'
+                  : assessment.attempt?.status === 'submitted'
+                  ? assessment.attempt.result === 'Passed'
+                    ? 'Passed'
+                    : 'Completed'
+                  : assessment.attempt?.status === 'active'
+                  ? 'In Progress'
+                  : 'Available'}
+              </span>
+            )}
+            {!assessment && hasApplied && (
+              <span className="badge rounded-pill ms-1 bg-light text-muted border" style={{ fontSize: '0.68rem' }}>
+                Not Required
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {activeTab === 'assessment' ? (
+        <div className="cc-assessment-tab-content">
+          {!hasApplied ? (
+            <div className="card border-0 shadow-sm rounded-4 overflow-hidden p-4 p-md-5 text-center bg-white mb-4">
+              <div
+                className="mx-auto mb-3 d-inline-flex align-items-center justify-content-center rounded-circle"
+                style={{ width: 68, height: 68, background: 'rgba(239, 68, 68, 0.08)', color: '#ef4444' }}
+              >
+                <Lock size={30} />
+              </div>
+              <h3 className="h5 fw-bold text-dark mb-2">Online Assessment Locked</h3>
+              <p className="text-muted mx-auto mb-4" style={{ maxWidth: 560, fontSize: '0.94rem', lineHeight: 1.6 }}>
+                This screening evaluation is administered by <strong>{company.companyName || 'the hiring organization'}</strong>. To access the examination syllabus, questions overview, and secure testing environment, you must first submit your application for this position.
+              </p>
+
+              {assessment && (
+                <div className="card border bg-light-subtle rounded-3 p-3 mx-auto mb-4 text-start shadow-xs" style={{ maxWidth: 500 }}>
+                  <div className="d-flex align-items-center gap-2 mb-2">
+                    <Sparkles size={16} className="text-warning" />
+                    <strong className="text-dark small">Upcoming Screening Test</strong>
+                  </div>
+                  <div className="fw-semibold text-secondary mb-2.5">{assessment.title}</div>
+                  <div className="d-flex align-items-center gap-3 text-muted small flex-wrap" style={{ fontSize: '0.8rem' }}>
+                    <span className="d-inline-flex align-items-center gap-1"><Clock size={13} /> {assessment.durationMinutes} Minutes</span>
+                    <span className="d-inline-flex align-items-center gap-1"><HelpCircle size={13} /> {assessment.numQuestions || assessment.questionCount} Questions</span>
+                    <span className="d-inline-flex align-items-center gap-1"><Target size={13} /> Pass Mark {assessment.passingPercentage}%</span>
+                    <span className="d-inline-flex align-items-center gap-1"><Zap size={13} /> {assessment.difficulty || 'Medium'}</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="d-flex justify-content-center gap-2.5 flex-wrap">
+                {user?.role === 'student' ? (
+                  <button
+                    type="button"
+                    className="btn btn-primary rounded-pill px-4 py-2.5 fw-bold shadow-sm d-inline-flex align-items-center gap-2"
+                    onClick={apply}
+                    disabled={busy || isClosed}
+                  >
+                    {busy ? 'Submitting Application...' : 'Apply for this Job to Unlock Assessment'}
+                    <ArrowRight size={16} />
+                  </button>
+                ) : !user ? (
+                  <Link to="/login" className="btn btn-primary rounded-pill px-4 py-2.5 fw-bold shadow-sm d-inline-flex align-items-center gap-1.5">
+                    <LogIn size={15} /> <span>Login as Student to Apply</span>
+                  </Link>
+                ) : null}
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary rounded-pill px-4 py-2.5"
+                  onClick={() => setActiveTab('overview')}
+                >
+                  View Job Overview
+                </button>
+              </div>
+            </div>
+          ) : assessment ? (
+            <div className="cc-assessment-active-view">
+              {/* Assessment Hero Card */}
+              <div className="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div
+                  className="card-body p-4 p-md-5"
+                  style={{ background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(14, 165, 233, 0.05) 100%)' }}
+                >
+                  <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                    <span
+                      className="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 fw-bold d-inline-flex align-items-center gap-1.5"
+                      style={{ fontSize: '0.78rem' }}
+                    >
+                      <ShieldCheck size={14} /> Official Recruiter Assessment · Unlocked
+                    </span>
+                    <span className="badge bg-light text-secondary border rounded-pill px-2.5 py-1 small">
+                      {assessment.categories || 'Technical'} · {assessment.difficulty || 'Medium'}
+                    </span>
+                  </div>
+
+                  <h2 className="h4 fw-bold text-dark mb-2">{assessment.title}</h2>
+                  <p className="text-secondary mb-4" style={{ maxWidth: 720, fontSize: '0.94rem', lineHeight: 1.6 }}>
+                    {assessment.description || `Official candidate screening evaluation for the ${job.title} position at ${company.companyName || 'the hiring partner'}. Complete this round to progress into technical and behavioral interview stages.`}
+                  </p>
+
+                  {/* 4 Metric Tiles */}
+                  <div className="row g-3 mb-4">
+                    <div className="col-6 col-md-3">
+                      <div className="p-3 bg-white rounded-3 border text-center shadow-xs">
+                        <div className="text-muted small mb-1 d-inline-flex align-items-center gap-1">
+                          <Clock size={14} className="text-warning" /> Duration
+                        </div>
+                        <div className="fs-5 fw-bold text-dark">{assessment.durationMinutes} Mins</div>
+                      </div>
+                    </div>
+                    <div className="col-6 col-md-3">
+                      <div className="p-3 bg-white rounded-3 border text-center shadow-xs">
+                        <div className="text-muted small mb-1 d-inline-flex align-items-center gap-1">
+                          <HelpCircle size={14} className="text-info" /> Questions
+                        </div>
+                        <div className="fs-5 fw-bold text-dark">{assessment.numQuestions || assessment.questionCount} MCQs</div>
+                      </div>
+                    </div>
+                    <div className="col-6 col-md-3">
+                      <div className="p-3 bg-white rounded-3 border text-center shadow-xs">
+                        <div className="text-muted small mb-1 d-inline-flex align-items-center gap-1">
+                          <Target size={14} className="text-danger" /> Pass Mark
+                        </div>
+                        <div className="fs-5 fw-bold text-dark">{assessment.passingPercentage}%</div>
+                      </div>
+                    </div>
+                    <div className="col-6 col-md-3">
+                      <div className="p-3 bg-white rounded-3 border text-center shadow-xs">
+                        <div className="text-muted small mb-1 d-inline-flex align-items-center gap-1">
+                          <Award size={14} className="text-success" /> Total Marks
+                        </div>
+                        <div className="fs-5 fw-bold text-dark">{assessment.totalMarks} Pts</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Candidate Status & Launch Action */}
+                  <div className="p-3.5 p-md-4 bg-white rounded-3 border shadow-xs d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div>
+                      <div className="d-flex align-items-center gap-2 mb-1">
+                        <span className="small text-muted fw-semibold">Your Attempt Status:</span>
+                        {assessment.attempt?.status === 'submitted' ? (
+                          <span className={`badge rounded-pill fw-bold ${assessment.attempt.result === 'Passed' ? 'bg-success' : 'bg-danger'}`}>
+                            {assessment.attempt.result === 'Passed' ? 'Passed & Cleared' : 'Needs Review / Failed'} ({assessment.attempt.percentage}%)
+                          </span>
+                        ) : assessment.attempt?.status === 'active' ? (
+                          <span className="badge bg-warning text-dark rounded-pill fw-bold">Active Session In Progress</span>
+                        ) : (
+                          <span className="badge bg-success-subtle text-success border rounded-pill fw-bold">Ready to Start</span>
+                        )}
+                      </div>
+                      <p className="small text-muted mb-0">
+                        {assessment.attempt?.status === 'submitted'
+                          ? `Submitted on ${dateText(assessment.attempt.submittedAt)}. Scored ${assessment.attempt.score} out of ${assessment.totalMarks} total points.`
+                          : assessment.attempt?.status === 'active'
+                          ? 'Your assessment timer is running. Click resume to complete and submit before time expires.'
+                          : 'You are eligible to take this assessment. Launch the secure exam tab when ready.'}
+                      </p>
+                    </div>
+
+                    <div className="d-flex align-items-center gap-2">
+                      {assessment.attempt?.status === 'submitted' ? (
+                        <Link
+                          to={`/student/attempt/${assessment.attempt._id}`}
+                          className="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold d-inline-flex align-items-center gap-2"
+                        >
+                          <Eye size={16} />
+                          <span>View Full Exam Report</span>
+                        </Link>
+                      ) : assessment.attempt?.status === 'active' ? (
+                        <Link
+                          to={`/student/assessments/${assessment._id}`}
+                          className="btn btn-warning rounded-pill px-4 py-2.5 fw-bold d-inline-flex align-items-center gap-2 shadow-sm"
+                        >
+                          <Play size={16} />
+                          <span>Resume Assessment</span>
+                        </Link>
+                      ) : (
+                        <Link
+                          to={`/student/assessments/${assessment._id}`}
+                          className="btn btn-primary rounded-pill px-4 py-2.5 fw-bold d-inline-flex align-items-center gap-2 shadow-sm"
+                        >
+                          <Play size={16} />
+                          <span>Start Assessment Now</span>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Proctoring & Examination Rules */}
+              <SectionCard title="Examination Proctoring Guidelines & Security Policy" icon={<ShieldCheck size={16} />}>
+                <div className="row g-3">
+                  <div className="col-12 col-md-6">
+                    <div className="p-3 bg-light rounded-3 h-100">
+                      <strong className="d-flex align-items-center gap-2 text-dark small mb-1">
+                        <CheckCircle2 size={16} className="text-success" /> Fullscreen Mode Enforced
+                      </strong>
+                      <p className="text-muted small mb-0">
+                        Exam launches in an isolated full-screen viewport. Exiting or resizing triggers integrity warnings.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="col-12 col-md-6">
+                    <div className="p-3 bg-light rounded-3 h-100">
+                      <strong className="d-flex align-items-center gap-2 text-dark small mb-1">
+                        <CheckCircle2 size={16} className="text-success" /> Tab Switch & Blur Monitoring
+                      </strong>
+                      <p className="text-muted small mb-0">
+                        Switching tabs or loss of window focus is recorded in realtime telemetry. Repeated violations flag the attempt.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="col-12 col-md-6">
+                    <div className="p-3 bg-light rounded-3 h-100">
+                      <strong className="d-flex align-items-center gap-2 text-dark small mb-1">
+                        <CheckCircle2 size={16} className="text-success" /> Real-time Answer Synchronization
+                      </strong>
+                      <p className="text-muted small mb-0">
+                        Selected responses are auto-saved per question. If the session expires, submitted answers are graded instantly.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="col-12 col-md-6">
+                    <div className="p-3 bg-light rounded-3 h-100">
+                      <strong className="d-flex align-items-center gap-2 text-dark small mb-1">
+                        <CheckCircle2 size={16} className="text-success" /> Transparent Recruiter Reporting
+                      </strong>
+                      <p className="text-muted small mb-0">
+                        Scores and proctoring metrics are transmitted directly to {company.companyName || 'the recruiting team'}.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </SectionCard>
+            </div>
+          ) : (
+            <div className="card border-0 shadow-sm rounded-4 p-5 text-center bg-white mb-4">
+              <div
+                className="mx-auto mb-3 d-inline-flex align-items-center justify-content-center rounded-circle"
+                style={{ width: 64, height: 64, background: 'rgba(37, 99, 235, 0.08)', color: '#2563eb' }}
+              >
+                <Sparkles size={30} />
+              </div>
+              <h3 className="h5 fw-bold text-dark mb-2">No Written Assessment Required</h3>
+              <p className="text-muted mx-auto mb-4" style={{ maxWidth: 540, fontSize: '0.94rem', lineHeight: 1.6 }}>
+                <strong>{company.companyName || 'The hiring organization'}</strong> has not scheduled an online test for the <strong>{job.title}</strong> role. Applications are evaluated directly based on academic scores, skills, and personal interviews.
+              </p>
+              <div className="d-flex justify-content-center gap-2.5 flex-wrap">
+                <Link
+                  to={application?._id ? `/student/applications/${application._id}` : '/student/applications'}
+                  className="btn btn-primary rounded-pill px-4 py-2 fw-semibold"
+                >
+                  Track in My Applications
+                </Link>
+                <button type="button" className="btn btn-outline-secondary rounded-pill px-4 py-2" onClick={() => setActiveTab('overview')}>
+                  Back to Overview
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
       {/* 2-Column Responsive Layout */}
       <div className="row g-4">
         {/* Left Column (8 cols): Job Description, Skills, Company */}
@@ -442,6 +744,8 @@ export function JobDetails({ prefix = '', canApply = false }) {
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 

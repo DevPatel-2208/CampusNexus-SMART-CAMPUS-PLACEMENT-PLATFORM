@@ -2,6 +2,7 @@ const { Job, JobSkill, SavedJob } = require('../models/Job');
 const CompanyProfile = require('../models/CompanyProfile');
 const User = require('../models/User');
 const { Application } = require('../models/Application');
+const { Assessment, AssessmentQuestion, AssessmentAttempt } = require('../models/Assessment');
 const { ExternalJobsCache } = require('../models/Misc');
 const { ApiError, asyncHandler, paginate, escapeRegex } = require('../utils/helpers');
 const { checkJobEligibility } = require('../services/eligibility.service');
@@ -41,10 +42,60 @@ const getJob = asyncHandler(async (req, res) => {
   if (!job) throw ApiError.notFound('Job not found');
   const skills = await JobSkill.find({ job: job._id }).populate('skill', 'skillName category');
   let application = null;
+  let assessment = null;
   if (req.user && req.user.role === 'student') {
     application = await Application.findOne({ student: req.user._id, job: job._id }).select('_id status createdAt history coverLetter').lean();
+    const activeAssessment = await Assessment.findOne({ job: job._id, status: 'active' })
+      .populate('company', 'companyName logo')
+      .lean();
+    if (activeAssessment) {
+      const [questionCount, attempt] = await Promise.all([
+        AssessmentQuestion.countDocuments({ assessment: activeAssessment._id }),
+        AssessmentAttempt.findOne({ assessment: activeAssessment._id, student: req.user._id }).lean(),
+      ]);
+      assessment = {
+        _id: activeAssessment._id,
+        title: activeAssessment.title,
+        description: activeAssessment.description,
+        durationMinutes: activeAssessment.durationMinutes,
+        totalMarks: activeAssessment.totalMarks,
+        numQuestions: activeAssessment.numQuestions || questionCount,
+        questionCount,
+        difficulty: activeAssessment.difficulty,
+        categories: activeAssessment.categories,
+        technology: activeAssessment.technology,
+        passingPercentage: activeAssessment.passingPercentage,
+        negativeMarking: activeAssessment.negativeMarking,
+        negativeMarks: activeAssessment.negativeMarks,
+        company: activeAssessment.company,
+        attempt: attempt || null,
+        unlocked: !!application,
+      };
+    }
+  } else {
+    const activeAssessment = await Assessment.findOne({ job: job._id, status: 'active' })
+      .populate('company', 'companyName logo')
+      .lean();
+    if (activeAssessment) {
+      const questionCount = await AssessmentQuestion.countDocuments({ assessment: activeAssessment._id });
+      assessment = {
+        _id: activeAssessment._id,
+        title: activeAssessment.title,
+        description: activeAssessment.description,
+        durationMinutes: activeAssessment.durationMinutes,
+        totalMarks: activeAssessment.totalMarks,
+        numQuestions: activeAssessment.numQuestions || questionCount,
+        questionCount,
+        difficulty: activeAssessment.difficulty,
+        categories: activeAssessment.categories,
+        technology: activeAssessment.technology,
+        passingPercentage: activeAssessment.passingPercentage,
+        company: activeAssessment.company,
+        unlocked: false,
+      };
+    }
   }
-  res.json({ success: true, data: { job, skills, hasApplied: !!application, application } });
+  res.json({ success: true, data: { job, skills, hasApplied: !!application, application, assessment } });
 });
 
 const jobEligibility = asyncHandler(async (req, res) => {

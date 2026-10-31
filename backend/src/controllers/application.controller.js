@@ -73,7 +73,27 @@ const getOne = asyncHandler(async (req, res) => {
     const cp = await CompanyProfile.findOne({ user: req.user._id });
     if (!cp || String(app.job.company?._id || app.job.company) !== String(cp._id)) throw ApiError.forbidden('Access denied');
   }
-  res.json({ success: true, data: app });
+  const appObj = app.toObject();
+  if (app.job) {
+    const { Assessment, AssessmentQuestion, AssessmentAttempt } = require('../models/Assessment');
+    const activeAssessment = await Assessment.findOne({ job: app.job._id, status: 'active' })
+      .populate('company', 'companyName logo')
+      .lean();
+    if (activeAssessment) {
+      const [questionCount, attempt] = await Promise.all([
+        AssessmentQuestion.countDocuments({ assessment: activeAssessment._id }),
+        AssessmentAttempt.findOne({ assessment: activeAssessment._id, student: app.student._id || app.student }).lean(),
+      ]);
+      appObj.assessment = {
+        ...activeAssessment,
+        questionCount,
+        numQuestions: activeAssessment.numQuestions || questionCount,
+        attempt: attempt || null,
+        unlocked: true,
+      };
+    }
+  }
+  res.json({ success: true, data: appObj });
 });
 
 const updateStatus = asyncHandler(async (req, res) => {
