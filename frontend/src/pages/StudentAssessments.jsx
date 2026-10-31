@@ -631,8 +631,9 @@ export function AttemptResult() {
   const [activeFilter, setActiveFilter] = useState('all'); // 'all', 'correct', 'wrong'
   const celebratedRef = useRef(false);
 
-  const triggerPassCelebration = (isManual = false) => {
-    const attempt = res.data?.attempt;
+  const triggerPassCelebration = (customAttempt) => {
+    const attempt = customAttempt || res.data?.attempt;
+    if (!attempt) return;
     const percentage = Math.max(0, Math.min(100, Number(attempt?.percentage) || 0));
     const passingScore = attempt?.assessment?.passingPercentage ?? 60;
     const assessmentTitle = attempt?.assessment?.title || 'Assessment';
@@ -640,27 +641,29 @@ export function AttemptResult() {
     try {
       // Dual-cannon confetti burst for executive celebration
       confetti({
-        particleCount: 90,
+        particleCount: 100,
         spread: 80,
         origin: { x: 0.15, y: 0.55 },
         colors: ['#4f46e5', '#7c3aed', '#10b981', '#f59e0b', '#ec4899', '#38bdf8'],
         zIndex: 10001,
       });
       confetti({
-        particleCount: 90,
+        particleCount: 100,
         spread: 80,
         origin: { x: 0.85, y: 0.55 },
         colors: ['#4f46e5', '#7c3aed', '#10b981', '#f59e0b', '#ec4899', '#38bdf8'],
         zIndex: 10001,
       });
       setTimeout(() => {
-        confetti({
-          particleCount: 120,
-          spread: 110,
-          origin: { x: 0.5, y: 0.38 },
-          colors: ['#4f46e5', '#10b981', '#fbbf24', '#38bdf8'],
-          zIndex: 10001,
-        });
+        try {
+          confetti({
+            particleCount: 140,
+            spread: 120,
+            origin: { x: 0.5, y: 0.38 },
+            colors: ['#4f46e5', '#10b981', '#fbbf24', '#38bdf8'],
+            zIndex: 10001,
+          });
+        } catch { /* ignore */ }
       }, 350);
     } catch {
       // safe fallback
@@ -690,12 +693,18 @@ export function AttemptResult() {
   };
 
   useEffect(() => {
-    if (res.data?.attempt?.result === 'Passed' && !celebratedRef.current) {
+    const attemptObj = res.data?.attempt;
+    const isPassed = attemptObj && (
+      attemptObj.result === 'Passed' ||
+      String(attemptObj.result).toLowerCase() === 'passed' ||
+      Number(attemptObj.percentage) >= (attemptObj.assessment?.passingPercentage ?? 60)
+    );
+
+    if (isPassed && !celebratedRef.current) {
       celebratedRef.current = true;
-      const t = setTimeout(() => {
-        triggerPassCelebration();
-      }, 400);
-      return () => clearTimeout(t);
+      window.setTimeout(() => {
+        triggerPassCelebration(attemptObj);
+      }, 500);
     }
   }, [res.data]);
 
@@ -774,6 +783,17 @@ export function AttemptResult() {
           <h2 className="cc-attempt-headline">
             {passed ? 'Outstanding Work! You Passed' : 'Assessment Completed'}
           </h2>
+          {passed && (
+            <div className="mt-2 mb-3">
+              <button
+                type="button"
+                className="btn btn-sm btn-success d-inline-flex align-items-center gap-2 rounded-pill px-3 py-1.5 fw-bold shadow-sm"
+                onClick={() => triggerPassCelebration(attempt)}
+              >
+                <Sparkles size={14} className="text-warning" /> Celebrate Result 🎉
+              </button>
+            </div>
+          )}
           <p className="cc-attempt-desc">
             {passed
               ? `Congratulations! You scored ${percentage}%, meeting the ${passingScore}% qualifying cutoff benchmark for this assessment.`

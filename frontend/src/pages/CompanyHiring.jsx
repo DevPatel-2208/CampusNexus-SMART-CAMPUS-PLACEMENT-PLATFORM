@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
+import { swalBase } from '../services/alerts';
 import api, { apiErrorMessage, downloadFile, fileUrl } from '../services/api';
 import { useFetch } from '../hooks/useUnread';
 import { Empty, Loading, PageHeader, SectionCard, StatusBadge, Toolbar,
@@ -106,13 +107,13 @@ export function Assessments() {
   const pages = Math.max(1, Math.ceil(filtered.length / limit));
   const cur = Math.min(page, pages);
   const rows = filtered.slice((cur - 1) * limit, cur * limit);
-    const del = async (id) => { const r = await Swal.fire({ title: 'Delete draft?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Delete', confirmButtonColor: 'var(--cc-danger)' }); if (!r.isConfirmed) return; try { await api.delete('/assessments/' + id); toast.success('Deleted.'); res.reload(); } catch (e) { toast.error(apiErrorMessage(e)); } };
+    const del = async (id) => { const r = await Swal.fire(swalBase({ title: 'Delete draft?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Delete', confirmButtonColor: '#e11d48' })); if (!r.isConfirmed) return; try { await api.delete('/assessments/' + id); toast.success('Deleted.'); res.reload(); } catch (e) { toast.error(apiErrorMessage(e)); } };
   const publish = async (a) => {
-    const r = await Swal.fire({
+    const r = await Swal.fire(swalBase({
       title: 'Publish assessment?',
       text: `"${a.title}" will become active and all applicants of the linked job will be notified. You can no longer edit questions without unpublishing.`,
       icon: 'question', showCancelButton: true, confirmButtonText: 'Publish', cancelButtonText: 'Cancel',
-    });
+    }));
     if (!r.isConfirmed) return;
     try { await api.post('/assessments/' + a._id + '/publish'); toast.success('Published and applicants notified.'); res.reload(); } catch (e) { toast.error(apiErrorMessage(e)); }
   };
@@ -246,13 +247,13 @@ export function AssessmentDetail() {
     setF({ question: q.question, optionA: q.optionA || '', optionB: q.optionB || '', optionC: q.optionC || '', optionD: q.optionD || '', correctAnswer: q.correctAnswer, questionType: q.questionType, marks: q.marks });
     requestAnimationFrame(() => questionEditorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   };
-  const del = async (qid) => { const r = await Swal.fire({ title: 'Delete question?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Delete', confirmButtonColor: '#e11d48' }); if (!r.isConfirmed) return; try { await api.delete('/assessments/' + id + '/questions/' + qid); qs.reload(); meta.reload(); } catch (e) { toast.error(apiErrorMessage(e)); } };
+  const del = async (qid) => { const r = await Swal.fire(swalBase({ title: 'Delete question?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Delete', confirmButtonColor: '#e11d48' })); if (!r.isConfirmed) return; try { await api.delete('/assessments/' + id + '/questions/' + qid); qs.reload(); meta.reload(); } catch (e) { toast.error(apiErrorMessage(e)); } };
   const regenerate = async (q) => {
-    const result = await Swal.fire({
+    const result = await Swal.fire(swalBase({
       title: 'Regenerate this question?',
       text: 'AI will replace this question and its answer choices. The question will stay unchanged if generation fails.',
       icon: 'question', showCancelButton: true, confirmButtonText: 'Regenerate', cancelButtonText: 'Keep question',
-    });
+    }));
     if (!result.isConfirmed) return;
     setRegenBusyId(q._id);
     try {
@@ -282,7 +283,7 @@ export function AssessmentDetail() {
       toast.error('Add at least one question before publishing this assessment.');
       return;
     }
-    const confirm = await Swal.fire({
+    const confirm = await Swal.fire(swalBase({
       title: active ? 'Unpublish this assessment?' : 'Publish this assessment?',
       text: active
         ? 'Students will no longer be able to start new attempts. Existing submissions and results will remain available.'
@@ -292,7 +293,7 @@ export function AssessmentDetail() {
       confirmButtonText: active ? 'Unpublish' : 'Publish assessment',
       cancelButtonText: 'Keep as is',
       confirmButtonColor: active ? '#c2414b' : '#5147e8',
-    });
+    }));
     if (!confirm.isConfirmed) return;
     setPublishBusy(true);
     try {
@@ -452,7 +453,7 @@ export function Interviews() {
   const [reschF, setReschF] = useState({ interviewDate: '', interviewTime: '', reason: '' });
   const update = async (iv, patch) => { setBusy(true); try { await api.patch('/interviews/' + iv._id, patch); toast.success('Interview updated.'); res.reload(); } catch (e) { toast.error(apiErrorMessage(e)); } finally { setBusy(false); } };
   const cancel = async (iv) => {
-    const r = await Swal.fire({ title: 'Cancel interview?', input: 'text', inputLabel: 'Reason (min 3 characters)', inputValidator: (v) => (!v || v.trim().length < 3 ? 'Reason required.' : null), showCancelButton: true, confirmButtonText: 'Cancel interview', confirmButtonColor: '#e11d48' });
+    const r = await Swal.fire(swalBase({ title: 'Cancel interview?', input: 'text', inputLabel: 'Reason (min 3 characters)', inputValidator: (v) => (!v || v.trim().length < 3 ? 'Reason required.' : null), showCancelButton: true, confirmButtonText: 'Cancel interview', confirmButtonColor: '#e11d48' }));
     if (!r.isConfirmed) return;
     await update(iv, { status: 'cancelled', notes: 'Cancelled: ' + r.value });
   };
@@ -637,9 +638,9 @@ export function Offers() {
   const [status, setStatus] = useState('');
   const [sort, setSort] = useState({ key: 'createdAt', dir: 'desc' });
   const [page, setPage] = useState(1);
-  const withdraw = async (o) => { const r = await Swal.fire({ title: 'Withdraw offer?', input: 'text', inputLabel: 'Reason (min 3 characters)', inputValidator: (v) => (!v || v.trim().length < 3 ? 'Reason required.' : null), showCancelButton: true, confirmButtonText: 'Withdraw', confirmButtonColor: '#e11d48' }); if (!r.isConfirmed) return; try { await api.post('/offers/' + o._id + '/withdraw', { reason: r.value }); toast.success('Withdrawn.'); res.reload(); } catch (e) { toast.error(apiErrorMessage(e)); } };
+  const withdraw = async (o) => { const r = await Swal.fire(swalBase({ title: 'Withdraw offer?', input: 'text', inputLabel: 'Reason (min 3 characters)', inputValidator: (v) => (!v || v.trim().length < 3 ? 'Reason required.' : null), showCancelButton: true, confirmButtonText: 'Withdraw', confirmButtonColor: '#e11d48' })); if (!r.isConfirmed) return; try { await api.post('/offers/' + o._id + '/withdraw', { reason: r.value }); toast.success('Withdrawn.'); res.reload(); } catch (e) { toast.error(apiErrorMessage(e)); } };
   const issue = async (o) => {
-    const r = await Swal.fire({ title: 'Issue offer?', text: `The offer for ${o.student?.name} will be sent to the student.`, icon: 'question', showCancelButton: true, confirmButtonText: 'Issue now' });
+    const r = await Swal.fire(swalBase({ title: 'Issue offer?', text: `The offer for ${o.student?.name} will be sent to the student.`, icon: 'question', showCancelButton: true, confirmButtonText: 'Issue now' }));
     if (!r.isConfirmed) return;
     try { await api.post('/offers/' + o._id + '/issue'); toast.success('Offer issued.'); res.reload(); } catch (e) { toast.error(apiErrorMessage(e)); }
   };
@@ -890,7 +891,7 @@ export function Verification() {
     try { await api.post('/company/documents', fd); toast.success('Document uploaded for TPO review.'); setFile(null); res.reload(); }
     catch (e) { toast.error(apiErrorMessage(e)); } finally { setBusy(false); }
   };
-  const del = async (id) => { const r = await Swal.fire({ title: 'Delete document?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Delete', confirmButtonColor: '#e11d48' }); if (!r.isConfirmed) return; try { await api.delete('/company/documents/' + id); res.reload(); } catch (e) { toast.error(apiErrorMessage(e)); } };
+  const del = async (id) => { const r = await Swal.fire(swalBase({ title: 'Delete document?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Delete', confirmButtonColor: '#e11d48' })); if (!r.isConfirmed) return; try { await api.delete('/company/documents/' + id); res.reload(); } catch (e) { toast.error(apiErrorMessage(e)); } };
   const vp = profileRes.data?.verificationStatus;
   return (
     <div className="cc-page">

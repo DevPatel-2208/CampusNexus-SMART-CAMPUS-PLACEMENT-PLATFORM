@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
+import { swalBase } from '../services/alerts';
 import api, { apiErrorMessage, downloadFile } from '../services/api';
 import { useFetch } from '../hooks/useUnread';
 import {
@@ -183,7 +184,7 @@ export function Jobs() {
   const [page, setPage] = useState(1);
   const toggle = async (id) => { try { await api.post(`/company/jobs/${id}/toggle`); res.reload(); } catch (e) { toast.error(apiErrorMessage(e)); } };
   const del = async (id) => {
-    const r = await Swal.fire({ title: 'Delete job?', text: 'This cannot be undone.', icon: 'warning', showCancelButton: true, confirmButtonText: 'Delete', confirmButtonColor: '#e11d48' });
+    const r = await Swal.fire(swalBase({ title: 'Delete job?', text: 'This cannot be undone.', icon: 'warning', showCancelButton: true, confirmButtonText: 'Delete', confirmButtonColor: '#e11d48' }));
     if (!r.isConfirmed) return;
     try { await api.delete(`/company/jobs/${id}`); toast.success('Job deleted.'); res.reload(); } catch (e) { toast.error(apiErrorMessage(e)); }
   };
@@ -815,7 +816,7 @@ export function ApplicationDetails() {
   const decide = async (status) => {
     let remarks = '';
     if (status === 'Rejected') {
-      const r = await Swal.fire({
+      const r = await Swal.fire(swalBase({
         title: 'Provide Rejection Reason',
         text: 'This feedback will be recorded in the candidate evaluation history.',
         input: 'textarea',
@@ -824,18 +825,18 @@ export function ApplicationDetails() {
         showCancelButton: true,
         confirmButtonText: 'Confirm Rejection',
         confirmButtonColor: '#e11d48',
-      });
+      }));
       if (!r.isConfirmed) return;
       remarks = r.value;
     } else {
-      const r = await Swal.fire({
+      const r = await Swal.fire(swalBase({
         title: `Mark Candidate as ${status}?`,
         text: `Update candidate status to ${status} in the campus placement records.`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: `Yes, Mark ${status}`,
         confirmButtonColor: '#4f46e5',
-      });
+      }));
       if (!r.isConfirmed) return;
     }
     setBusy(true);
@@ -851,14 +852,14 @@ export function ApplicationDetails() {
   };
 
   const setStatus = async (status) => {
-    const r = await Swal.fire({
+    const r = await Swal.fire(swalBase({
       title: `Advance to "${status}"?`,
       text: `Update candidate status in recruitment pipeline.`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Confirm',
       confirmButtonColor: '#4f46e5',
-    });
+    }));
     if (!r.isConfirmed) return;
     setBusy(true);
     try {

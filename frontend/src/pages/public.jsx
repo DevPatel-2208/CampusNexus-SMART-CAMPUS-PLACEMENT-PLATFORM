@@ -8,6 +8,7 @@ import {
   ExternalLink, FileText, HelpCircle, MessageSquare, PhoneCall, ShieldCheck, SlidersHorizontal, Sparkles, Target, TrendingUp, Trophy, User, UserPlus, Users, X, Zap,
 } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { swalBase } from '../services/alerts';
 import { useDebounced, useFetch } from '../hooks/useUnread';
 import { useAuth } from '../context/AuthContext';
 import api, { apiErrorMessage, fileUrl } from '../services/api';
@@ -1608,12 +1609,12 @@ export function ContactForm({ full = false }) {
 
   useEffect(() => {
     if (submitted) {
-      Swal.fire({
+      Swal.fire(swalBase({
         title: 'Message Sent Successfully!',
         text: 'Thank you for reaching out. A placement officer will respond to your inquiry shortly.',
         icon: 'success',
         confirmButtonColor: '#4f46e5',
-      });
+      }));
     }
   }, [submitted]);
 

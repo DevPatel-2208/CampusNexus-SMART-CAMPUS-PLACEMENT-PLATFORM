@@ -13,10 +13,14 @@ export function swalBase(extra = {}) {
     background: dark ? '#121b2e' : '#ffffff',
     color: dark ? '#eaf0fb' : '#0f172a',
     confirmButtonColor: '#4f46e5',
-    cancelButtonColor: dark ? '#2e3d5c' : '#e5e9f2',
+    cancelButtonColor: dark ? '#1e293b' : '#f1f5f9',
     buttonsStyling: true,
     reverseButtons: true,
-    customClass: { popup: 'cc-swal' },
+    customClass: {
+      popup: 'cc-swal',
+      confirmButton: 'cc-swal-confirm',
+      cancelButton: 'cc-swal-cancel',
+    },
     ...extra,
   };
 }
@@ -34,8 +38,8 @@ export async function confirmAction(opts) {
 }
 
 /** Destructive confirmation (delete/cancel). Resolves true when confirmed. */
-export async function confirmDanger({ title, text, confirmButtonText = 'Delete', icon = 'warning' }) {
-  return confirmAction({ title, text, icon, confirmButtonText });
+export async function confirmDanger({ title, text, confirmButtonText = 'Delete', icon = 'warning', confirmButtonColor = '#e11d48' }) {
+  return confirmAction({ title, text, icon, confirmButtonText, confirmButtonColor });
 }
 
 /** Text/textarea prompt. Resolves the string, or null when cancelled. */

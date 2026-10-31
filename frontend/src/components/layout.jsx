@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useUnread } from '../hooks/useUnread';
 import Swal from 'sweetalert2';
+import { swalBase } from '../services/alerts';
 import * as icons from './icons';
 
 export const NAV = {
@@ -161,7 +162,7 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }) {
   }, [open, onClose]);
 
   const confirmLogout = async () => {
-    const r = await Swal.fire({
+    const r = await Swal.fire(swalBase({
       title: 'Sign out?',
       text: 'You will need to sign in again to access the portal.',
       icon: 'question',
@@ -169,7 +170,7 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }) {
       confirmButtonText: 'Sign out',
       cancelButtonText: 'Stay',
       confirmButtonColor: '#e11d48',
-    });
+    }));
     if (r.isConfirmed) {
       window.location.href = '/';
       await logout();
@@ -333,7 +334,7 @@ export function Topbar({ onMenu, onToggleCollapse, title, crumb, collapsed }) {
 
   const confirmLogout = async () => {
     setMenu(false);
-    const r = await Swal.fire({
+    const r = await Swal.fire(swalBase({
       title: 'Sign out?',
       text: 'You will need to sign in again to access the portal.',
       icon: 'question',
@@ -341,7 +342,7 @@ export function Topbar({ onMenu, onToggleCollapse, title, crumb, collapsed }) {
       confirmButtonText: 'Sign out',
       cancelButtonText: 'Stay',
       confirmButtonColor: '#e11d48',
-    });
+    }));
     if (r.isConfirmed) {
       window.location.href = '/';
       await logout();
