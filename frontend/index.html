@@ -19,8 +19,15 @@
     />
     <script>
       try {
-        var t = localStorage.getItem('cc-theme');
-        if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.theme = 'dark';
+        if (localStorage.getItem('cc-theme')) localStorage.removeItem('cc-theme');
+        var t = localStorage.getItem('campusnexus-theme');
+        if (t === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+          document.documentElement.classList.add('dark');
+        } else {
+          delete document.documentElement.dataset.theme;
+          document.documentElement.classList.remove('dark');
+        }
       } catch (e) {}
     </script>
   </head>

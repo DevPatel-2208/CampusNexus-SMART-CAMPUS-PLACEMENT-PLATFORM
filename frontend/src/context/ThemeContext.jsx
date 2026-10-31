@@ -6,9 +6,13 @@ export const useTheme = () => useContext(ThemeContext);
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     try {
-      const t = localStorage.getItem('cc-theme');
-      if (t) return t;
-      return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      // Clear legacy cc-theme so users with auto-saved dark mode get the new light default
+      if (localStorage.getItem('cc-theme')) {
+        localStorage.removeItem('cc-theme');
+      }
+      const t = localStorage.getItem('campusnexus-theme');
+      if (t === 'dark' || t === 'light') return t;
+      return 'light'; // Always default to light mode
     } catch { return 'light'; }
   });
   useEffect(() => {
@@ -19,7 +23,7 @@ export function ThemeProvider({ children }) {
       delete document.documentElement.dataset.theme;
       document.documentElement.classList.remove('dark');
     }
-    try { localStorage.setItem('cc-theme', theme); } catch { /* ignore */ }
+    try { localStorage.setItem('campusnexus-theme', theme); } catch { /* ignore */ }
   }, [theme]);
   const toggle = useCallback(() => setTheme((t) => (t === 'dark' ? 'light' : 'dark')), []);
   return <ThemeContext.Provider value={{ theme, toggle }}>{children}</ThemeContext.Provider>;
