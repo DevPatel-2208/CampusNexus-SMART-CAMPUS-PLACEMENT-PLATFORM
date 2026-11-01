@@ -28,6 +28,63 @@ function shuffledOptions(attemptId, qid) {
 }
 function displayLetter(order, correct) { return order[order.indexOf(correct)] ? String.fromCharCode(65 + order.indexOf(correct)) : correct; }
 
+async function hasStudentAppliedForAssessment(studentId, assessment) {
+  if (!assessment || !studentId) return false;
+
+  // 1. Direct match on assessment.job
+  if (assessment.job) {
+    const directApp = await Application.findOne({ student: studentId, job: assessment.job });
+    if (directApp) return true;
+  }
+
+  // 2. Title / role matching across all jobs
+  let targetJob = null;
+  if (assessment.job) {
+    targetJob = await Job.findById(assessment.job).select('title company');
+  }
+
+  const queryOr = [];
+  if (targetJob?.title) {
+    const rx = new RegExp(targetJob.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    queryOr.push({ title: rx });
+  }
+  if (assessment.title) {
+    const cleanTitle = assessment.title
+      .replace(/(Competency Test|Architecture Exam|Proficiency Exam|Screening Exam|Screening Test|Core Evaluation|Evaluation|Assessment|Test|Exam)$/i, '')
+      .trim();
+    if (cleanTitle.length > 3) {
+      const rx = new RegExp(cleanTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      queryOr.push({ title: rx });
+    }
+  }
+
+  const companyId = assessment.company?._id || assessment.company || targetJob?.company;
+  if (companyId) {
+    queryOr.push({ company: companyId });
+  }
+
+  if (queryOr.length > 0) {
+    const matchingJobs = await Job.find({ $or: queryOr }).select('_id');
+    const jobIds = matchingJobs.map((j) => j._id);
+    if (jobIds.length > 0) {
+      const matchApp = await Application.findOne({ student: studentId, job: { $in: jobIds } });
+      if (matchApp) return true;
+    }
+  }
+
+  // 3. Match any job applied at this company
+  if (companyId) {
+    const companyJobs = await Job.find({ company: companyId }).select('_id');
+    const compJobIds = companyJobs.map((j) => j._id);
+    if (compJobIds.length > 0) {
+      const compApp = await Application.findOne({ student: studentId, job: { $in: compJobIds } });
+      if (compApp) return true;
+    }
+  }
+
+  return false;
+}
+
 async function ownCompany(userId) {
   const cp = await CompanyProfile.findOne({ user: userId });
   if (!cp) throw ApiError.badRequest('Company profile not found.');
@@ -38,43 +95,10 @@ const list = asyncHandler(async (req, res) => {
   const { page, limit, skip } = paginate(req.query);
   let filter = {};
   if (req.user.role === 'student') {
-    const apps = await Application.find({ student: req.user._id }).populate('job', 'title company');
-    const appliedJobIds = [];
-    const titles = [];
-    const companyIds = [];
-    for (const a of apps) {
-      if (a.job) {
-        const jId = a.job._id || a.job;
-        appliedJobIds.push(jId);
-        if (a.job.title) titles.push(a.job.title.trim());
-        if (a.job.company) companyIds.push(a.job.company._id || a.job.company);
-      }
-    }
-    // Find all matching jobs across the platform by ID or Title
-    const matchingJobs = titles.length
-      ? await Job.find({ $or: [{ _id: { $in: appliedJobIds } }, { title: { $in: titles } }] }).select('_id')
-      : [];
-    const allJobIds = [...new Set([
-      ...appliedJobIds.map(String),
-      ...matchingJobs.map((j) => String(j._id)),
-    ])];
-    const validJobObjectIds = allJobIds
-      .filter((id) => mongoose.Types.ObjectId.isValid(id))
-      .map((id) => new mongoose.Types.ObjectId(id));
-
     if (req.query.jobId) {
-      if (!allJobIds.includes(String(req.query.jobId))) {
-        return res.json({ success: true, data: [], pagination: { page: 1, limit, total: 0, pages: 1 } });
-      }
       filter = { status: 'active', job: req.query.jobId };
     } else {
-      filter = {
-        status: 'active',
-        $or: [
-          { job: { $in: validJobObjectIds } },
-          { company: { $in: companyIds } },
-        ],
-      };
+      filter = { status: 'active' };
     }
   } else if (req.user.role === 'company') {
     const cp = await ownCompany(req.user._id);
@@ -85,7 +109,7 @@ const list = asyncHandler(async (req, res) => {
   }
   if (req.query.status && req.user.role !== 'student') filter.status = req.query.status;
   const [items, total] = await Promise.all([
-    Assessment.find(filter).populate('company', 'companyName').populate('job', 'title').sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Assessment.find(filter).populate('company', 'companyName logo').populate('job', 'title').sort({ createdAt: -1 }).skip(skip).limit(limit),
     Assessment.countDocuments(filter),
   ]);
   const enriched = await Promise.all(items.map(async (a) => {
@@ -96,18 +120,26 @@ const list = asyncHandler(async (req, res) => {
     const o = a.toObject();
     o.questionCount = questionCount;
     o.attemptCount = attemptCount;
+    if (req.user.role === 'student') {
+      o.unlocked = await hasStudentAppliedForAssessment(req.user._id, a);
+      o.hasApplied = o.unlocked;
+    }
     return o;
   }));
 
   // Deduplicate assessments by title and company name for clean student rendering
-  const seen = new Set();
-  const deduped = [];
+  const seen = new Map();
   for (const item of enriched) {
     const key = `${item.title}::${item.company?.companyName || item.company?._id || item.company}`;
     if (!seen.has(key)) {
-      seen.add(key);
-      deduped.push(item);
+      seen.set(key, item);
+    } else if (item.unlocked && !seen.get(key).unlocked) {
+      seen.set(key, item);
     }
+  }
+  const deduped = Array.from(seen.values());
+  if (req.user.role === 'student') {
+    deduped.sort((a, b) => (b.unlocked ? 1 : 0) - (a.unlocked ? 1 : 0));
   }
 
   res.json({ success: true, data: deduped, pagination: { page, limit, total: deduped.length, pages: Math.max(1, Math.ceil(deduped.length / limit)) } });
@@ -252,7 +284,7 @@ const start = asyncHandler(async (req, res) => {
   const qcount = await AssessmentQuestion.countDocuments({ assessment: a._id });
   if (!qcount) throw ApiError.conflict('This assessment is not ready yet.');
   if (a.job) {
-    const has = await Application.findOne({ student: req.user._id, job: a.job });
+    const has = await hasStudentAppliedForAssessment(req.user._id, a);
     if (!has) throw ApiError.forbidden('You are not eligible for this assessment yet. Apply for the linked job first.');
   }
   const done = await AssessmentAttempt.findOne({ assessment: a._id, student: req.user._id, status: 'submitted' });
@@ -343,6 +375,22 @@ async function evaluateAndSubmit(attemptId) {
   const comp = await CompanyProfile.findById(a.company);
   if (comp) await notifyUser(comp.user, 'Assessment submitted', `${a.title} — a student submitted the assessment.`, { type: 'assessment', referenceId: attempt._id, actionUrl: '/company/assessments', dedupe: true });
   await notifyTpos('Assessment submitted', `${a.title} was submitted by a student.`, { type: 'assessment', referenceId: attempt._id, priority: 'low' });
+  // Progress linked application status upon passing
+  try {
+    const query = a.job ? { student: attempt.student, job: a.job } : { student: attempt.student };
+    let app = await Application.findOne(query);
+    if (!app && a.company) {
+      const companyJobIds = (await Job.find({ company: a.company }).select('_id')).map((j) => j._id);
+      app = await Application.findOne({ student: attempt.student, job: { $in: companyJobIds } });
+    }
+    if (app && ['Applied', 'Under Review'].includes(app.status)) {
+      app.status = perc >= (a.passingPercentage ?? 60) ? 'Interview' : 'Assessment';
+      app.history.push({ status: app.status, note: `Online Assessment ${attempt.result} (${perc}%)` });
+      await app.save();
+    }
+  } catch (appErr) {
+    console.warn('[assessment:app-update:warn]', appErr.message);
+  }
   return attempt;
 }
 
@@ -459,14 +507,14 @@ const getOne = asyncHandler(async (req, res) => {
     const cp = await CompanyProfile.findOne({ user: req.user._id });
     if (!cp || String(a.company?._id || a.company) !== String(cp._id)) throw ApiError.forbidden('Access denied');
   }
-  if (req.user.role === 'student' && a.job) {
+  let unlocked = true;
+  if (req.user.role === 'student') {
     if (a.status !== 'active') throw ApiError.forbidden('This assessment is not currently available.');
-    const hasApplied = await Application.findOne({ student: req.user._id, job: a.job });
-    if (!hasApplied) {
-      throw ApiError.forbidden('You must apply for this company\'s job before accessing its assessment.');
-    }
+    unlocked = await hasStudentAppliedForAssessment(req.user._id, a);
   }
-  res.json({ success: true, data: a });
+  const obj = a.toObject();
+  obj.unlocked = unlocked;
+  res.json({ success: true, data: obj });
 });
 const results = asyncHandler(async (req, res) => {
   const a = await Assessment.findById(req.params.id);

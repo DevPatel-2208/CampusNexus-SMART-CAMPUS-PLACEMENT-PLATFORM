@@ -294,6 +294,27 @@ export function AssessmentOpen() {
               </Link>
             </div>
           </div>
+        ) : assessment.unlocked === false ? (
+          <div className="card border-0 bg-warning-subtle rounded-4 p-4 text-center my-2 shadow-xs">
+            <div className="mx-auto mb-2 text-warning">
+              <ShieldAlert size={34} />
+            </div>
+            <h4 className="h6 fw-bold text-dark mb-1">Application Required Before Starting Exam</h4>
+            <p className="small text-muted mb-3" style={{ maxWidth: 500, margin: '0 auto', lineHeight: 1.5 }}>
+              You are viewing the official syllabus and evaluation details for <strong>{assessment.company?.companyName || 'this hiring organization'}</strong>. To launch this secure proctored test, submit your application for this position first.
+            </p>
+            <div>
+              {assessment.job?._id || assessment.job ? (
+                <Link to={`/student/jobs/${assessment.job?._id || assessment.job}`} className="btn btn-primary rounded-pill px-4 py-2 small fw-bold shadow-xs">
+                  View &amp; Apply for this Job Opening
+                </Link>
+              ) : (
+                <Link to="/student/jobs" className="btn btn-primary rounded-pill px-4 py-2 small fw-bold shadow-xs">
+                  Explore Campus Job Openings
+                </Link>
+              )}
+            </div>
+          </div>
         ) : (
           <div className="cc-exam-action-box">
             <label className="cc-exam-agreement">
