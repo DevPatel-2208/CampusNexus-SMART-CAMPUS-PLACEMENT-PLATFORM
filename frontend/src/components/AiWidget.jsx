@@ -16,6 +16,7 @@ import {
   Zap,
   CheckCircle2,
   AlertCircle,
+  Maximize2,
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { swalBase } from '../services/alerts';
@@ -621,7 +622,7 @@ export function AiWidget() {
     <>
       {/* Floating Action Button Launcher */}
       <motion.button
-        className="cc-ai-launcher"
+        className={`cc-ai-launcher ${open && !minimized ? 'is-chat-open' : ''}`}
         onClick={() => {
           setOpen((prev) => !prev);
           setMinimized(false);
@@ -680,8 +681,14 @@ export function AiWidget() {
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
           >
             {/* Header */}
-            <div className="cc-ai-header">
-              <div className="d-flex align-items-center gap-2">
+            <div
+              className={`cc-ai-header ${minimized ? 'is-minimized' : ''}`}
+              onClick={minimized ? () => setMinimized(false) : undefined}
+              role={minimized ? 'button' : undefined}
+              tabIndex={minimized ? 0 : undefined}
+              title={minimized ? 'Click to expand chat' : undefined}
+            >
+              <div className="d-flex align-items-center gap-2 min-w-0">
                 <div className="cc-ai-avatar-badge">
                   <Bot size={22} />
                   <span className="cc-ai-status-dot" title="Available" />
@@ -694,23 +701,27 @@ export function AiWidget() {
                       Active
                     </span>
                   </h6>
-                  <span className="cc-ai-head-sub">Personalized Student Assistant</span>
+                  <span className="cc-ai-head-sub">
+                    {minimized ? 'Tap anywhere to expand' : 'Personalized Student Assistant'}
+                  </span>
                 </div>
               </div>
 
-              <div className="cc-ai-actions">
+              <div className="cc-ai-actions" onClick={(e) => e.stopPropagation()}>
                 {/* Clear / New Chat */}
-                <button
-                  type="button"
-                  className="cc-ai-btn-icon"
-                  onClick={handleClearChat}
-                  title="New conversation"
-                  aria-label="New conversation"
-                >
-                  <RotateCcw size={15} />
-                </button>
+                {!minimized && (
+                  <button
+                    type="button"
+                    className="cc-ai-btn-icon"
+                    onClick={handleClearChat}
+                    title="New conversation"
+                    aria-label="New conversation"
+                  >
+                    <RotateCcw size={15} />
+                  </button>
+                )}
 
-                {/* Minimize */}
+                {/* Minimize / Expand */}
                 <button
                   type="button"
                   className="cc-ai-btn-icon"
@@ -718,14 +729,17 @@ export function AiWidget() {
                   title={minimized ? 'Expand' : 'Minimize'}
                   aria-label={minimized ? 'Expand' : 'Minimize'}
                 >
-                  <Minus size={15} />
+                  {minimized ? <Maximize2 size={15} /> : <Minus size={15} />}
                 </button>
 
                 {/* Close */}
                 <button
                   type="button"
                   className="cc-ai-btn-icon"
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    setOpen(false);
+                    setMinimized(false);
+                  }}
                   title="Close"
                   aria-label="Close"
                 >

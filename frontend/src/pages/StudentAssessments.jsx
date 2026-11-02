@@ -736,7 +736,7 @@ export function AttemptResult() {
   return (
     <div className="cc-page cc-attempt-result-page">
       {/* Top Back bar */}
-      <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+      <div className="cc-attempt-top-bar d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
         <Link to="/student/assessments" className="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-2">
           <ArrowLeft size={15} /> Back to Assessments
         </Link>
@@ -843,7 +843,7 @@ export function AttemptResult() {
         subtitle="Review your submitted choices alongside the verified correct answer keys."
         icon={<ListChecks size={18} />}
         actions={(
-          <div className="btn-group btn-group-sm" role="group" aria-label="Filter answers">
+          <div className="btn-group btn-group-sm cc-attempt-filters-wrap" role="group" aria-label="Filter answers">
             <button
               type="button"
               className={`btn ${activeFilter === 'all' ? 'btn-primary' : 'btn-outline-secondary'}`}
@@ -913,9 +913,12 @@ export function AttemptResult() {
 
                         return (
                           <div key={letter} className={optClass}>
-                            <b className="cc-opt-letter">{letter}</b>
-                            <span className="cc-opt-text">{text}</span>
-                            <div className="cc-opt-badges">
+                            <div className="cc-opt-main">
+                              <b className="cc-opt-letter">{letter}</b>
+                              <span className="cc-opt-text">{text}</span>
+                            </div>
+                            {(isStudentChoice || isAnswerKey) && (
+                              <div className="cc-opt-badges">
                               {isStudentChoice && (
                                 <span className={`badge ${isAnswerKey ? 'bg-success' : 'bg-danger'} text-white`}>
                                   Your Choice
@@ -927,6 +930,7 @@ export function AttemptResult() {
                                 </span>
                               )}
                             </div>
+                            )}
                           </div>
                         );
                       })}
