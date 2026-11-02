@@ -11,12 +11,36 @@ const api = axios.create({
   withCredentials: true,
 });
 
-let accessToken = null;
-export const setAccessToken = (t) => { accessToken = t; };
-export const getAccessToken = () => accessToken;
+const TOKEN_STORAGE_KEY = 'cc_access_token';
+
+let accessToken = (() => {
+  try {
+    return localStorage.getItem(TOKEN_STORAGE_KEY) || null;
+  } catch {
+    return null;
+  }
+})();
+
+export const setAccessToken = (t) => {
+  accessToken = t || null;
+  try {
+    if (t) localStorage.setItem(TOKEN_STORAGE_KEY, t);
+    else localStorage.removeItem(TOKEN_STORAGE_KEY);
+  } catch { /* ignore storage write errors */ }
+};
+
+export const getAccessToken = () => {
+  if (accessToken) return accessToken;
+  try {
+    return localStorage.getItem(TOKEN_STORAGE_KEY) || null;
+  } catch {
+    return null;
+  }
+};
 
 api.interceptors.request.use((config) => {
-  if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
+  const token = getAccessToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
@@ -50,9 +74,12 @@ api.interceptors.response.use(
       try {
         const token = await refreshSession();
         if (!token) throw error;
+        setAccessToken(token);
         original.headers.Authorization = `Bearer ${token}`;
         return api(original);
       } catch (e) {
+        setAccessToken(null);
+        try { localStorage.removeItem('cc_user'); } catch { /* ignore */ }
         window.dispatchEvent(new Event('cc:logout'));
         return Promise.reject(error);
       }

@@ -22,13 +22,19 @@ export function homeFor(role) {
  *   PublicOnly auto-redirect while the welcome flow completes.
  * @returns {Promise<void>}
  */
-export async function handleLoginSuccess({ user, isFirstLogin, navigate, setUser, setPostLogin }) {
+export async function handleLoginSuccess({ user, isFirstLogin, navigate, setUser, setPostLogin, from }) {
   const name = (user && user.name) || 'there';
   // Establish the authenticated session and redirect immediately so the user is
   // never left sitting on the login page even if the welcome dialog hangs.
   if (setPostLogin) setPostLogin(true);
   if (setUser) setUser(user);
-  navigate(homeFor(user?.role), { replace: true });
+
+  const fallback = homeFor(user?.role);
+  const destination = from && typeof from === 'string' && from.startsWith('/') && from !== '/login'
+    ? from
+    : fallback;
+
+  navigate(destination, { replace: true });
 
   // Welcome dialog is cosmetic only — show it after navigation, never block.
   try {

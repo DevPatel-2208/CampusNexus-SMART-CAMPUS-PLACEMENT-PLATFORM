@@ -298,6 +298,7 @@ const ROLE_SUB = {
 export function Login() {
   const { login, setUser, setPostLogin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [params] = useSearchParams();
   const googleError = GOOGLE_ERRORS[params.get('google')] || '';
   const [err, setErr] = useState('');
@@ -314,7 +315,14 @@ export function Login() {
     setErr('');
     try {
       const data = await login(values);
-      await handleLoginSuccess({ user: data.user, isFirstLogin: data.isFirstLogin, navigate, setUser, setPostLogin });
+      await handleLoginSuccess({
+        user: data.user,
+        isFirstLogin: data.isFirstLogin,
+        navigate,
+        setUser,
+        setPostLogin,
+        from: location.state?.from,
+      });
     } catch (e2) {
       if (e2.response?.data?.code === 'EMAIL_NOT_VERIFIED') {
         navigate('/verify-email', { state: { userId: e2.response.data.userId, email: e2.response.data.email || values.email } });

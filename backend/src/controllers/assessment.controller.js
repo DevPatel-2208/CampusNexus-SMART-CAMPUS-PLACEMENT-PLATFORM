@@ -369,7 +369,14 @@ async function evaluateAndSubmit(attemptId) {
   const perc = max ? Math.round((score * 100 / max) * 100) / 100 : 0;
   attempt.score = score; attempt.percentage = perc;
   attempt.result = perc >= (a.passingPercentage ?? 60) ? 'Passed' : 'Failed';
-  attempt.submittedAt = new Date(); attempt.status = 'submitted'; attempt.integrityStatus = 'SUBMITTED';
+  attempt.submittedAt = new Date(); attempt.status = 'submitted';
+  if (attempt.integrityStatus !== 'BLOCKED') {
+    if (attempt.violationCount >= FLAG_AT || attempt.integrityStatus === 'FLAGGED') {
+      attempt.integrityStatus = 'FLAGGED';
+    } else {
+      attempt.integrityStatus = 'SUBMITTED';
+    }
+  }
   await attempt.save();
   // Notify company + TPOs (parity with PHP exam_evaluate_and_submit)
   const comp = await CompanyProfile.findById(a.company);
@@ -415,7 +422,13 @@ const violation = asyncHandler(async (req, res) => {
   if (!VIOLATION_TYPES.includes(type)) throw ApiError.badRequest('Invalid violation type.');
   const attempt = await AssessmentAttempt.findOne({ _id: req.params.id, student: req.user._id, status: 'active' });
   if (!attempt) throw ApiError.notFound('Active attempt not found');
-  const upd = await recordViolation(attempt, req.user._id, type, description || '', type === 'MULTIPLE_SESSION' ? 'HIGH' : 'LOW', req);
+  let severity = 'LOW';
+  if (['MULTIPLE_SESSION', 'SHORTCUT_ATTEMPT', 'PRINTSCREEN_ATTEMPT'].includes(type)) {
+    severity = 'HIGH';
+  } else if (['TAB_SWITCH', 'FULLSCREEN_EXIT', 'WINDOW_BLUR', 'COPY_ATTEMPT', 'PASTE_ATTEMPT'].includes(type)) {
+    severity = 'MEDIUM';
+  }
+  const upd = await recordViolation(attempt, req.user._id, type, description || '', severity, req);
   res.json({ success: true, data: { violationCount: upd.violationCount, integrityStatus: upd.integrityStatus, blocked: upd.integrityStatus === 'BLOCKED' } });
 });
 const submit = asyncHandler(async (req, res) => {

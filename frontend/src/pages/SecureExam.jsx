@@ -72,16 +72,7 @@ export function AssessmentOpen() {
       sessionId = window.crypto?.randomUUID?.() || Date.now() + '-' + Math.random().toString(36).slice(2);
       sessionStorage.setItem(sessionKey, sessionId);
     }
-    const url = window.location.origin + '/student/exam/' + id + '?session=' + encodeURIComponent(sessionId);
-    const width = Math.min(window.screen.availWidth || 1440, 1600);
-    const height = Math.min(window.screen.availHeight || 900, 1000);
-    const examWindow = window.open(url, '_blank', 'popup=yes,width=' + width + ',height=' + height + ',left=20,top=20,resizable=yes,scrollbars=yes');
-    if (!examWindow) {
-      toast.info('Popup blocked. Opening the secure assessment in this tab.');
-      navigate('/student/exam/' + id + '?session=' + encodeURIComponent(sessionId));
-      return;
-    }
-    examWindow.focus();
+    navigate('/student/exam/' + id + '?session=' + encodeURIComponent(sessionId));
   };
 
   if (loading) {
@@ -335,12 +326,12 @@ export function AssessmentOpen() {
               onClick={openExam}
             >
               <Maximize size={18} />
-              <span>Launch Secure Exam Window</span>
+              <span>Start Secure Assessment</span>
               <ChevronRight size={18} />
             </button>
 
             <p className="cc-exam-popup-note">
-              Note: If your browser blocks pop-ups, please allow pop-ups for this domain, or the exam will open in the current tab.
+              Note: Fullscreen proctoring mode will be enabled once you begin. Ensure all work is saved and other tabs are closed.
             </p>
           </div>
         )}
